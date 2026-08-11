@@ -317,6 +317,58 @@ class CSVImporter {
         link.click();
         document.body.removeChild(link);
     }
+
+    /**
+     * Parse multiple Student CSV files
+     * @param {FileList|Array<File>} files 
+     * @returns {Promise<Array<Object>>}
+     */
+    async parseMultipleCSV(files) {
+        const fileList = Array.from(files);
+        let allStudents = [];
+        let errorMessages = [];
+
+        for (const file of fileList) {
+            try {
+                const students = await this.parseCSV(file);
+                allStudents = allStudents.concat(students);
+            } catch (err) {
+                errorMessages.push(`${file.name}: ${err.message}`);
+            }
+        }
+
+        if (allStudents.length === 0 && errorMessages.length > 0) {
+            throw new Error(`ไม่สามารถอ่านข้อมูลได้:\n${errorMessages.join('\n')}`);
+        }
+
+        return allStudents;
+    }
+
+    /**
+     * Parse multiple Teacher CSV files
+     * @param {FileList|Array<File>} files 
+     * @returns {Promise<Array<Object>>}
+     */
+    async parseMultipleTeacherCSV(files) {
+        const fileList = Array.from(files);
+        let allTeachers = [];
+        let errorMessages = [];
+
+        for (const file of fileList) {
+            try {
+                const teachers = await this.parseTeacherCSV(file);
+                allTeachers = allTeachers.concat(teachers);
+            } catch (err) {
+                errorMessages.push(`${file.name}: ${err.message}`);
+            }
+        }
+
+        if (allTeachers.length === 0 && errorMessages.length > 0) {
+            throw new Error(`ไม่สามารถอ่านข้อมูลได้:\n${errorMessages.join('\n')}`);
+        }
+
+        return allTeachers;
+    }
 }
 
 const csvImporter = new CSVImporter();

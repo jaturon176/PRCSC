@@ -90,7 +90,12 @@ class Application {
         if (csvInput) {
             csvInput.addEventListener('change', () => {
                 if (csvInput.files.length > 0 && csvFilename && csvFileDiv) {
-                    csvFilename.textContent = csvInput.files[0].name;
+                    if (csvInput.files.length === 1) {
+                        csvFilename.textContent = `เลือก 1 ไฟล์: ${csvInput.files[0].name}`;
+                    } else {
+                        const names = Array.from(csvInput.files).map(f => f.name).join(', ');
+                        csvFilename.textContent = `เลือกทั้งหมด ${csvInput.files.length} ไฟล์: ${names}`;
+                    }
                     csvFileDiv.style.display = 'flex';
                 }
             });
@@ -102,7 +107,12 @@ class Application {
         if (tchCsvInput) {
             tchCsvInput.addEventListener('change', () => {
                 if (tchCsvInput.files.length > 0 && tchFilename && tchFileDiv) {
-                    tchFilename.textContent = tchCsvInput.files[0].name;
+                    if (tchCsvInput.files.length === 1) {
+                        tchFilename.textContent = `เลือก 1 ไฟล์: ${tchCsvInput.files[0].name}`;
+                    } else {
+                        const names = Array.from(tchCsvInput.files).map(f => f.name).join(', ');
+                        tchFilename.textContent = `เลือกทั้งหมด ${tchCsvInput.files.length} ไฟล์: ${names}`;
+                    }
                     tchFileDiv.style.display = 'flex';
                 }
             });
@@ -302,15 +312,18 @@ class Application {
         document.getElementById('form-teacher-csv-import')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const fileInput = document.getElementById('teacher-csv-file-input');
-            if (fileInput.files.length === 0) {
+            if (!fileInput || fileInput.files.length === 0) {
                 this.showAlert('แจ้งเตือน', 'กรุณาเลือกไฟล์ CSV สำหรับนำเข้าข้อมูลครู', 'warning');
                 return;
             }
             try {
-                const parsed = await csvImporter.parseTeacherCSV(fileInput.files[0]);
+                const parsed = await csvImporter.parseMultipleTeacherCSV(fileInput.files);
                 await firebaseService.saveTeachersBatch(parsed);
                 this.closeModal('modal-teacher-csv-import');
-                this.showAlert('นำเข้าข้อมูลสำเร็จ 🎉', `นำเข้าข้อมูลครูสำเร็จจำนวน ${parsed.length} คน`, 'success');
+                const countMsg = fileInput.files.length > 1 
+                    ? `นำเข้าข้อมูลครูจาก ${fileInput.files.length} ไฟล์ สำเร็จรวมทั้งหมด ${parsed.length} คน 🎉`
+                    : `นำเข้าข้อมูลครูสำเร็จจำนวน ${parsed.length} คน 🎉`;
+                this.showAlert('นำเข้าข้อมูลสำเร็จ 🎉', countMsg, 'success');
             } catch (err) {
                 this.showAlert('เกิดข้อผิดพลาด', 'ไม่สามารถอ่านไฟล์ CSV ครูได้: ' + err.message, 'error');
             }
@@ -411,15 +424,18 @@ class Application {
         document.getElementById('form-csv-import')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const fileInput = document.getElementById('csv-file-input');
-            if (fileInput.files.length === 0) {
+            if (!fileInput || fileInput.files.length === 0) {
                 this.showAlert('แจ้งเตือน', 'กรุณาเลือกไฟล์ CSV สำหรับนำเข้า', 'warning');
                 return;
             }
             try {
-                const parsed = await csvImporter.parseCSV(fileInput.files[0]);
+                const parsed = await csvImporter.parseMultipleCSV(fileInput.files);
                 await firebaseService.saveStudentsBatch(parsed);
                 this.closeModal('modal-csv-import');
-                this.showAlert('นำเข้าข้อมูลสำเร็จ 🎉', `นำเข้าข้อมูลนักเรียนสำเร็จจำนวน ${parsed.length} คน`, 'success');
+                const countMsg = fileInput.files.length > 1 
+                    ? `นำเข้าข้อมูลนักเรียนจาก ${fileInput.files.length} ไฟล์ สำเร็จรวมทั้งหมด ${parsed.length} คน 🎉`
+                    : `นำเข้าข้อมูลนักเรียนสำเร็จจำนวน ${parsed.length} คน 🎉`;
+                this.showAlert('นำเข้าข้อมูลสำเร็จ 🎉', countMsg, 'success');
             } catch (err) {
                 this.showAlert('เกิดข้อผิดพลาด', 'ไม่สามารถอ่านไฟล์ CSV ได้: ' + err.message, 'error');
             }

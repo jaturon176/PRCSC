@@ -19,8 +19,8 @@
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Custom Design System v2.0 -->
-    <link rel="stylesheet" href="css/style.css?v=2.0">
+    <!-- Custom Design System v2.1 -->
+    <link rel="stylesheet" href="css/style.css?v=2.1">
 </head>
 <body>
     <!-- DEDICATED FULLSCREEN LOGIN PAGE (Matching User Reference Image Design) -->
@@ -795,10 +795,10 @@
                     </div>
                     <div class="drop-zone" id="student-csv-drop-zone" onclick="document.getElementById('csv-file-input').click()">
                         <div class="drop-zone-icon"><i class="ri-file-excel-2-line"></i></div>
-                        <div class="drop-zone-title">ลากไฟล์ CSV มาวางที่นี่</div>
-                        <div class="drop-zone-sub">หรือ <span>คลิกเพื่อเลือกไฟล์</span> จากเครื่องของคุณ</div>
-                        <div class="drop-zone-formats"><i class="ri-file-list-3-line"></i> รองรับเฉพาะไฟล์ .CSV เท่านั้น</div>
-                        <input type="file" id="csv-file-input" accept=".csv" required style="display: none;">
+                        <div class="drop-zone-title">ลากไฟล์ CSV มาวางที่นี่ (เลือกหลายไฟล์ได้)</div>
+                        <div class="drop-zone-sub">หรือ <span>คลิกเพื่อเลือกไฟล์</span> (สามารถเลือกได้หลายไฟล์พร้อมกัน)</div>
+                        <div class="drop-zone-formats"><i class="ri-file-list-3-line"></i> รองรับไฟล์ .CSV ทั้งแบบไฟล์เดียวและหลายไฟล์พร้อมกัน</div>
+                        <input type="file" id="csv-file-input" accept=".csv" multiple required style="display: none;">
                     </div>
                     <div id="student-csv-selected-file" style="display:none; margin-top:12px; padding:10px 14px; background:var(--indigo-50); border:1px solid var(--indigo-100); border-radius:10px; font-size:0.88rem; color:var(--indigo-700);">
                         <i class="ri-file-check-line"></i> <span id="student-csv-filename">ไม่มีไฟล์ที่เลือก</span>
@@ -1147,10 +1147,10 @@
                 <div class="modal-body">
                     <div class="drop-zone" id="teacher-csv-drop-zone" onclick="document.getElementById('teacher-csv-file-input').click()">
                         <div class="drop-zone-icon"><i class="ri-file-excel-2-line"></i></div>
-                        <div class="drop-zone-title">ลากไฟล์ CSV มาวางที่นี่</div>
-                        <div class="drop-zone-sub">หรือ <span>คลิกเพื่อเลือกไฟล์</span> จากเครื่องของคุณ</div>
-                        <div class="drop-zone-formats"><i class="ri-file-list-3-line"></i> รองรับเฉพาะไฟล์ .CSV เท่านั้น</div>
-                        <input type="file" id="teacher-csv-file-input" accept=".csv" required style="display: none;">
+                        <div class="drop-zone-title">ลากไฟล์ CSV มาวางที่นี่ (เลือกหลายไฟล์ได้)</div>
+                        <div class="drop-zone-sub">หรือ <span>คลิกเพื่อเลือกไฟล์</span> (สามารถเลือกได้หลายไฟล์พร้อมกัน)</div>
+                        <div class="drop-zone-formats"><i class="ri-file-list-3-line"></i> รองรับไฟล์ .CSV ทั้งแบบไฟล์เดียวและหลายไฟล์พร้อมกัน</div>
+                        <input type="file" id="teacher-csv-file-input" accept=".csv" multiple required style="display: none;">
                     </div>
                     <div id="teacher-csv-selected-file" style="display:none; margin-top:12px; padding:10px 14px; background:var(--indigo-50); border:1px solid var(--indigo-100); border-radius:10px; font-size:0.88rem; color:var(--indigo-700); display:flex; align-items:center; gap:8px;">
                         <i class="ri-file-check-line"></i> <span id="teacher-csv-filename">ไม่มีไฟล์ที่เลือก</span>
@@ -1221,12 +1221,12 @@
     </div>
 
     <!-- Load Application Scripts -->
-    <script src="js/config.js?v=2.0"></script>
-    <script src="js/firebase-service.js?v=2.0"></script>
-    <script src="js/cloudinary-service.js?v=2.0"></script>
-    <script src="js/pdf-generator.js?v=2.0"></script>
-    <script src="js/csv-importer.js?v=2.0"></script>
-    <script src="js/auth.js?v=2.0"></script>
-    <script src="js/app.js?v=2.0"></script>
+    <script src="js/config.js?v=2.1"></script>
+    <script src="js/firebase-service.js?v=2.1"></script>
+    <script src="js/cloudinary-service.js?v=2.1"></script>
+    <script src="js/pdf-generator.js?v=2.1"></script>
+    <script src="js/csv-importer.js?v=2.1"></script>
+    <script src="js/auth.js?v=2.1"></script>
+    <script src="js/app.js?v=2.1"></script>
 </body>
 </html>
