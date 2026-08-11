@@ -29,20 +29,47 @@ class FirebaseService {
         }
         if (online) {
             this.syncAllFromCloud();
+            this.initRealtimeSSE();
         }
     }
 
     initSync() {
-        // Initial Fetch from Cloud when online
         if (this.isOnline) {
             this.syncAllFromCloud();
+            this.initRealtimeSSE();
         }
-        // Poll Firebase REST endpoint every 3 seconds for zero-delay multi-device live sync
+        // Poll Firebase REST endpoint every 2 seconds for ultra-fast multi-user live sync
         this.syncInterval = setInterval(() => {
-            if (this.isOnline) {
+            if (this.isOnline && !this.isSavingBatch) {
                 this.syncAllFromCloud();
             }
-        }, 3000);
+        }, 2000);
+    }
+
+    initRealtimeSSE() {
+        if (!window.EventSource || !this.isOnline) return;
+        try {
+            if (this.eventSource) this.eventSource.close();
+            this.eventSource = new EventSource(`${this.baseUrl}.json`);
+            
+            this.eventSource.onmessage = (event) => {
+                if (this.isSavingBatch) return;
+                try {
+                    const messageData = JSON.parse(event.data);
+                    if (messageData) {
+                        this.syncAllFromCloud();
+                    }
+                } catch (e) {
+                    console.warn('[FirebaseService] SSE event parse error:', e);
+                }
+            };
+
+            this.eventSource.onerror = (err) => {
+                console.warn('[FirebaseService] Realtime SSE stream fallback to fast polling:', err);
+            };
+        } catch (e) {
+            console.warn('[FirebaseService] EventSource setup error:', e);
+        }
     }
 
     // --- Helper: LocalStorage Fast Cache (0ms) ---

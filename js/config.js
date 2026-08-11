@@ -4,8 +4,8 @@
  */
 
 const CONFIG = {
-    SYSTEM_VERSION: "1.3",
-    VERSION: "v1.3",
+    SYSTEM_VERSION: "1.5",
+    VERSION: "v1.5",
 
     // 1. Firebase Realtime Database Configuration
     FIREBASE: {

@@ -1316,26 +1316,11 @@ class Application {
 
     // --- Dynamic System Version Control ---
     getVersion() {
-        const stored = localStorage.getItem('prcare_app_version');
-        const codeVer = CONFIG.VERSION || (CONFIG.SYSTEM_VERSION ? `v${CONFIG.SYSTEM_VERSION}` : 'v1.3');
-        if (!stored) {
-            localStorage.setItem('prcare_app_version', codeVer);
-            return codeVer;
-        }
-        
-        const parseV = v => v.replace(/^v/i, '').split('.').map(n => parseInt(n) || 0);
-        const [codeMajor, codeMinor] = parseV(codeVer);
-        const [storedMajor, storedMinor] = parseV(stored);
-
-        if (codeMajor > storedMajor || (codeMajor === storedMajor && codeMinor > storedMinor)) {
-            localStorage.setItem('prcare_app_version', codeVer);
-            return codeVer;
-        }
-        return stored;
+        return CONFIG.VERSION || (CONFIG.SYSTEM_VERSION ? `v${CONFIG.SYSTEM_VERSION}` : 'v1.4');
     }
 
     setVersion(newVer) {
-        localStorage.setItem('prcare_app_version', newVer);
+        CONFIG.VERSION = newVer;
         this.updateVersionUI();
     }
 
