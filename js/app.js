@@ -1244,7 +1244,7 @@ class Application {
 
         tbody.innerHTML = '';
         if (offenses.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#64748b;">ไม่มีประวัติการกระทำความผิด</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding: 24px;">ไม่มีประวัติการกระทำความผิด</td></tr>';
             return;
         }
 
@@ -1252,15 +1252,23 @@ class Application {
             const levelBadgeClass = `badge-${off.level}`;
             const levelLabel = off.level === 'severe' ? 'ร้ายแรง' : (off.level === 'moderate' ? 'ปานกลาง' : 'เบา');
 
+            const escapedName = (off.studentName || 'นักเรียน').replace(/'/g, "\\'");
+            const imageTdHtml = off.imageUrl 
+                ? `<div style="display:flex; align-items:center; gap:8px;">
+                     <img src="${off.imageUrl}" alt="หลักฐาน" style="width:40px; height:40px; border-radius:8px; object-fit:cover; border:1px solid var(--border-light); cursor:pointer; box-shadow: var(--shadow-sm);" onclick="app.previewImage('${off.imageUrl}', '${escapedName}')" title="คลิกเพื่อขยายดูรูปภาพ">
+                     <button class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 0.78rem;" onclick="app.previewImage('${off.imageUrl}', '${escapedName}')"><i class="ri-search-eye-line"></i> ดูรูป</button>
+                   </div>`
+                : `<span class="text-dim text-sm"><i class="ri-image-off-line"></i> ไม่มีรูป</span>`;
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong>${off.studentName}</strong> <br><small style="color:#64748b;">${off.gradeRoom}</small></td>
+                <td><strong>${off.studentName}</strong> <br><small style="color:var(--text-muted);">${off.gradeRoom || ''}</small></td>
                 <td><span class="badge ${levelBadgeClass}">${levelLabel}</span></td>
                 <td>${off.category}</td>
-                <td>${off.incidentDate}</td>
-                <td>${off.imageUrl ? '<i class="ri-image-line" style="color:#38bdf8;"></i> มีรูปหลักฐาน' : 'ไม่มีรูป'}</td>
+                <td>${off.incidentDate || '-'}</td>
+                <td>${imageTdHtml}</td>
                 <td>
-                    <button class="btn btn-primary btn-sm" onclick="app.downloadOffensePDF('${off.id}')"><i class="ri-file-pdf-line"></i> รายงาน PDF</button>
+                    <button class="btn btn-primary btn-sm" onclick="app.downloadOffensePDF('${off.id}')"><i class="ri-printer-line"></i> พิมพ์รายงาน / PDF</button>
                     <button class="btn btn-danger btn-sm teacher-only" onclick="app.deleteOffense('${off.id}')"><i class="ri-delete-bin-line"></i> ลบ</button>
                 </td>
             `;
@@ -1268,6 +1276,27 @@ class Application {
         });
 
         authManager.applyUIPermissions();
+    }
+
+    previewImage(url, title = 'รูปภาพหลักฐาน') {
+        if (!url) return;
+        if (window.Swal) {
+            Swal.fire({
+                title: `📷 รูปภาพหลักฐาน: ${title}`,
+                imageUrl: url,
+                imageAlt: title,
+                imageWidth: 640,
+                imageHeight: 'auto',
+                showCloseButton: true,
+                confirmButtonText: '<i class="ri-check-line"></i> ปิดหน้าต่าง',
+                confirmButtonColor: '#4f46e5',
+                customClass: {
+                    popup: 'swal2-popup'
+                }
+            });
+        } else {
+            window.open(url, '_blank');
+        }
     }
 
     async deleteOffense(id) {
@@ -1279,7 +1308,7 @@ class Application {
         });
         if (confirmed) {
             await firebaseService.deleteOffense(id);
-            alert('ลบรายการสำเร็จ');
+            this.showToast('ลบรายการสำเร็จ', 'success');
         }
     }
 
@@ -1289,7 +1318,9 @@ class Application {
         if (offense) {
             const students = firebaseService.getStudents();
             const student = students.find(s => s.studentId === offense.studentId || s.id === offense.studentId);
-            await pdfGenerator.generateOffenseReport(offense, student);
+            pdfGenerator.generateOffenseReport(offense, student);
+        } else {
+            this.showAlert('ไม่พบข้อมูล', 'ไม่พบข้อมูลรายการกระทำความผิดที่เลือก', 'error');
         }
     }
 

@@ -1,180 +1,244 @@
 /**
  * ระบบดูแลช่วยเหลือนักเรียน - PDF Report Generator
- * Generates official Thai discipline & offense reports using jsPDF
+ * Generates official Thai discipline & offense reports with browser print / PDF download
  */
 
 class PDFGenerator {
-    constructor() {
-        // Uses jsPDF standard library from CDN
-    }
+    constructor() {}
 
     /**
      * Download or Print Offense Incident PDF Report
      * @param {Object} offense 
      * @param {Object} student 
      */
-    async generateOffenseReport(offense, student) {
-        if (!window.jspdf) {
-            alert('กำลังโหลดคลังพัฒนา PDF กรุณาลองใหม่อีกครั้งใน 2 วินาที');
+    generateOffenseReport(offense, student) {
+        if (!offense) return;
+
+        const studentName = student ? `${student.prefix || ''}${student.fullName}` : (offense.studentName || '-');
+        const studentId = student ? student.studentId : (offense.studentId || '-');
+        const gradeRoom = student ? `${student.grade}/${student.room}` : (offense.gradeRoom || '-');
+        const numberStr = student ? student.number : (offense.studentNumber || '-');
+        const advisors = student ? (student.advisors || '-') : (offense.advisors || '-');
+        const levelLabel = offense.level === 'severe' ? 'ร้ายแรง' : (offense.level === 'moderate' ? 'ปานกลาง' : 'เบา');
+        const levelClass = offense.level === 'severe' ? 'badge-severe' : (offense.level === 'moderate' ? 'badge-moderate' : 'badge-minor');
+        
+        let formattedDate = '-';
+        if (offense.incidentDate) {
+            try {
+                formattedDate = new Date(offense.incidentDate).toLocaleDateString('th-TH', {
+                    year: 'numeric', month: 'long', day: 'numeric'
+                });
+            } catch (e) {
+                formattedDate = offense.incidentDate;
+            }
+        }
+
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            alert('เบราว์เซอร์บล็อกหน้าต่าง Pop-up กรุณายกเลิกการบล็อกและลองใหม่อีกครั้ง');
             return;
         }
 
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({
-            orientation: 'p',
-            unit: 'mm',
-            format: 'a4'
-        });
-
-        const studentName = student ? `${student.prefix || ''}${student.fullName}` : offense.studentName;
-        const studentId = student ? student.studentId : offense.studentId;
-        const gradeRoom = student ? `${student.grade}/${student.room}` : offense.gradeRoom;
-        const numberStr = student ? student.number : (offense.studentNumber || '-');
-
-        // Document Colors
-        const primaryColor = [15, 23, 42]; // Slate 900
-        const accentColor = [225, 29, 72]; // Rose 600
-
-        // --- Header ---
-        doc.setFillColor(15, 23, 42);
-        doc.rect(0, 0, 210, 24, 'F');
-
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(16);
-        doc.text('แบบบันทึกพฤติกรรมและการกระทำความผิดของนักเรียน', 105, 12, { align: 'center' });
-        doc.setFontSize(10);
-        doc.text('งานกิจการนักเรียน โรงเรียนพนมดงรักวิทยา - ระบบดูแลช่วยเหลือนักเรียน', 105, 18, { align: 'center' });
-
-        // --- Section 1: Student Information Box ---
-        doc.setLineWidth(0.5);
-        doc.setDrawColor(203, 213, 225);
-        doc.setFillColor(248, 250, 252);
-        doc.roundedRect(15, 30, 180, 32, 2, 2, 'FD');
-
-        doc.setTextColor(15, 23, 42);
-        doc.setFontSize(11);
-        doc.text('ข้อมูลนักเรียนผู้กระทำความผิด', 20, 38);
-
-        doc.setFontSize(10);
-        doc.setTextColor(51, 65, 85);
-        doc.text(`ชื่อ-นามสกุล: ${studentName}`, 20, 46);
-        doc.text(`เลขประจำตัว: ${studentId}`, 115, 46);
-        doc.text(`ระดับชั้น/ห้อง: ${gradeRoom}`, 20, 54);
-        doc.text(`เลขที่: ${numberStr}`, 115, 54);
-
-        // --- Section 2: Offense Incident Details ---
-        doc.setFontSize(11);
-        doc.setTextColor(15, 23, 42);
-        doc.text('รายละเอียดการกระทำความผิด', 15, 70);
-
-        const offenseLevelTH = offense.level === 'severe' ? 'ร้ายแรง' : (offense.level === 'moderate' ? 'ปานกลาง' : 'เบา');
-        const formattedDate = offense.incidentDate ? new Date(offense.incidentDate).toLocaleDateString('th-TH', {
-            year: 'numeric', month: 'long', day: 'numeric'
-        }) : '-';
-
-        const incidentData = [
-            ['วันที่เกิดเหตุ:', formattedDate, 'ระดับความผิด:', offenseLevelTH],
-            ['สถานที่เกิดเหตุ:', offense.location || 'ภายในโรงเรียน', 'ครูผู้บันทึก:', offense.recordedBy || 'ครูกิจการนักเรียน'],
-            ['หมวดหมู่ความผิด:', offense.category || 'พฤติกรรมไม่พึงประสงค์', 'สถานะการส่งต่อ:', offense.referralType ? (offense.referralType === 'internal' ? 'ส่งต่อภายใน' : 'ส่งต่อภายนอก') : 'ไม่มี']
-        ];
-
-        if (doc.autoTable) {
-            doc.autoTable({
-                startY: 73,
-                margin: { left: 15, right: 15 },
-                body: incidentData,
-                theme: 'plain',
-                styles: { fontSize: 9, cellPadding: 2, textColor: [51, 65, 85] },
-                columnStyles: {
-                    0: { fontStyle: 'bold', width: 30 },
-                    1: { width: 60 },
-                    2: { fontStyle: 'bold', width: 30 },
-                    3: { width: 60 }
-                }
-            });
+        const htmlContent = `
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>รายงานการกระทำความผิด - ${studentName}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        @page { size: A4 portrait; margin: 12mm; }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Sarabun', 'Prompt', sans-serif;
+            font-size: 14pt;
+            line-height: 1.5;
+            color: #1e1b4b;
+            margin: 0; padding: 24px;
+            background: #fff;
         }
-
-        let currentY = doc.lastAutoTable ? doc.lastAutoTable.previous.finalY + 6 : 100;
-
-        // Details Text Block
-        doc.setFillColor(255, 255, 255);
-        doc.setDrawColor(226, 232, 240);
-        doc.roundedRect(15, currentY, 180, 24, 1, 1, 'D');
-
-        doc.setFontSize(10);
-        doc.setTextColor(15, 23, 42);
-        doc.text('พฤติกรรม/ข้อเท็จจริงการกระทำผิด:', 18, currentY + 6);
-
-        doc.setFontSize(9.5);
-        doc.setTextColor(71, 85, 105);
-        const splitDescription = doc.splitTextToSize(offense.description || 'ไม่มีรายละเอียดเพิ่มเติม', 170);
-        doc.text(splitDescription, 18, currentY + 12);
-
-        currentY += 30;
-
-        // Corrective Action / Disciplinary Measures
-        doc.setFontSize(10);
-        doc.setTextColor(15, 23, 42);
-        doc.text('มาตรการแก้ไข/การปรับปรุงพฤติกรรม:', 15, currentY);
-        doc.setFontSize(9.5);
-        doc.setTextColor(71, 85, 105);
-        const splitPenalty = doc.splitTextToSize(offense.actionTaken || 'ว่ากล่าวตักเตือน และบันทึกประวัติพฤติกรรม', 15, currentY + 6);
-        doc.text(splitPenalty, 15, currentY + 6);
-
-        currentY += 18;
-
-        // --- Section 3: Photo Evidence (if available) ---
-        if (offense.imageUrl) {
-            try {
-                doc.setFontSize(10);
-                doc.setTextColor(15, 23, 42);
-                doc.text('รูปภาพหลักฐานการกระทำผิด (Evidence Photo):', 15, currentY);
-                
-                // Draw Image Frame
-                doc.setDrawColor(203, 213, 225);
-                doc.rect(15, currentY + 3, 70, 45, 'D');
-                
-                // Embed Base64 or Loaded Image
-                doc.addImage(offense.imageUrl, 'JPEG', 16, currentY + 4, 68, 43);
-                currentY += 52;
-            } catch (err) {
-                console.warn('[PDFGenerator] Could not render image in PDF:', err);
-                currentY += 8;
-            }
-        } else {
-            currentY += 5;
+        .no-print-bar {
+            background: #1e1b4b;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(30,27,75,0.15);
         }
-
-        // --- Section 4: Signature Blocks ---
-        if (currentY > 230) {
-            doc.addPage();
-            currentY = 25;
+        .btn-print {
+            padding: 10px 22px;
+            background: #f59e0b;
+            color: #1e1b4b;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(245,158,11,0.3);
+            transition: all 0.2s ease;
         }
+        .btn-print:hover { background: #fbbf24; transform: translateY(-1px); }
+        .header {
+            text-align: center;
+            border-bottom: 3px double #312e81;
+            padding-bottom: 14px;
+            margin-bottom: 22px;
+        }
+        .header h1 { margin: 0; font-size: 20pt; color: #1e1b4b; font-family: 'Prompt', sans-serif; font-weight: 700; }
+        .header h3 { margin: 5px 0 0; font-size: 14pt; color: #4338ca; font-weight: 600; }
+        .box {
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 16px 20px;
+            background: #f8fafc;
+            margin-bottom: 18px;
+        }
+        .box-title {
+            font-weight: 700;
+            color: #1e1b4b;
+            margin-bottom: 10px;
+            font-family: 'Prompt', sans-serif;
+            font-size: 13pt;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 6px;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        td { padding: 6px 8px; vertical-align: top; }
+        .label { font-weight: 700; width: 130px; color: #334155; }
+        .badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 12pt;
+            font-weight: 700;
+        }
+        .badge-severe   { background: #ffe4e6; color: #be123c; border: 1px solid #fecdd3; }
+        .badge-moderate { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .badge-minor    { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+        .img-evidence-container {
+            margin-top: 14px;
+            text-align: center;
+            background: #fff;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        .img-evidence {
+            max-width: 100%;
+            max-height: 280px;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+        .signatures {
+            margin-top: 48px;
+            display: flex;
+            justify-content: space-between;
+            page-break-inside: avoid;
+        }
+        .sig-box { text-align: center; width: 45%; }
+        .sig-line { margin-top: 36px; border-top: 1px dotted #64748b; padding-top: 6px; }
+        @media print {
+            .no-print-bar { display: none !important; }
+            body { padding: 0; margin: 0; }
+            .box { background: #fff; border-color: #94a3b8; }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print-bar">
+        <div><strong>🖨️ ระบบพิมพ์รายงานพฤติกรรม</strong> — กดปุ่มขวามือเพื่อพิมพ์เอกสาร หรือ บันทึกเป็น PDF</div>
+        <button class="btn-print" onclick="window.print()">🖨️ พิมพ์เอกสาร / บันทึก PDF</button>
+    </div>
 
-        doc.setLineWidth(0.3);
-        doc.setDrawColor(148, 163, 184);
+    <div class="header">
+        <h1>แบบบันทึกพฤติกรรมและการกระทำความผิดของนักเรียน</h1>
+        <h3>งานกิจการนักเรียน โรงเรียนพนมดงรักวิทยา — ระบบดูแลช่วยเหลือนักเรียน (PR Care+)</h3>
+    </div>
 
-        // Signature 1: Recording Teacher
-        doc.line(20, currentY + 25, 75, currentY + 25);
-        doc.setFontSize(9);
-        doc.setTextColor(71, 85, 105);
-        doc.text('(......................................................)', 47.5, currentY + 30, { align: 'center' });
-        doc.text('ตำแหน่ง ครูผู้บันทึก / ครูกิจการนักเรียน', 47.5, currentY + 35, { align: 'center' });
+    <div class="box">
+        <div class="box-title">👤 ข้อมูลนักเรียนผู้กระทำความผิด</div>
+        <table>
+            <tr>
+                <td class="label">ชื่อ - นามสกุล:</td>
+                <td><strong>${studentName}</strong></td>
+                <td class="label">รหัสประจำตัว:</td>
+                <td>${studentId}</td>
+            </tr>
+            <tr>
+                <td class="label">ระดับชั้น/ห้อง:</td>
+                <td>${gradeRoom}</td>
+                <td class="label">เลขที่:</td>
+                <td>${numberStr}</td>
+            </tr>
+            <tr>
+                <td class="label">ครูที่ปรึกษา:</td>
+                <td colspan="3">${advisors}</td>
+            </tr>
+        </table>
+    </div>
 
-        // Signature 2: Student
-        doc.line(135, currentY + 25, 190, currentY + 25);
-        doc.text('(......................................................)', 162.5, currentY + 30, { align: 'center' });
-        doc.text('ลายมือชื่อ นักเรียนผู้กระทำความผิด', 162.5, currentY + 35, { align: 'center' });
+    <div class="box">
+        <div class="box-title">🚨 รายละเอียดเหตุการณ์การกระทำความผิด</div>
+        <table>
+            <tr>
+                <td class="label">วันที่เกิดเหตุ:</td>
+                <td>${formattedDate}</td>
+                <td class="label">ระดับความผิด:</td>
+                <td><span class="badge ${levelClass}">${levelLabel}</span></td>
+            </tr>
+            <tr>
+                <td class="label">หมวดหมู่ความผิด:</td>
+                <td>${offense.category || '-'}</td>
+                <td class="label">การส่งต่อ:</td>
+                <td>${offense.referralType === 'internal' ? 'ส่งต่อภายใน (ครูแนะแนว/ฝ่ายปกครอง)' : (offense.referralType === 'external' ? 'ส่งต่อภายนอก' : 'ไม่มี')}</td>
+            </tr>
+            <tr>
+                <td class="label">รายละเอียดเหตุการณ์:</td>
+                <td colspan="3">${offense.details || offense.description || offense.category || '-'}</td>
+            </tr>
+        </table>
+        ${offense.imageUrl ? `
+            <div class="img-evidence-container">
+                <div style="font-weight: 700; margin-bottom: 6px; font-size: 11pt; color: #475569;">📷 ภาพถ่ายหลักฐานประกอบการบันทึก:</div>
+                <img src="${offense.imageUrl}" class="img-evidence" alt="รูปหลักฐาน">
+            </div>
+        ` : ''}
+    </div>
 
-        // Signature 3: Head of Student Affairs / Principal
-        currentY += 45;
-        doc.line(77.5, currentY + 15, 132.5, currentY + 15);
-        doc.text('(......................................................)', 105, currentY + 20, { align: 'center' });
-        doc.text('หัวหน้าฝ่ายกิจการนักเรียน / ผู้อำนวยการ', 105, currentY + 25, { align: 'center' });
+    <div class="box">
+        <div class="box-title">📋 มาตรการแก้ไขและปรับเปลี่ยนพฤติกรรม</div>
+        <p style="margin: 4px 0 0;">${offense.actionTaken || 'ว่ากล่าวตักเตือน บันทึกประวัติพฤติกรรมในระบบ PR Care+ และแจ้งครูที่ปรึกษาร่วมกำกับดูแล'}</p>
+    </div>
 
-        // Save PDF file
-        const safeName = (studentName || 'student').replace(/[^a-zA-Z0-9ก-๙]/g, '_');
-        doc.save(`รายงานพฤติกรรม_${safeName}_${studentId}.pdf`);
+    <div class="signatures">
+        <div class="sig-box">
+            <div class="sig-line">ลงชื่อ..........................................................</div>
+            <div>(${offense.recordedBy || 'ครูผู้บันทึก/ครูกิจการนักเรียน'})</div>
+            <div>ผู้บันทึกข้อมูล</div>
+        </div>
+        <div class="sig-box">
+            <div class="sig-line">ลงชื่อ..........................................................</div>
+            <div>(นายจาตุรน ศรีละพันธ์)</div>
+            <div>หัวหน้างานกิจการนักเรียน / ครูที่ปรึกษา</div>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            setTimeout(function() { window.print(); }, 500);
+        };
+    </script>
+</body>
+</html>
+        `;
+
+        printWindow.document.open();
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
     }
 }
 
