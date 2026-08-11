@@ -158,12 +158,12 @@ class FirebaseService {
         if (this.isSavingBatch) return;
 
         const collections = [
-            { key: CONFIG.STORAGE_KEYS.STUDENTS, endpoint: CONFIG.FIREBASE.ENDPOINTS.STUDENTS, event: 'studentsUpdated', clearFlag: 'prcare_seed_cleared_students' },
-            { key: CONFIG.STORAGE_KEYS.TEACHERS, endpoint: CONFIG.FIREBASE.ENDPOINTS.TEACHERS, event: 'teachersUpdated', clearFlag: 'prcare_seed_cleared_teachers' },
+            { key: CONFIG.STORAGE_KEYS.STUDENTS, endpoint: CONFIG.FIREBASE.ENDPOINTS.STUDENTS, event: 'studentsUpdated' },
+            { key: CONFIG.STORAGE_KEYS.TEACHERS, endpoint: CONFIG.FIREBASE.ENDPOINTS.TEACHERS, event: 'teachersUpdated' },
             { key: CONFIG.STORAGE_KEYS.USERS, endpoint: CONFIG.FIREBASE.ENDPOINTS.USERS, event: 'usersUpdated' },
             { key: CONFIG.STORAGE_KEYS.SCREENINGS, endpoint: CONFIG.FIREBASE.ENDPOINTS.SCREENINGS, event: 'screeningsUpdated' },
             { key: CONFIG.STORAGE_KEYS.MERITS, endpoint: CONFIG.FIREBASE.ENDPOINTS.MERITS, event: 'meritsUpdated' },
-            { key: CONFIG.STORAGE_KEYS.OFFENSES, endpoint: CONFIG.FIREBASE.ENDPOINTS.OFFENSES, event: 'offensesUpdated', clearFlag: 'prcare_seed_cleared_offenses' },
+            { key: CONFIG.STORAGE_KEYS.OFFENSES, endpoint: CONFIG.FIREBASE.ENDPOINTS.OFFENSES, event: 'offensesUpdated' },
             { key: CONFIG.STORAGE_KEYS.REFERRALS, endpoint: CONFIG.FIREBASE.ENDPOINTS.REFERRALS, event: 'referralsUpdated' },
             { key: CONFIG.STORAGE_KEYS.ACTIVITIES, endpoint: CONFIG.FIREBASE.ENDPOINTS.ACTIVITIES, event: 'activitiesUpdated' }
         ];
@@ -189,15 +189,13 @@ class FirebaseService {
                     window.dispatchEvent(new CustomEvent(item.event, { detail: itemsList }));
                 }
             } else if ((cloudData === null || (typeof cloudData === 'object' && Object.keys(cloudData).length === 0)) && currentCache.length > 0) {
-                // If cloud is empty but local cache has newly imported items, sync local cache UP to cloud!
-                if (!item.clearFlag || localStorage.getItem(item.clearFlag) !== 'true') {
-                    const cloudObject = {};
-                    currentCache.forEach(it => {
-                        const idKey = it.id || it.studentId || ('ITEM_' + Date.now());
-                        cloudObject[idKey] = it;
-                    });
-                    await this.cloudPut(item.endpoint, cloudObject);
-                }
+                // Cloud is empty but local device has newly added items -> Sync local items UP to cloud!
+                const cloudObject = {};
+                currentCache.forEach(it => {
+                    const idKey = it.id || it.studentId || ('ITEM_' + Date.now());
+                    cloudObject[idKey] = it;
+                });
+                await this.cloudPut(item.endpoint, cloudObject);
             }
         }
     }
@@ -563,7 +561,7 @@ class FirebaseService {
     async saveOffense(offense) {
         const offenses = this.getOffenses();
         if (!offense.id) {
-            offense.id = 'OFF_' + Date.now();
+            offense.id = 'OFF_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
             offense.createdAt = new Date().toISOString();
         }
         offense.updatedAt = new Date().toISOString();
@@ -576,7 +574,9 @@ class FirebaseService {
         window.dispatchEvent(new CustomEvent('offensesUpdated', { detail: offenses }));
 
         if (this.isOnline) {
-            await this.cloudPut(`${CONFIG.FIREBASE.ENDPOINTS.OFFENSES}/${offense.id}`, offense);
+            const cloudObject = {};
+            offenses.forEach(o => { cloudObject[o.id] = o; });
+            await this.cloudPut(CONFIG.FIREBASE.ENDPOINTS.OFFENSES, cloudObject);
         }
         return offense;
     }
@@ -589,7 +589,9 @@ class FirebaseService {
         window.dispatchEvent(new CustomEvent('offensesUpdated', { detail: offenses }));
 
         if (this.isOnline) {
-            await this.cloudDelete(`${CONFIG.FIREBASE.ENDPOINTS.OFFENSES}/${offenseId}`);
+            const cloudObject = {};
+            offenses.forEach(o => { cloudObject[o.id] = o; });
+            await this.cloudPut(CONFIG.FIREBASE.ENDPOINTS.OFFENSES, cloudObject);
         }
         return true;
     }
