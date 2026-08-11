@@ -300,6 +300,37 @@ class FirebaseService {
         }
     }
 
+    async deleteStudentsByGradeRoom(grade, room) {
+        this.isSavingBatch = true;
+        try {
+            let students = this.getStudents();
+            const targetStudents = students.filter(s => {
+                const matchGrade = !grade || grade === 'ALL' || s.grade === grade || (s.grade && s.grade.startsWith(grade));
+                const matchRoom = !room || room === 'ALL' || s.room === room || s.room === `ห้อง ${room}`;
+                return matchGrade && matchRoom;
+            });
+
+            if (targetStudents.length === 0) {
+                return 0;
+            }
+
+            const targetIds = new Set(targetStudents.map(s => s.id));
+            students = students.filter(s => !targetIds.has(s.id));
+
+            this.setCache(CONFIG.STORAGE_KEYS.STUDENTS, students);
+            window.dispatchEvent(new CustomEvent('studentsUpdated', { detail: students }));
+
+            if (this.isOnline) {
+                for (const s of targetStudents) {
+                    await this.cloudDelete(`${CONFIG.FIREBASE.ENDPOINTS.STUDENTS}/${s.id}`);
+                }
+            }
+            return targetStudents.length;
+        } finally {
+            this.isSavingBatch = false;
+        }
+    }
+
     // 1.5 Teachers
     getTeachers() {
         return this.getCache(CONFIG.STORAGE_KEYS.TEACHERS) || [];

@@ -123,7 +123,7 @@
             </ul>
 
             <div style="padding: 18px 14px; font-size: 1rem; color: #ffffff; font-weight: 600; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.2); letter-spacing: 0.3px; text-shadow: 0 1px 4px rgba(0,0,0,0.3);">
-                © 2026 PR-Care+ Developed by Krunoii <span id="app-sidebar-version">v1.6</span>
+                © 2026 PR-Care+ Developed by Krunoii <span id="app-sidebar-version">v1.7</span>
             </div>
         </aside>
 
@@ -795,6 +795,60 @@
         </div>
     </div>
 
+    <!-- Modal: Delete Students Scope Selection -->
+    <div class="modal-overlay" id="modal-delete-student-scope">
+        <div class="modal-content" style="max-width: 520px;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #e11d48, #be123c); color: white;">
+                <h3 style="color: white;"><i class="ri-delete-bin-7-line"></i> เลือกลบข้อมูลนักเรียน</h3>
+                <button class="btn-close" style="color: white;" onclick="app.closeModal('modal-delete-student-scope')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.95rem; color: #475569; margin-bottom: 16px;">
+                    โปรดเลือกระดับชั้นและห้องเรียนที่ต้องการลบข้อมูล หรือเลือกลบนักเรียนทั้งหมดในระบบ:
+                </p>
+
+                <div class="form-group">
+                    <label class="form-label" style="font-weight: 600;">เลือกระดับชั้น</label>
+                    <select class="form-select" id="del-scope-grade">
+                        <option value="ALL">-- ทุกระดับชั้น --</option>
+                        <option value="ม.1">มัธยมศึกษาปีที่ 1 (ม.1)</option>
+                        <option value="ม.2">มัธยมศึกษาปีที่ 2 (ม.2)</option>
+                        <option value="ม.3">มัธยมศึกษาปีที่ 3 (ม.3)</option>
+                        <option value="ม.4">มัธยมศึกษาปีที่ 4 (ม.4)</option>
+                        <option value="ม.5">มัธยมศึกษาปีที่ 5 (ม.5)</option>
+                        <option value="ม.6">มัธยมศึกษาปีที่ 6 (ม.6)</option>
+                        <option value="ปวช.1">ปวช.1</option>
+                        <option value="ปวช.2">ปวช.2</option>
+                        <option value="ปวช.3">ปวช.3</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" style="font-weight: 600;">เลือกห้องเรียน</label>
+                    <select class="form-select" id="del-scope-room">
+                        <option value="ALL">-- ทุกห้องเรียน --</option>
+                        <option value="1">ห้อง 1</option>
+                        <option value="2">ห้อง 2</option>
+                        <option value="3">ห้อง 3</option>
+                        <option value="4">ห้อง 4</option>
+                        <option value="5">ห้อง 5</option>
+                        <option value="6">ห้อง 6</option>
+                        <option value="7">ห้อง 7</option>
+                        <option value="8">ห้อง 8</option>
+                    </select>
+                </div>
+
+                <div id="del-scope-summary-badge" style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 8px; padding: 12px; font-size: 0.9rem; color: #be123c; margin-top: 12px; font-weight: 500;">
+                    <i class="ri-information-line"></i> จะทำการลบ: <strong id="del-scope-target-text">นักเรียนทั้งหมดในระบบ</strong>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="app.closeModal('modal-delete-student-scope')">ยกเลิก</button>
+                <button type="button" class="btn btn-danger" id="btn-confirm-delete-student-scope"><i class="ri-delete-bin-line"></i> ยืนยันการลบข้อมูล</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal 4: Screening Form -->
     <div class="modal-overlay" id="modal-screening">
         <div class="modal-content">
@@ -1145,12 +1199,12 @@
     </div>
 
     <!-- Load Application Scripts -->
-    <script src="js/config.js?v=1.6"></script>
-    <script src="js/firebase-service.js?v=1.6"></script>
-    <script src="js/cloudinary-service.js?v=1.6"></script>
-    <script src="js/pdf-generator.js?v=1.6"></script>
-    <script src="js/csv-importer.js?v=1.6"></script>
-    <script src="js/auth.js?v=1.6"></script>
-    <script src="js/app.js?v=1.6"></script>
+    <script src="js/config.js?v=1.7"></script>
+    <script src="js/firebase-service.js?v=1.7"></script>
+    <script src="js/cloudinary-service.js?v=1.7"></script>
+    <script src="js/pdf-generator.js?v=1.7"></script>
+    <script src="js/csv-importer.js?v=1.7"></script>
+    <script src="js/auth.js?v=1.7"></script>
+    <script src="js/app.js?v=1.7"></script>
 </body>
 </html>

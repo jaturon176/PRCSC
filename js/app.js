@@ -315,21 +315,13 @@ class Application {
         });
 
         // Delete All Handlers
-        document.getElementById('btn-delete-all-students')?.addEventListener('click', async () => {
-            const students = firebaseService.getStudents();
-            const confirmed = await this.confirmDialog({
-                title: '⚠️ ยืนยันการลบข้อมูลนักเรียนทั้งหมด',
-                message: `คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนักเรียนทั้งหมดในระบบ (${students.length} รายการ)? การดำเนินการนี้จะไม่สามารถย้อนกลับได้`,
-                type: 'danger',
-                confirmText: 'ลบข้อมูลนักเรียนทั้งหมด',
-                cancelText: 'ยกเลิก'
-            });
-            if (confirmed) {
-                localStorage.setItem('prcare_seed_cleared_students', 'true');
-                await firebaseService.deleteAllStudents();
-                alert('ลบข้อมูลนักเรียนทั้งหมดเรียบร้อยแล้ว');
-            }
+        document.getElementById('btn-delete-all-students')?.addEventListener('click', () => {
+            this.openDeleteStudentScopeModal();
         });
+
+        document.getElementById('del-scope-grade')?.addEventListener('change', () => this.updateDeleteScopeSummary());
+        document.getElementById('del-scope-room')?.addEventListener('change', () => this.updateDeleteScopeSummary());
+        document.getElementById('btn-confirm-delete-student-scope')?.addEventListener('click', () => this.confirmDeleteStudentScope());
 
         document.getElementById('btn-delete-all-teachers')?.addEventListener('click', async () => {
             const teachers = firebaseService.getTeachers();
@@ -923,6 +915,89 @@ class Application {
         if (confirmed) {
             await firebaseService.deleteStudent(id);
             alert('ลบข้อมูลนักเรียนสำเร็จ');
+        }
+    }
+
+    openDeleteStudentScopeModal() {
+        const currentGrade = document.getElementById('student-grade-filter')?.value || 'ALL';
+        const currentRoom = document.getElementById('student-room-filter')?.value || 'ALL';
+
+        const gradeSelect = document.getElementById('del-scope-grade');
+        const roomSelect = document.getElementById('del-scope-room');
+
+        if (gradeSelect) gradeSelect.value = currentGrade || 'ALL';
+        if (roomSelect) roomSelect.value = currentRoom || 'ALL';
+
+        this.updateDeleteScopeSummary();
+        this.openModal('modal-delete-student-scope');
+    }
+
+    updateDeleteScopeSummary() {
+        const grade = document.getElementById('del-scope-grade')?.value || 'ALL';
+        const room = document.getElementById('del-scope-room')?.value || 'ALL';
+        const summaryText = document.getElementById('del-scope-target-text');
+
+        const students = firebaseService.getStudents();
+        const targets = students.filter(s => {
+            const matchG = grade === 'ALL' || s.grade === grade || (s.grade && s.grade.startsWith(grade));
+            const matchR = room === 'ALL' || s.room === room || s.room === `ห้อง ${room}`;
+            return matchG && matchR;
+        });
+
+        let targetDesc = '';
+        if (grade === 'ALL' && room === 'ALL') {
+            targetDesc = `นักเรียนทั้งหมดในระบบ (${targets.length} รายการ)`;
+        } else if (grade !== 'ALL' && room === 'ALL') {
+            targetDesc = `นักเรียนระดับชั้น ${grade} ทุกห้อง (${targets.length} รายการ)`;
+        } else if (grade === 'ALL' && room !== 'ALL') {
+            targetDesc = `นักเรียนห้อง ${room} ทุกระดับชั้น (${targets.length} รายการ)`;
+        } else {
+            targetDesc = `นักเรียนเฉพาะห้อง ${grade}/${room} (${targets.length} รายการ)`;
+        }
+
+        if (summaryText) summaryText.textContent = targetDesc;
+    }
+
+    async confirmDeleteStudentScope() {
+        const grade = document.getElementById('del-scope-grade')?.value || 'ALL';
+        const room = document.getElementById('del-scope-room')?.value || 'ALL';
+
+        const students = firebaseService.getStudents();
+        const targets = students.filter(s => {
+            const matchG = grade === 'ALL' || s.grade === grade || (s.grade && s.grade.startsWith(grade));
+            const matchR = room === 'ALL' || s.room === room || s.room === `ห้อง ${room}`;
+            return matchG && matchR;
+        });
+
+        if (targets.length === 0) {
+            alert('ไม่พบข้อมูลนักเรียนตามเงื่อนไขที่เลือก');
+            return;
+        }
+
+        let scopeLabel = '';
+        if (grade === 'ALL' && room === 'ALL') scopeLabel = 'ทั้งหมดทุกห้องในระบบ';
+        else if (grade !== 'ALL' && room === 'ALL') scopeLabel = `ระดับชั้น ${grade} ทุกห้อง`;
+        else if (grade === 'ALL' && room !== 'ALL') scopeLabel = `ห้อง ${room} ทุกระดับชั้น`;
+        else scopeLabel = `เฉพาะห้อง ${grade}/${room}`;
+
+        const confirmed = await this.confirmDialog({
+            title: `⚠️ ยืนยันการลบข้อมูลนักเรียน (${scopeLabel})`,
+            message: `คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนักเรียน ${scopeLabel} จำนวน ${targets.length} รายการออกจากระบบ?`,
+            type: 'danger',
+            confirmText: 'ยืนยันลบข้อมูล',
+            cancelText: 'ยกเลิก'
+        });
+
+        if (confirmed) {
+            this.closeModal('modal-delete-student-scope');
+            if (grade === 'ALL' && room === 'ALL') {
+                localStorage.setItem('prcare_seed_cleared_students', 'true');
+                await firebaseService.deleteAllStudents();
+                alert('ลบข้อมูลนักเรียนทั้งหมดในระบบเรียบร้อยแล้ว');
+            } else {
+                const count = await firebaseService.deleteStudentsByGradeRoom(grade === 'ALL' ? '' : grade, room === 'ALL' ? '' : room);
+                alert(`ลบข้อมูลนักเรียน (${scopeLabel}) สำเร็จจำนวน ${count} รายการ`);
+            }
         }
     }
 
