@@ -4,7 +4,6 @@
  */
 
 class CSVImporter {
-class CSVImporter {
     constructor() {
         this.sampleTemplateHeaders = "เลขที่,รหัสประจำตัว,ชื่อ-สกุล,ระดับชั้น,ครูที่ปรึกษา\n";
         this.sampleRows = [
