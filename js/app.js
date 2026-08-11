@@ -136,13 +136,15 @@ class Application {
 
     // --- Sample Data Purge ---
     purgeSampleData() {
-        if (localStorage.getItem('prcare_sample_purged_v1.1') !== 'true') {
-            console.log('[App] Purging initial sample student and teacher data...');
+        if (localStorage.getItem('prcare_sample_purged_v1.9_offenses') !== 'true') {
+            console.log('[App] Purging initial sample student, teacher and offense data...');
             localStorage.setItem('prcare_seed_cleared_students', 'true');
             localStorage.setItem('prcare_seed_cleared_teachers', 'true');
-            localStorage.setItem('prcare_sample_purged_v1.1', 'true');
+            localStorage.setItem('prcare_seed_cleared_offenses', 'true');
+            localStorage.setItem('prcare_sample_purged_v1.9_offenses', 'true');
             firebaseService.deleteAllStudents();
             firebaseService.deleteAllTeachers();
+            firebaseService.deleteAllOffenses();
         }
     }
 

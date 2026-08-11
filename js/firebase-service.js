@@ -163,7 +163,7 @@ class FirebaseService {
             { key: CONFIG.STORAGE_KEYS.USERS, endpoint: CONFIG.FIREBASE.ENDPOINTS.USERS, event: 'usersUpdated' },
             { key: CONFIG.STORAGE_KEYS.SCREENINGS, endpoint: CONFIG.FIREBASE.ENDPOINTS.SCREENINGS, event: 'screeningsUpdated' },
             { key: CONFIG.STORAGE_KEYS.MERITS, endpoint: CONFIG.FIREBASE.ENDPOINTS.MERITS, event: 'meritsUpdated' },
-            { key: CONFIG.STORAGE_KEYS.OFFENSES, endpoint: CONFIG.FIREBASE.ENDPOINTS.OFFENSES, event: 'offensesUpdated' },
+            { key: CONFIG.STORAGE_KEYS.OFFENSES, endpoint: CONFIG.FIREBASE.ENDPOINTS.OFFENSES, event: 'offensesUpdated', clearFlag: 'prcare_seed_cleared_offenses' },
             { key: CONFIG.STORAGE_KEYS.REFERRALS, endpoint: CONFIG.FIREBASE.ENDPOINTS.REFERRALS, event: 'referralsUpdated' },
             { key: CONFIG.STORAGE_KEYS.ACTIVITIES, endpoint: CONFIG.FIREBASE.ENDPOINTS.ACTIVITIES, event: 'activitiesUpdated' }
         ];
@@ -590,6 +590,17 @@ class FirebaseService {
 
         if (this.isOnline) {
             await this.cloudDelete(`${CONFIG.FIREBASE.ENDPOINTS.OFFENSES}/${offenseId}`);
+        }
+        return true;
+    }
+
+    async deleteAllOffenses() {
+        localStorage.setItem('prcare_seed_cleared_offenses', 'true');
+        this.setCache(CONFIG.STORAGE_KEYS.OFFENSES, []);
+        window.dispatchEvent(new CustomEvent('offensesUpdated', { detail: [] }));
+        if (this.isOnline) {
+            await this.cloudPut(CONFIG.FIREBASE.ENDPOINTS.OFFENSES, null);
+            await this.cloudDelete(CONFIG.FIREBASE.ENDPOINTS.OFFENSES);
         }
         return true;
     }
