@@ -4,13 +4,14 @@
  */
 
 class CSVImporter {
+class CSVImporter {
     constructor() {
-        this.sampleTemplateHeaders = "เลขประจำตัว,คำนำหน้า,ชื่อ-นามสกุล,ระดับชั้น,ห้อง,เลขที่,เบอร์โทรศัพท์,ครูที่ปรึกษา\n";
+        this.sampleTemplateHeaders = "เลขที่,รหัสประจำตัว,ชื่อ-สกุล,ระดับชั้น,ครูที่ปรึกษา\n";
         this.sampleRows = [
-            "66001,นาย,สมชาย สายชล,ม.1,1,1,0812345678,\"ครูสมศักดิ์ รักเรียน, ครูสมศรี ใจดี\"\n",
-            "66002,นางสาว,สมหญิง สุขใจ,ม.3,2,15,0898765432,ครูวิเชียร ดีเลิศ\n",
-            "66003,นาย,วิชัย ดีเลิศ,ปวช.1,1,5,0821112233,\"ครูอนันต์ ชัยชนะ, ครูพิมพ์ใจ รักดี\"\n",
-            "66004,นาย,อนันต์ ชัยชนะ,ม.5,3,8,0845556677,ครูธนา มุ่งมั่น\n"
+            "1,09537,นายจิระ เพชรไพทูรย์,ม.1/3,นายจาตุรน ศรีละพันธ์\n",
+            "2,09538,นางสาวสมหญิง สุขใจ,ม.1/3,นายจาตุรน ศรีละพันธ์\n",
+            "3,09539,นายสมชาย สายชล,ม.2/1,นางสาวสมศรี ใจดี\n",
+            "4,09540,นายวิชัย ดีเลิศ,ปวช.1/2,นายอนันต์ ชัยชนะ\n"
         ];
     }
 
@@ -23,7 +24,7 @@ class CSVImporter {
         const link = document.createElement("a");
         const url = URL.createObjectURL(blob);
         link.setAttribute("href", url);
-        link.setAttribute("download", "ตัวอย่างไฟล์นำเข้านักเรียน_ม.1-ม.6_ปวช.1-ปวช.3.csv");
+        link.setAttribute("download", "ตัวอย่างไฟล์นำเข้านักเรียน_เลขที่_รหัสประจำตัว_ชื่อสกุล_ระดับชั้น_ครูที่ปรึกษา.csv");
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -42,39 +43,100 @@ class CSVImporter {
                     const text = e.target.result;
                     const lines = text.split(/\r\n|\n/).filter(line => line.trim().length > 0);
 
-                    if (lines.length <= 1) {
-                        reject(new Error("ไฟล์ CSV ไม่มีข้อมูลนักเรียน"));
+                    if (lines.length === 0) {
+                        reject(new Error("ไฟล์ CSV ไม่มีข้อมูล"));
                         return;
                     }
 
-                    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, '').replace(/^\uFEFF/, ''));
+                    const firstLineCols = this.parseCSVLine(lines[0]);
+                    const cleanHeaders = firstLineCols.map(h => h.trim().replace(/^"|"$/g, '').replace(/^\uFEFF/, ''));
+
+                    // Check if line 0 is a header row
+                    const isHeaderRow = cleanHeaders.some(h => 
+                        /เลข|รหัส|ชื่อ|ชั้น|ครู|number|id|name|grade/i.test(h)
+                    );
+
+                    let startIndex = isHeaderRow ? 1 : 0;
+
+                    // Map column indices based on header names if present
+                    let idxNum = -1, idxId = -1, idxName = -1, idxGrade = -1, idxRoom = -1, idxAdvisor = -1, idxPhone = -1, idxPrefix = -1;
+
+                    if (isHeaderRow) {
+                        cleanHeaders.forEach((h, idx) => {
+                            const lower = h.toLowerCase();
+                            if (lower.includes('เลขที่') || lower === 'no' || lower === 'seq') idxNum = idx;
+                            else if (lower.includes('รหัส')) idxId = idx;
+                            else if (lower.includes('คำนำหน้า')) idxPrefix = idx;
+                            else if (lower.includes('ชื่อ')) idxName = idx;
+                            else if (lower.includes('ระดับชั้น') || lower.includes('ชั้น')) idxGrade = idx;
+                            else if (lower === 'ห้อง' || lower.includes('ห้องเรียน')) idxRoom = idx;
+                            else if (lower.includes('ครู') || lower.includes('ปรึกษา')) idxAdvisor = idx;
+                            else if (lower.includes('โทร')) idxPhone = idx;
+                        });
+                    }
+
+                    // Fallbacks for requested 5-column format: [เลขที่, รหัสประจำตัว, ชื่อ-สกุล, ระดับชั้น, ครูที่ปรึกษา]
+                    if (idxNum === -1) idxNum = 0;
+                    if (idxId === -1) idxId = 1;
+                    if (idxName === -1) idxName = 2;
+                    if (idxGrade === -1) idxGrade = 3;
+                    if (idxAdvisor === -1) idxAdvisor = 4;
+
                     const parsedStudents = [];
 
-                    for (let i = 1; i < lines.length; i++) {
+                    for (let i = startIndex; i < lines.length; i++) {
                         const cols = this.parseCSVLine(lines[i]);
-                        if (cols.length >= 3) {
-                            const studentId = cols[0] || `STD_${Date.now()}_${i}`;
-                            const prefix = cols[1] || '';
-                            const fullName = cols[2] || '';
-                            const grade = cols[3] || 'ม.1';
-                            const room = cols[4] || '1';
-                            const number = cols[5] || i.toString();
-                            const phone = cols[6] || '';
-                            const advisors = cols[7] || '';
+                        if (cols.length >= 2) {
+                            const numberStr = (cols[idxNum] || (i - startIndex + 1).toString()).trim();
+                            const rawStudentId = (cols[idxId] || `STD_${Date.now()}_${i}`).trim();
+                            
+                            let prefix = idxPrefix !== -1 ? (cols[idxPrefix] || '').trim() : '';
+                            let rawFullName = (cols[idxName] || '').trim();
+                            
+                            // Auto extract prefix if attached to name (e.g. นายจิระ เพชรไพทูรย์)
+                            if (!prefix && rawFullName) {
+                                const prefixes = ['นางสาว', 'นาย', 'เด็กชาย', 'เด็กหญิง', 'นาง', 'ด.ช.', 'ด.ญ.'];
+                                for (const p of prefixes) {
+                                    if (rawFullName.startsWith(p)) {
+                                        prefix = p;
+                                        break;
+                                    }
+                                }
+                            }
 
-                            parsedStudents.push({
-                                studentId: studentId.trim(),
-                                prefix: prefix.trim(),
-                                fullName: fullName.trim(),
-                                grade: grade.trim(),
-                                room: room.trim(),
-                                number: number.trim(),
-                                phone: phone.trim(),
-                                advisors: advisors.trim(),
-                                status: 'active',
-                                createdAt: new Date().toISOString()
-                            });
+                            const rawGradeRoom = (cols[idxGrade] || 'ม.1/1').trim();
+                            let grade = rawGradeRoom;
+                            let room = idxRoom !== -1 ? (cols[idxRoom] || '1').trim() : '1';
+
+                            if (rawGradeRoom.includes('/')) {
+                                const parts = rawGradeRoom.split('/');
+                                grade = parts[0].trim();
+                                room = parts[1].trim();
+                            }
+
+                            const phone = idxPhone !== -1 ? (cols[idxPhone] || '').trim() : '';
+                            const advisors = (cols[idxAdvisor] || '').trim();
+
+                            if (rawStudentId || rawFullName) {
+                                parsedStudents.push({
+                                    studentId: rawStudentId,
+                                    prefix: prefix,
+                                    fullName: rawFullName,
+                                    grade: grade,
+                                    room: room,
+                                    number: numberStr,
+                                    phone: phone,
+                                    advisors: advisors,
+                                    status: 'active',
+                                    createdAt: new Date().toISOString()
+                                });
+                            }
                         }
+                    }
+
+                    if (parsedStudents.length === 0) {
+                        reject(new Error("ไม่พบข้อมูลนักเรียนที่สมบูรณ์ในไฟล์ CSV"));
+                        return;
                     }
 
                     resolve(parsedStudents);
@@ -118,16 +180,19 @@ class CSVImporter {
         }
 
         let csvContent = "\uFEFF" + this.sampleTemplateHeaders;
-        students.forEach(s => {
+        students.forEach((s, idx) => {
+            const num = s.number || (idx + 1).toString();
+            const id = s.studentId || '';
+            const name = s.fullName || `${s.prefix || ''}${s.fullName || ''}`;
+            const gradeRoom = (s.grade && s.room) ? (s.grade.includes('/') ? s.grade : `${s.grade}/${s.room}`) : (s.grade || '');
+            const advisors = s.advisors || s.advisorTeachers || s.guardian || '';
+
             const row = [
-                `"${s.studentId || ''}"`,
-                `"${s.prefix || ''}"`,
-                `"${s.fullName || ''}"`,
-                `"${s.grade || ''}"`,
-                `"${s.room || ''}"`,
-                `"${s.number || ''}"`,
-                `"${s.phone || ''}"`,
-                `"${s.advisors || s.advisorTeachers || s.guardian || ''}"`
+                `"${num}"`,
+                `"${id}"`,
+                `"${name}"`,
+                `"${gradeRoom}"`,
+                `"${advisors}"`
             ].join(",");
             csvContent += row + "\n";
         });

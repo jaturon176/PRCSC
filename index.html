@@ -384,11 +384,10 @@
                         <table class="custom-table">
                             <thead>
                                 <tr>
-                                    <th>รหัสนักเรียน</th>
-                                    <th>ชื่อ - นามสกุล</th>
-                                    <th>ระดับชั้น/ห้อง</th>
                                     <th>เลขที่</th>
-                                    <th>เบอร์โทรศัพท์</th>
+                                    <th>รหัสประจำตัว</th>
+                                    <th>ชื่อ - สกุล</th>
+                                    <th>ระดับชั้น</th>
                                     <th>ครูที่ปรึกษา</th>
                                     <th>จัดการ</th>
                                 </tr>
@@ -767,7 +766,8 @@
             <form id="form-csv-import">
                 <div class="modal-body">
                     <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">
-                        อัปโหลดไฟล์ .CSV ที่มีข้อมูลนักเรียนระดับชั้น ม.1-ม.6 และ ปวช.1-ปวช.3
+                        อัปโหลดไฟล์ .CSV โดยให้มีหัวคอลัมน์ดังนี้:<br>
+                        <code style="background: #f1f5f9; padding: 4px 8px; border-radius: 6px; color: #0284c7; font-weight: 600;">เลขที่, รหัสประจำตัว, ชื่อ-สกุล, ระดับชั้น, ครูที่ปรึกษา</code>
                     </p>
                     <div class="form-group">
                         <label class="form-label">เลือกไฟล์ CSV</label>

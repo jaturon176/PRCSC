@@ -832,29 +832,35 @@ class Application {
 
         if (search) {
             students = students.filter(s => 
-                s.fullName.toLowerCase().includes(search) || 
-                s.studentId.includes(search)
+                (s.fullName && s.fullName.toLowerCase().includes(search)) || 
+                (s.studentId && s.studentId.toLowerCase().includes(search)) ||
+                (s.number && s.number.includes(search))
             );
         }
         if (gradeFilter) {
-            students = students.filter(s => s.grade === gradeFilter);
+            students = students.filter(s => s.grade === gradeFilter || (s.grade && s.grade.startsWith(gradeFilter)));
         }
 
         tbody.innerHTML = '';
         if (students.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#64748b;">ไม่พบข้อมูลนักเรียน</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#64748b; padding: 24px;">ไม่พบข้อมูลนักเรียน</td></tr>';
             return;
         }
 
-        students.forEach(s => {
+        students.forEach((s, idx) => {
             const tr = document.createElement('tr');
+            const num = s.number || (idx + 1).toString();
+            const studentId = s.studentId || '-';
+            const fullName = s.fullName || '-';
+            const gradeRoom = (s.grade && s.room) ? (s.grade.includes('/') ? s.grade : `${s.grade}/${s.room}`) : (s.grade || '-');
+            const advisors = s.advisors || s.advisorTeachers || s.guardian || '-';
+
             tr.innerHTML = `
-                <td><strong style="color:#38bdf8;">${s.studentId}</strong></td>
-                <td>${s.prefix || ''}${s.fullName}</td>
-                <td><span class="badge badge-normal">${s.grade}/${s.room}</span></td>
-                <td>${s.number}</td>
-                <td>${s.phone || '-'}</td>
-                <td>${s.advisors || s.advisorTeachers || s.guardian || '-'}</td>
+                <td><strong style="color:#0284c7;">${num}</strong></td>
+                <td><strong style="color:#38bdf8;">${studentId}</strong></td>
+                <td>${fullName}</td>
+                <td><span class="badge badge-normal">${gradeRoom}</span></td>
+                <td>${advisors}</td>
                 <td>
                     <button class="btn btn-secondary btn-sm teacher-only" onclick="app.editStudent('${s.id}')"><i class="ri-edit-line"></i> แก้ไข</button>
                     <button class="btn btn-danger btn-sm teacher-only" onclick="app.deleteStudent('${s.id}')"><i class="ri-delete-bin-line"></i> ลบ</button>
@@ -864,6 +870,23 @@ class Application {
         });
 
         authManager.applyUIPermissions();
+    }
+
+    editStudent(id) {
+        const students = firebaseService.getStudents();
+        const student = students.find(s => s.id === id || s.studentId === id);
+        if (student) {
+            document.getElementById('student-id-input').value = student.id || '';
+            document.getElementById('std-code').value = student.studentId || '';
+            document.getElementById('std-prefix').value = student.prefix || 'นาย';
+            document.getElementById('std-fullname').value = student.fullName || '';
+            document.getElementById('std-grade').value = student.grade || 'ม.1';
+            document.getElementById('std-room').value = student.room || '1';
+            document.getElementById('std-number').value = student.number || '1';
+            document.getElementById('std-phone').value = student.phone || '';
+            document.getElementById('std-advisors').value = student.advisors || '';
+            this.openModal('modal-student');
+        }
     }
 
     async deleteStudent(id) {
