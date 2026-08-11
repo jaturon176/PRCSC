@@ -16,9 +16,8 @@ class Application {
     async init() {
         console.log('[App] Initializing Student Care & Assistance System...');
 
-        // 1. Load Seed Data if database empty
-        this.checkAndLoadSeedData();
-        this.checkAndLoadTeacherSeedData();
+        // 1. Purge sample student & teacher data
+        this.purgeSampleData();
         this.checkAndLoadUserSeedData();
 
         // 2. Setup Page Routing & Navigation
@@ -82,77 +81,15 @@ class Application {
         this.updateVersionUI();
     }
 
-    // --- Seed Data Loader ---
-    checkAndLoadSeedData() {
-        if (localStorage.getItem('prcare_seed_cleared_students') === 'true') return;
-        const students = firebaseService.getStudents();
-        if (!students || students.length === 0) {
-            console.log('[App] Loading default sample Thai student data (ม.1-ม.6, ปวช.1-ปวช.3)...');
-            const sampleStudents = [
-                { studentId: '66001', prefix: 'นาย', fullName: 'สมชาย สายชล', grade: 'ม.1', room: '1', number: '1', phone: '081-234-5678', advisors: 'ครูสมศักดิ์ รักเรียน, ครูสมศรี ใจดี' },
-                { studentId: '66002', prefix: 'นางสาว', fullName: 'สมหญิง สุขใจ', grade: 'ม.2', room: '1', number: '2', phone: '089-876-5432', advisors: 'ครูวิเชียร ดีเลิศ' },
-                { studentId: '66003', prefix: 'นาย', fullName: 'วิชัย ดีเลิศ', grade: 'ม.3', room: '2', number: '5', phone: '082-111-2233', advisors: 'ครูอนันต์ ชัยชนะ, ครูพิมพ์ใจ รักดี' },
-                { studentId: '66004', prefix: 'นาย', fullName: 'อนันต์ ชัยชนะ', grade: 'ม.4', room: '1', number: '8', phone: '084-555-6677', advisors: 'ครูธนา มุ่งมั่น' },
-                { studentId: '66005', prefix: 'นางสาว', fullName: 'พิมพ์มาดา รักดี', grade: 'ม.5', room: '2', number: '12', phone: '086-777-8899', advisors: 'ครูเกรียงศักดิ์ ช่างกล' },
-                { studentId: '66006', prefix: 'นาย', fullName: 'ธนากร มุ่งมั่น', grade: 'ม.6', room: '1', number: '3', phone: '083-444-5566', advisors: 'ครูนพรัตน์ ฝีมือดี' },
-                { studentId: '66007', prefix: 'นาย', fullName: 'เกียรติศักดิ์ ช่างกล', grade: 'ปวช.1', room: '1', number: '4', phone: '085-111-9988', advisors: 'ครูสุภาพ สร้างสรรค์' },
-                { studentId: '66008', prefix: 'นาย', fullName: 'นพดล ฝีมือดี', grade: 'ปวช.2', room: '2', number: '10', phone: '087-333-2211', advisors: 'ครูกิตติ มั่นคง' },
-                { studentId: '66009', prefix: 'นางสาว', fullName: 'สุพรรษา สร้างสรรค์', grade: 'ปวช.3', room: '1', number: '7', phone: '089-000-1122', advisors: 'ครูกานดา สวยงาม' }
-            ];
-            firebaseService.saveStudentsBatch(sampleStudents);
-        }
-
-        const offenses = firebaseService.getOffenses();
-        if (!offenses || offenses.length === 0) {
-            const sampleOffenses = [
-                {
-                    id: 'OFF_SAMPLE_1',
-                    studentId: '66001',
-                    studentName: 'นายสมชาย สายชล',
-                    gradeRoom: 'ม.1/1',
-                    studentNumber: '1',
-                    level: 'minor',
-                    category: 'เข้าเรียนสาย/หนีเรียน',
-                    description: 'มาโรงเรียนสายเกิน 3 ครั้งในสัปดาห์เดียว',
-                    location: 'ประตูโรงเรียนด้านหน้า',
-                    incidentDate: new Date().toISOString().slice(0, 10),
-                    actionTaken: 'ว่ากล่าวตักเตือน และให้ทำกิจกรรมบำเพ็ญประโยชน์ 1 ชั่วโมง',
-                    recordedBy: 'ครูกิจการนักเรียน',
-                    referralType: 'internal'
-                },
-                {
-                    id: 'OFF_SAMPLE_2',
-                    studentId: '66007',
-                    studentName: 'นายเกียรติศักดิ์ ช่างกล',
-                    gradeRoom: 'ปวช.1/1',
-                    studentNumber: '4',
-                    level: 'moderate',
-                    category: 'พฤติกรรมความก้าวร้าว',
-                    description: 'มีปากเสียงทะเลาะวิวาทกับเพื่อนต่างวิทยาลัยบริเวณหน้าโรงเรียน',
-                    location: 'หน้าวิทยาลัย',
-                    incidentDate: new Date().toISOString().slice(0, 10),
-                    actionTaken: 'เชิญผู้ปกครองมารับทราบพฤติกรรม และทำทักท้วงลายทัศน์',
-                    recordedBy: 'หัวหน้างานปกครอง',
-                    referralType: 'external'
-                }
-            ];
-            sampleOffenses.forEach(o => firebaseService.saveOffense(o));
-        }
-    }
-
-    checkAndLoadTeacherSeedData() {
-        if (localStorage.getItem('prcare_seed_cleared_teachers') === 'true') return;
-        const teachers = firebaseService.getTeachers();
-        if (!teachers || teachers.length === 0) {
-            console.log('[App] Loading default sample Teacher data...');
-            const sampleTeachers = [
-                { prefix: 'นาย', fullName: 'สมศักดิ์ รักเรียน', position: 'ครูกิจการนักเรียน', responsibleRoom: 'ม.1/1', phone: '081-222-3333' },
-                { prefix: 'นาง', fullName: 'สมศรี ใจดี', position: 'ครูประจำชั้น', responsibleRoom: 'ม.1/1', phone: '082-333-4444' },
-                { prefix: 'นาย', fullName: 'วิเชียร ดีเลิศ', position: 'ครูแนะแนว', responsibleRoom: 'ม.2/1', phone: '083-444-5555' },
-                { prefix: 'นาย', fullName: 'อนันต์ ชัยชนะ', position: 'หัวหน้างานปกครอง', responsibleRoom: 'ม.3/1', phone: '084-555-6666' },
-                { prefix: 'นางสาว', fullName: 'พิมพ์มาดา รักดี', position: 'ครูผู้สอน', responsibleRoom: 'ม.4/1', phone: '085-666-7777' }
-            ];
-            firebaseService.saveTeachersBatch(sampleTeachers);
+    // --- Sample Data Purge ---
+    purgeSampleData() {
+        if (localStorage.getItem('prcare_sample_purged_v1.1') !== 'true') {
+            console.log('[App] Purging initial sample student and teacher data...');
+            localStorage.setItem('prcare_seed_cleared_students', 'true');
+            localStorage.setItem('prcare_seed_cleared_teachers', 'true');
+            localStorage.setItem('prcare_sample_purged_v1.1', 'true');
+            firebaseService.deleteAllStudents();
+            firebaseService.deleteAllTeachers();
         }
     }
 
@@ -1216,9 +1153,9 @@ class Application {
 
         const usernameInput = document.getElementById('page-login-user');
         if (usernameInput) {
-            if (role === 'teacher') usernameInput.value = 'ครูสมศักดิ์ รักเรียน';
-            else if (role === 'student') usernameInput.value = '66001';
-            else if (role === 'admin') usernameInput.value = 'ผู้ดูแลระบบ';
+            if (role === 'teacher') usernameInput.value = 'teacher1';
+            else if (role === 'student') usernameInput.value = 'student1';
+            else if (role === 'admin') usernameInput.value = 'admin';
         }
     }
 
@@ -1240,8 +1177,8 @@ class Application {
             console.log('[App] Seeding initial User Accounts with Passwords...');
             const defaultUsers = [
                 { id: 'USR_ADMIN_01', username: 'admin', fullName: 'ผู้ดูแลระบบ (Admin)', role: 'admin', password: 'admin123', createdAt: new Date().toISOString() },
-                { id: 'USR_TEACHER_01', username: 'teacher1', fullName: 'ครูสมศักดิ์ รักเรียน', role: 'teacher', password: 'teacher123', createdAt: new Date().toISOString() },
-                { id: 'USR_STUDENT_01', username: '66001', fullName: 'นายสมชาย สายชล', role: 'student', password: '123456', createdAt: new Date().toISOString() }
+                { id: 'USR_TEACHER_01', username: 'teacher1', fullName: 'ครูกิจการนักเรียน', role: 'teacher', password: 'teacher123', createdAt: new Date().toISOString() },
+                { id: 'USR_STUDENT_01', username: 'student1', fullName: 'นักเรียน', role: 'student', password: '123456', createdAt: new Date().toISOString() }
             ];
             firebaseService.saveUsersBatch(defaultUsers);
         }

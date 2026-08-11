@@ -51,14 +51,14 @@ class AuthManager {
             };
         } else if (role === CONFIG.ROLES.STUDENT) {
             const students = firebaseService.getStudents();
-            const studentMatch = students.find(s => s.studentId === username || s.fullName.includes(username));
+            const studentMatch = students.find(s => s.studentId === username || (s.fullName && s.fullName.includes(username)));
             
             userProfile = {
-                id: studentMatch ? studentMatch.id : 'STD_DEMO',
-                studentId: studentMatch ? studentMatch.studentId : (username || '66001'),
-                name: studentMatch ? studentMatch.fullName : (username || 'นายสมชาย สายชล (นักเรียน)'),
-                grade: studentMatch ? studentMatch.grade : 'ม.1',
-                room: studentMatch ? studentMatch.room : '1',
+                id: studentMatch ? studentMatch.id : 'STD_USER',
+                studentId: studentMatch ? studentMatch.studentId : (username || ''),
+                name: studentMatch ? studentMatch.fullName : (username || 'นักเรียน'),
+                grade: studentMatch ? studentMatch.grade : '-',
+                room: studentMatch ? studentMatch.room : '-',
                 role: CONFIG.ROLES.STUDENT,
                 roleTitle: CONFIG.ROLE_NAMES_TH.student,
                 avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=student'
@@ -66,7 +66,7 @@ class AuthManager {
         } else if (role === CONFIG.ROLES.TEACHER) {
             userProfile = {
                 id: 'TCH_01',
-                name: username || 'ครูสมศักดิ์ รักเรียน (ครูกิจการนักเรียน)',
+                name: username || 'ครูผู้ใช้งานระบบ',
                 role: CONFIG.ROLES.TEACHER,
                 roleTitle: CONFIG.ROLE_NAMES_TH.teacher,
                 avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=teacher'
