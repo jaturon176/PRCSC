@@ -271,6 +271,10 @@ class Application {
             }
         });
 
+        document.getElementById('student-search-input')?.addEventListener('input', () => this.renderStudentList());
+        document.getElementById('student-grade-filter')?.addEventListener('change', () => this.renderStudentList());
+        document.getElementById('student-room-filter')?.addEventListener('change', () => this.renderStudentList());
+
         document.getElementById('teacher-search-input')?.addEventListener('input', () => this.renderTeacherList());
         document.getElementById('teacher-position-filter')?.addEventListener('change', () => this.renderTeacherList());
 
@@ -829,6 +833,7 @@ class Application {
         let students = firebaseService.getStudents();
         const search = document.getElementById('student-search-input')?.value.toLowerCase() || '';
         const gradeFilter = document.getElementById('student-grade-filter')?.value || '';
+        const roomFilter = document.getElementById('student-room-filter')?.value || '';
 
         if (search) {
             students = students.filter(s => 
@@ -840,6 +845,25 @@ class Application {
         if (gradeFilter) {
             students = students.filter(s => s.grade === gradeFilter || (s.grade && s.grade.startsWith(gradeFilter)));
         }
+        if (roomFilter) {
+            students = students.filter(s => s.room === roomFilter || s.room === `ห้อง ${roomFilter}`);
+        }
+
+        // Automatic Sorting: Grade ➔ Room (numeric) ➔ Student Number (numeric)
+        const gradeOrder = { 'ม.1': 1, 'ม.2': 2, 'ม.3': 3, 'ม.4': 4, 'ม.5': 5, 'ม.6': 6, 'ปวช.1': 7, 'ปวช.2': 8, 'ปวช.3': 9 };
+        students.sort((a, b) => {
+            const gA = gradeOrder[a.grade] || 99;
+            const gB = gradeOrder[b.grade] || 99;
+            if (gA !== gB) return gA - gB;
+
+            const rA = parseInt((a.room || '').replace(/\D/g, '')) || 0;
+            const rB = parseInt((b.room || '').replace(/\D/g, '')) || 0;
+            if (rA !== rB) return rA - rB;
+
+            const nA = parseInt((a.number || '').replace(/\D/g, '')) || 0;
+            const nB = parseInt((b.number || '').replace(/\D/g, '')) || 0;
+            return nA - nB;
+        });
 
         tbody.innerHTML = '';
         if (students.length === 0) {
@@ -912,18 +936,40 @@ class Application {
 
         if (search) {
             teachers = teachers.filter(t => 
-                t.fullName.toLowerCase().includes(search) || 
+                (t.fullName && t.fullName.toLowerCase().includes(search)) || 
+                (t.position && t.position.toLowerCase().includes(search)) ||
                 (t.responsibleRoom && t.responsibleRoom.toLowerCase().includes(search)) ||
                 (t.phone && t.phone.includes(search))
             );
         }
         if (positionFilter) {
-            teachers = teachers.filter(t => t.position === positionFilter);
+            teachers = teachers.filter(t => t.position === positionFilter || (t.position && t.position.includes(positionFilter)));
         }
+
+        // Executive & Position Hierarchy Sorting: ผู้อำนวยการ > รองผู้อำนวยการ > ครูกิจการนักเรียน/หัวหน้างาน > ครูประจำชั้น/ที่ปรึกษา > อื่นๆ
+        const getPosPriority = (pos) => {
+            if (!pos) return 99;
+            const p = pos.trim();
+            if (p.includes('ผู้อำนวยการ') && !p.includes('รอง')) return 1;
+            if (p.includes('รองผู้อำนวยการ')) return 2;
+            if (p.includes('ผู้บริหาร')) return 3;
+            if (p.includes('กิจการนักเรียน') || p.includes('ปกครอง')) return 4;
+            if (p.includes('ประจำชั้น') || p.includes('ที่ปรึกษา')) return 5;
+            if (p.includes('แนะแนว')) return 6;
+            if (p.includes('ครูผู้สอน') || p.includes('ครู')) return 7;
+            return 10;
+        };
+
+        teachers.sort((a, b) => {
+            const prioA = getPosPriority(a.position);
+            const prioB = getPosPriority(b.position);
+            if (prioA !== prioB) return prioA - prioB;
+            return (a.fullName || '').localeCompare(b.fullName || '', 'th');
+        });
 
         tbody.innerHTML = '';
         if (teachers.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#64748b;">ไม่พบข้อมูลครู/บุคลากร</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#64748b; padding: 24px;">ไม่พบข้อมูลครู/บุคลากร</td></tr>';
             return;
         }
 
