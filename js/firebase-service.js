@@ -128,9 +128,11 @@ class FirebaseService {
 
     // --- Comprehensive Cloud Sync & Realtime Dispatch ---
     async syncAllFromCloud() {
+        if (this.isSavingBatch) return;
+
         const collections = [
-            { key: CONFIG.STORAGE_KEYS.STUDENTS, endpoint: CONFIG.FIREBASE.ENDPOINTS.STUDENTS, event: 'studentsUpdated' },
-            { key: CONFIG.STORAGE_KEYS.TEACHERS, endpoint: CONFIG.FIREBASE.ENDPOINTS.TEACHERS, event: 'teachersUpdated' },
+            { key: CONFIG.STORAGE_KEYS.STUDENTS, endpoint: CONFIG.FIREBASE.ENDPOINTS.STUDENTS, event: 'studentsUpdated', clearFlag: 'prcare_seed_cleared_students' },
+            { key: CONFIG.STORAGE_KEYS.TEACHERS, endpoint: CONFIG.FIREBASE.ENDPOINTS.TEACHERS, event: 'teachersUpdated', clearFlag: 'prcare_seed_cleared_teachers' },
             { key: CONFIG.STORAGE_KEYS.USERS, endpoint: CONFIG.FIREBASE.ENDPOINTS.USERS, event: 'usersUpdated' },
             { key: CONFIG.STORAGE_KEYS.SCREENINGS, endpoint: CONFIG.FIREBASE.ENDPOINTS.SCREENINGS, event: 'screeningsUpdated' },
             { key: CONFIG.STORAGE_KEYS.MERITS, endpoint: CONFIG.FIREBASE.ENDPOINTS.MERITS, event: 'meritsUpdated' },
@@ -140,23 +142,34 @@ class FirebaseService {
         ];
 
         for (const item of collections) {
+            if (this.isSavingBatch) return;
             const cloudData = await this.cloudGet(item.endpoint);
-            if (cloudData !== null) {
+            const currentCache = this.getCache(item.key) || [];
+
+            if (cloudData !== null && typeof cloudData === 'object' && Object.keys(cloudData).length > 0) {
                 let itemsList = [];
-                if (typeof cloudData === 'object' && !Array.isArray(cloudData)) {
+                if (!Array.isArray(cloudData)) {
                     itemsList = Object.keys(cloudData).map(id => ({
                         id,
                         ...cloudData[id]
                     }));
-                } else if (Array.isArray(cloudData)) {
+                } else {
                     itemsList = cloudData.filter(Boolean);
                 }
 
-                // Check if local cache differs
-                const currentCache = this.getCache(item.key) || [];
                 if (JSON.stringify(currentCache) !== JSON.stringify(itemsList)) {
                     this.setCache(item.key, itemsList);
                     window.dispatchEvent(new CustomEvent(item.event, { detail: itemsList }));
+                }
+            } else if ((cloudData === null || (typeof cloudData === 'object' && Object.keys(cloudData).length === 0)) && currentCache.length > 0) {
+                // If cloud is empty but local cache has newly imported items, sync local cache UP to cloud!
+                if (!item.clearFlag || localStorage.getItem(item.clearFlag) !== 'true') {
+                    const cloudObject = {};
+                    currentCache.forEach(it => {
+                        const idKey = it.id || it.studentId || ('ITEM_' + Date.now());
+                        cloudObject[idKey] = it;
+                    });
+                    await this.cloudPut(item.endpoint, cloudObject);
                 }
             }
         }
@@ -196,27 +209,36 @@ class FirebaseService {
     }
 
     async saveStudentsBatch(newStudentsList) {
-        const students = this.getStudents();
-        const map = new Map();
-        students.forEach(s => map.set(s.studentId, s));
+        this.isSavingBatch = true;
+        try {
+            localStorage.removeItem('prcare_seed_cleared_students');
+            const students = this.getStudents();
+            const map = new Map();
+            students.forEach(s => {
+                const k = s.studentId || s.id;
+                if (k) map.set(k, s);
+            });
 
-        newStudentsList.forEach(s => {
-            if (!s.id) s.id = 'STD_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
-            s.updatedAt = new Date().toISOString();
-            map.set(s.studentId, s);
-        });
+            newStudentsList.forEach(s => {
+                if (!s.id) s.id = 'STD_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+                s.updatedAt = new Date().toISOString();
+                const k = s.studentId || s.id;
+                map.set(k, s);
+            });
 
-        const merged = Array.from(map.values());
-        this.setCache(CONFIG.STORAGE_KEYS.STUDENTS, merged);
-        window.dispatchEvent(new CustomEvent('studentsUpdated', { detail: merged }));
+            const merged = Array.from(map.values());
+            this.setCache(CONFIG.STORAGE_KEYS.STUDENTS, merged);
+            window.dispatchEvent(new CustomEvent('studentsUpdated', { detail: merged }));
 
-        if (this.isOnline) {
-            // Push full object map to Firebase
-            const cloudObject = {};
-            merged.forEach(s => { cloudObject[s.id] = s; });
-            await this.cloudPut(CONFIG.FIREBASE.ENDPOINTS.STUDENTS, cloudObject);
+            if (this.isOnline) {
+                const cloudObject = {};
+                merged.forEach(s => { cloudObject[s.id] = s; });
+                await this.cloudPut(CONFIG.FIREBASE.ENDPOINTS.STUDENTS, cloudObject);
+            }
+            return merged;
+        } finally {
+            this.isSavingBatch = false;
         }
-        return merged;
     }
 
     async deleteStudent(studentId) {
@@ -235,14 +257,20 @@ class FirebaseService {
     }
 
     async deleteAllStudents() {
-        this.setCache(CONFIG.STORAGE_KEYS.STUDENTS, []);
-        window.dispatchEvent(new CustomEvent('studentsUpdated', { detail: [] }));
+        this.isSavingBatch = true;
+        try {
+            localStorage.setItem('prcare_seed_cleared_students', 'true');
+            this.setCache(CONFIG.STORAGE_KEYS.STUDENTS, []);
+            window.dispatchEvent(new CustomEvent('studentsUpdated', { detail: [] }));
 
-        if (this.isOnline) {
-            await this.cloudPut(CONFIG.FIREBASE.ENDPOINTS.STUDENTS, null);
-            await this.cloudDelete(CONFIG.FIREBASE.ENDPOINTS.STUDENTS);
+            if (this.isOnline) {
+                await this.cloudPut(CONFIG.FIREBASE.ENDPOINTS.STUDENTS, null);
+                await this.cloudDelete(CONFIG.FIREBASE.ENDPOINTS.STUDENTS);
+            }
+            return true;
+        } finally {
+            this.isSavingBatch = false;
         }
-        return true;
     }
 
     // 1.5 Teachers
@@ -275,26 +303,32 @@ class FirebaseService {
     }
 
     async saveTeachersBatch(newTeachersList) {
-        const teachers = this.getTeachers();
-        const map = new Map();
-        teachers.forEach(t => map.set(t.teacherId || t.id, t));
+        this.isSavingBatch = true;
+        try {
+            localStorage.removeItem('prcare_seed_cleared_teachers');
+            const teachers = this.getTeachers();
+            const map = new Map();
+            teachers.forEach(t => map.set(t.teacherId || t.id, t));
 
-        newTeachersList.forEach(t => {
-            if (!t.id) t.id = 'TCH_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
-            t.updatedAt = new Date().toISOString();
-            map.set(t.teacherId || t.id, t);
-        });
+            newTeachersList.forEach(t => {
+                if (!t.id) t.id = 'TCH_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+                t.updatedAt = new Date().toISOString();
+                map.set(t.teacherId || t.id, t);
+            });
 
-        const merged = Array.from(map.values());
-        this.setCache(CONFIG.STORAGE_KEYS.TEACHERS, merged);
-        window.dispatchEvent(new CustomEvent('teachersUpdated', { detail: merged }));
+            const merged = Array.from(map.values());
+            this.setCache(CONFIG.STORAGE_KEYS.TEACHERS, merged);
+            window.dispatchEvent(new CustomEvent('teachersUpdated', { detail: merged }));
 
-        if (this.isOnline) {
-            const cloudObject = {};
-            merged.forEach(t => { cloudObject[t.id] = t; });
-            await this.cloudPut(CONFIG.FIREBASE.ENDPOINTS.TEACHERS, cloudObject);
+            if (this.isOnline) {
+                const cloudObject = {};
+                merged.forEach(t => { cloudObject[t.id] = t; });
+                await this.cloudPut(CONFIG.FIREBASE.ENDPOINTS.TEACHERS, cloudObject);
+            }
+            return merged;
+        } finally {
+            this.isSavingBatch = false;
         }
-        return merged;
     }
 
     async deleteTeacher(teacherId) {
