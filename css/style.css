@@ -243,15 +243,44 @@ a { text-decoration: none; color: inherit; }
     color: #ffffff !important;
 }
 
+/* Version Pill Badge (Capsule Style) */
+.version-pill-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 12px;
+    border-radius: var(--radius-full);
+    background: #eef2ff;
+    color: var(--indigo-600);
+    font-weight: 700;
+    font-size: 0.82rem;
+    margin-left: 6px;
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    box-shadow: 0 1px 4px rgba(99, 102, 241, 0.12);
+    letter-spacing: 0.2px;
+}
+
 /* Sidebar Version Footer */
 .sidebar-footer-version {
     padding: 14px 18px;
     font-size: 0.82rem;
-    color: rgba(224, 231, 255, 0.45);
+    color: rgba(224, 231, 255, 0.70);
     font-weight: 500;
     text-align: center;
     border-top: 1px solid rgba(255,255,255,0.07);
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.sidebar-footer-version .version-pill-badge {
+    background: rgba(255, 255, 255, 0.14);
+    color: var(--amber-300);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    box-shadow: none;
 }
 
 /* ============================================================

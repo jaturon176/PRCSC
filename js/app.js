@@ -1490,8 +1490,11 @@ class Application {
 
     updateVersionUI() {
         const ver = this.getVersion();
-        const el = document.getElementById('app-sidebar-version');
-        if (el) el.textContent = ver;
+        const formattedVer = ver.startsWith('(') ? ver : `(${ver})`;
+        ['app-sidebar-version', 'app-login-version'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = formattedVer;
+        });
     }
 
     incrementVersion() {
