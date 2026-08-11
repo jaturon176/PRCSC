@@ -79,6 +79,7 @@ class Application {
 
         // Initialize Student Select Options
         this.updateStudentDropdowns();
+        this.updateVersionUI();
     }
 
     // --- Seed Data Loader ---
@@ -366,16 +367,18 @@ class Application {
             this.clearCache();
         });
 
+        // Version Control Handler
+        document.getElementById('btn-increment-version')?.addEventListener('click', () => {
+            const nextVer = this.incrementVersion();
+            alert(`อัปเดตเวอร์ชันระบบเป็น ${nextVer} เรียบร้อยแล้ว`);
+        });
+
         // Delete All Handlers
         document.getElementById('btn-delete-all-students')?.addEventListener('click', async () => {
             const students = firebaseService.getStudents();
-            if (students.length === 0) {
-                alert('ไม่มีข้อมูลนักเรียนในระบบ');
-                return;
-            }
             const confirmed = await this.confirmDialog({
                 title: '⚠️ ยืนยันการลบข้อมูลนักเรียนทั้งหมด',
-                message: `คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนักเรียนทั้งหมด (${students.length} รายการ)? การดำเนินการนี้จะไม่สามารถย้อนกลับได้`,
+                message: `คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนักเรียนทั้งหมดในระบบ (${students.length} รายการ)? การดำเนินการนี้จะไม่สามารถย้อนกลับได้`,
                 type: 'danger',
                 confirmText: 'ลบข้อมูลนักเรียนทั้งหมด',
                 cancelText: 'ยกเลิก'
@@ -389,10 +392,6 @@ class Application {
 
         document.getElementById('btn-delete-all-teachers')?.addEventListener('click', async () => {
             const teachers = firebaseService.getTeachers();
-            if (teachers.length === 0) {
-                alert('ไม่มีข้อมูลครูในระบบ');
-                return;
-            }
             const confirmed = await this.confirmDialog({
                 title: '⚠️ ยืนยันการลบข้อมูลครูทั้งหมด',
                 message: `คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลครูและบุคลากรทั้งหมด (${teachers.length} รายการ)? การดำเนินการนี้จะไม่สามารถย้อนกลับได้`,
@@ -1355,6 +1354,34 @@ class Application {
         }
     }
 
+    // --- Dynamic System Version Control ---
+    getVersion() {
+        return localStorage.getItem('prcare_app_version') || CONFIG.VERSION || 'v1.1';
+    }
+
+    setVersion(newVer) {
+        localStorage.setItem('prcare_app_version', newVer);
+        this.updateVersionUI();
+    }
+
+    updateVersionUI() {
+        const ver = this.getVersion();
+        const el = document.getElementById('app-sidebar-version');
+        if (el) el.textContent = ver;
+    }
+
+    incrementVersion() {
+        const current = this.getVersion();
+        const clean = current.replace(/^v/i, '');
+        const parts = clean.split('.');
+        let major = parseInt(parts[0]) || 1;
+        let minor = parseInt(parts[1]) || 0;
+        minor += 1;
+        const newVer = `v${major}.${minor}`;
+        this.setVersion(newVer);
+        return newVer;
+    }
+
     // --- Custom Confirmation Dialog Helper ---
     confirmDialog({ title, message, type = 'danger', confirmText = 'ยืนยัน', cancelText = 'ยกเลิก' }) {
         return new Promise((resolve) => {
@@ -1367,7 +1394,7 @@ class Application {
             const btnOk = document.getElementById('confirm-dialog-btn-ok');
 
             if (!modal) {
-                resolve(confirm(message));
+                resolve(window.confirm(`${title}\n\n${message}`));
                 return;
             }
 
@@ -1392,27 +1419,35 @@ class Application {
 
             this.openModal('modal-confirm-dialog');
 
+            const cleanup = () => {
+                btnOk?.removeEventListener('click', handleOk);
+                btnCancel?.removeEventListener('click', handleCancel);
+                modal?.removeEventListener('click', handleOverlayClick);
+            };
+
             const handleOk = (e) => {
-                e.preventDefault();
+                if (e) e.preventDefault();
                 cleanup();
                 this.closeModal('modal-confirm-dialog');
                 resolve(true);
             };
 
             const handleCancel = (e) => {
-                e.preventDefault();
+                if (e) e.preventDefault();
                 cleanup();
                 this.closeModal('modal-confirm-dialog');
                 resolve(false);
             };
 
-            const cleanup = () => {
-                btnOk?.removeEventListener('click', handleOk);
-                btnCancel?.removeEventListener('click', handleCancel);
+            const handleOverlayClick = (e) => {
+                if (e.target === modal) {
+                    handleCancel(e);
+                }
             };
 
             btnOk?.addEventListener('click', handleOk);
             btnCancel?.addEventListener('click', handleCancel);
+            modal?.addEventListener('click', handleOverlayClick);
         });
     }
 }

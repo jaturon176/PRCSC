@@ -239,6 +239,7 @@ class FirebaseService {
         window.dispatchEvent(new CustomEvent('studentsUpdated', { detail: [] }));
 
         if (this.isOnline) {
+            await this.cloudPut(CONFIG.FIREBASE.ENDPOINTS.STUDENTS, null);
             await this.cloudDelete(CONFIG.FIREBASE.ENDPOINTS.STUDENTS);
         }
         return true;
@@ -316,6 +317,7 @@ class FirebaseService {
         window.dispatchEvent(new CustomEvent('teachersUpdated', { detail: [] }));
 
         if (this.isOnline) {
+            await this.cloudPut(CONFIG.FIREBASE.ENDPOINTS.TEACHERS, null);
             await this.cloudDelete(CONFIG.FIREBASE.ENDPOINTS.TEACHERS);
         }
         return true;
@@ -335,6 +337,7 @@ class FirebaseService {
             this.setCache(item.key, []);
             window.dispatchEvent(new CustomEvent(item.event, { detail: [] }));
             if (this.isOnline) {
+                await this.cloudPut(item.endpoint, null);
                 await this.cloudDelete(item.endpoint);
             }
         }
