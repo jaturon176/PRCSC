@@ -1523,6 +1523,30 @@ a { text-decoration: none; color: inherit; }
 }
 .login-feature-item i { color: var(--amber-300); font-size: 1rem; }
 
+.login-banner-copyright {
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    width: 100%;
+    font-size: 0.82rem;
+    color: rgba(224, 231, 255, 0.75);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+
+.login-banner-copyright .version-pill-badge {
+    background: rgba(255, 255, 255, 0.16);
+    color: var(--amber-300);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    box-shadow: none;
+}
+
 /* Right Form Side */
 .login-right-form {
     flex: 1;
