@@ -159,18 +159,8 @@ class Application {
             }
         });
 
-        document.getElementById('btn-logout')?.addEventListener('click', async () => {
-            const confirmed = await this.confirmDialog({
-                title: 'ยืนยันการออกจากระบบ',
-                message: 'คุณต้องการออกจากระบบดูแลช่วยเหลือนักเรียนใช่หรือไม่?',
-                type: 'warning',
-                confirmText: 'ออกจากระบบ',
-                cancelText: 'ยกเลิก'
-            });
-            if (confirmed) {
-                authManager.logout();
-                this.switchPage('dashboard');
-            }
+        document.getElementById('btn-logout')?.addEventListener('click', () => {
+            this.confirmLogout();
         });
 
         // Form Standalone Login Submit
@@ -195,7 +185,7 @@ class Application {
             const success = await authManager.login(role, username, '');
             if (success) {
                 this.closeModal('modal-login');
-                alert(`เข้าสู่ระบบสำเร็จในฐานะ: ${CONFIG.ROLE_NAMES_TH[role]}`);
+                this.showToast(`เข้าสู่ระบบสำเร็จในฐานะ: ${CONFIG.ROLE_NAMES_TH[role]}`, 'success');
             }
         });
 
@@ -221,7 +211,7 @@ class Application {
             };
             await firebaseService.saveStudent(student);
             this.closeModal('modal-student');
-            alert('บันทึกข้อมูลนักเรียนเรียบร้อย');
+            this.showToast('บันทึกข้อมูลนักเรียนเรียบร้อยแล้ว 🎓', 'success');
         });
 
         // Teacher Modal & Actions
@@ -243,7 +233,7 @@ class Application {
             };
             await firebaseService.saveTeacher(teacher);
             this.closeModal('modal-teacher');
-            alert('บันทึกข้อมูลครูเรียบร้อย');
+            this.showToast('บันทึกข้อมูลครูเรียบร้อยแล้ว 👨‍🏫', 'success');
         });
 
         // CSV Teacher Import Controls
@@ -258,16 +248,16 @@ class Application {
             e.preventDefault();
             const fileInput = document.getElementById('teacher-csv-file-input');
             if (fileInput.files.length === 0) {
-                alert('กรุณาเลือกไฟล์ CSV สำหรับนำเข้าข้อมูลครู');
+                this.showAlert('แจ้งเตือน', 'กรุณาเลือกไฟล์ CSV สำหรับนำเข้าข้อมูลครู', 'warning');
                 return;
             }
             try {
                 const parsed = await csvImporter.parseTeacherCSV(fileInput.files[0]);
                 await firebaseService.saveTeachersBatch(parsed);
                 this.closeModal('modal-teacher-csv-import');
-                alert(`นำเข้าข้อมูลครูสำเร็จจำนวน ${parsed.length} คน`);
+                this.showAlert('นำเข้าข้อมูลสำเร็จ 🎉', `นำเข้าข้อมูลครูสำเร็จจำนวน ${parsed.length} คน`, 'success');
             } catch (err) {
-                alert('เกิดข้อผิดพลาดในการอ่านไฟล์ CSV ครู: ' + err.message);
+                this.showAlert('เกิดข้อผิดพลาด', 'ไม่สามารถอ่านไฟล์ CSV ครูได้: ' + err.message, 'error');
             }
         });
 
@@ -296,7 +286,7 @@ class Application {
             const user = { id: id || undefined, username, fullName, role, password };
             await firebaseService.saveUser(user);
             this.closeModal('modal-user-account');
-            alert('บันทึกข้อมูลชื่อผู้ใช้และรหัสผ่านเรียบร้อยแล้ว');
+            this.showToast('บันทึกข้อมูลชื่อผู้ใช้และรหัสผ่านเรียบร้อยแล้ว 🔑', 'success');
         });
 
         // Backup & Cache Handlers
@@ -311,7 +301,7 @@ class Application {
         // Version Control Handler
         document.getElementById('btn-increment-version')?.addEventListener('click', () => {
             const nextVer = this.incrementVersion();
-            alert(`อัปเดตเวอร์ชันระบบเป็น ${nextVer} เรียบร้อยแล้ว`);
+            this.showToast(`อัปเดตเวอร์ชันระบบเป็น ${nextVer} เรียบร้อยแล้ว`, 'info');
         });
 
         // Delete All Handlers
@@ -335,7 +325,7 @@ class Application {
             if (confirmed) {
                 localStorage.setItem('prcare_seed_cleared_teachers', 'true');
                 await firebaseService.deleteAllTeachers();
-                alert('ลบข้อมูลครูทั้งหมดเรียบร้อยแล้ว');
+                this.showAlert('ลบข้อมูลสำเร็จ', 'ลบข้อมูลครูทั้งหมดเรียบร้อยแล้ว', 'success');
             }
         });
 
@@ -351,7 +341,7 @@ class Application {
                 localStorage.setItem('prcare_seed_cleared_students', 'true');
                 localStorage.setItem('prcare_seed_cleared_teachers', 'true');
                 await firebaseService.deleteAllSystemData();
-                alert('ลบข้อมูลทั้งหมดในระบบเรียบร้อยแล้ว');
+                this.showAlert('ลบข้อมูลสำเร็จ', 'ลบข้อมูลทั้งหมดในระบบเรียบร้อยแล้ว', 'success');
             }
         });
 
@@ -367,16 +357,16 @@ class Application {
             e.preventDefault();
             const fileInput = document.getElementById('csv-file-input');
             if (fileInput.files.length === 0) {
-                alert('กรุณาเลือกไฟล์ CSV สำหรับนำเข้า');
+                this.showAlert('แจ้งเตือน', 'กรุณาเลือกไฟล์ CSV สำหรับนำเข้า', 'warning');
                 return;
             }
             try {
                 const parsed = await csvImporter.parseCSV(fileInput.files[0]);
                 await firebaseService.saveStudentsBatch(parsed);
                 this.closeModal('modal-csv-import');
-                alert(`นำเข้าข้อมูลนักเรียนสำเร็จจำนวน ${parsed.length} คน`);
+                this.showAlert('นำเข้าข้อมูลสำเร็จ 🎉', `นำเข้าข้อมูลนักเรียนสำเร็จจำนวน ${parsed.length} คน`, 'success');
             } catch (err) {
-                alert('เกิดข้อผิดพลาดในการอ่านไฟล์ CSV: ' + err.message);
+                this.showAlert('เกิดข้อผิดพลาด', 'ไม่สามารถอ่านไฟล์ CSV ได้: ' + err.message, 'error');
             }
         });
 
@@ -404,7 +394,7 @@ class Application {
             };
             await firebaseService.saveScreening(screening);
             this.closeModal('modal-screening');
-            alert(`บันทึกผลการคัดกรองเรียบร้อย! ผลการประเมิน: ${CONFIG.SCREENING_LEVELS[resultLevel.toUpperCase()].label}`);
+            this.showAlert('บันทึกผลการคัดกรองสำเร็จ 🎉', `ผลการประเมินคัดกรอง: <strong>${CONFIG.SCREENING_LEVELS[resultLevel.toUpperCase()].label}</strong>`, 'success');
         });
         document.getElementById('btn-open-screening')?.addEventListener('click', () => {
             const user = authManager.getCurrentUser();
@@ -500,7 +490,7 @@ class Application {
             }
 
             this.closeModal('modal-offense');
-            alert('บันทึกข้อมูลการกระทำผิดของนักเรียนเรียบร้อย');
+            this.showToast('บันทึกข้อมูลการกระทำผิดเรียบร้อยแล้ว 🚨', 'success');
         });
 
         // Merit Activity Submit
@@ -521,7 +511,7 @@ class Application {
             };
             await firebaseService.saveMerit(merit);
             this.closeModal('modal-merit');
-            alert('บันทึกการทำความดีสำเร็จ!');
+            this.showToast('บันทึกการทำความดีสำเร็จ! ⭐', 'success');
         });
 
         // Referral Form Submit
@@ -543,7 +533,7 @@ class Application {
             };
             await firebaseService.saveReferral(referral);
             this.closeModal('modal-referral');
-            alert('บันทึกการส่งต่อนักเรียนเรียบร้อย');
+            this.showToast('บันทึกการส่งต่อนักเรียนเรียบร้อยแล้ว 🕊️', 'success');
         });
 
         // Search & Filter Triggers
@@ -914,7 +904,7 @@ class Application {
         });
         if (confirmed) {
             await firebaseService.deleteStudent(id);
-            alert('ลบข้อมูลนักเรียนสำเร็จ');
+            this.showToast('ลบข้อมูลนักเรียนสำเร็จ 🎓', 'success');
         }
     }
 
@@ -970,7 +960,7 @@ class Application {
         });
 
         if (targets.length === 0) {
-            alert('ไม่พบข้อมูลนักเรียนตามเงื่อนไขที่เลือก');
+            this.showAlert('ไม่พบข้อมูลนักเรียน', 'ไม่พบข้อมูลนักเรียนตามเงื่อนไขที่เลือก', 'warning');
             return;
         }
 
@@ -993,10 +983,10 @@ class Application {
             if (grade === 'ALL' && room === 'ALL') {
                 localStorage.setItem('prcare_seed_cleared_students', 'true');
                 await firebaseService.deleteAllStudents();
-                alert('ลบข้อมูลนักเรียนทั้งหมดในระบบเรียบร้อยแล้ว');
+                this.showAlert('ลบข้อมูลสำเร็จ 🎉', 'ลบข้อมูลนักเรียนทั้งหมดในระบบเรียบร้อยแล้ว', 'success');
             } else {
                 const count = await firebaseService.deleteStudentsByGradeRoom(grade === 'ALL' ? '' : grade, room === 'ALL' ? '' : room);
-                alert(`ลบข้อมูลนักเรียน (${scopeLabel}) สำเร็จจำนวน ${count} รายการ`);
+                this.showAlert('ลบข้อมูลสำเร็จ 🎉', `ลบข้อมูลนักเรียน (${scopeLabel}) สำเร็จจำนวน ${count} รายการ`, 'success');
             }
         }
     }
@@ -1075,7 +1065,7 @@ class Application {
         });
         if (confirmed) {
             await firebaseService.deleteTeacher(id);
-            alert('ลบข้อมูลครูเรียบร้อย');
+            this.showToast('ลบข้อมูลครูสำเร็จ 👨‍🏫', 'success');
         }
     }
 
@@ -1395,7 +1385,7 @@ class Application {
         });
         if (confirmed) {
             await firebaseService.deleteUser(id);
-            alert('ลบบัญชีผู้ใช้เรียบร้อยแล้ว');
+            this.showToast('ลบบัญชีผู้ใช้เรียบร้อยแล้ว 🔑', 'success');
         }
     }
 
@@ -1430,7 +1420,7 @@ class Application {
         });
         if (confirmed) {
             localStorage.clear();
-            alert('ล้างแคชเครื่องเรียบร้อยแล้ว ระบบกำลังโหลดข้อมูลใหม่...');
+            await this.showAlert('ล้างแคชเรียบร้อย', 'ล้างแคชเครื่องเรียบร้อยแล้ว กำลังโหลดข้อมูลใหม่...', 'success');
             window.location.reload();
         }
     }
@@ -1530,6 +1520,90 @@ class Application {
             btnCancel?.addEventListener('click', handleCancel);
             modal?.addEventListener('click', handleOverlayClick);
         });
+    }
+
+    // --- Modern Custom Popup Alerts & Toasts ---
+    showAlert(title, message = '', type = 'success') {
+        if (window.Swal) {
+            const iconMap = {
+                success: 'success',
+                error: 'error',
+                warning: 'warning',
+                info: 'info',
+                danger: 'error'
+            };
+            const btnColorMap = {
+                success: '#059669',
+                error: '#e11d48',
+                warning: '#d97706',
+                info: '#0284c7',
+                danger: '#be123c'
+            };
+            return Swal.fire({
+                title: title,
+                html: message,
+                icon: iconMap[type] || 'info',
+                confirmButtonText: 'ตกลง',
+                confirmButtonColor: btnColorMap[type] || '#be123c',
+                customClass: {
+                    popup: 'swal2-popup'
+                }
+            });
+        } else {
+            alert(`${title}\n${message}`);
+        }
+    }
+
+    showToast(title, type = 'success') {
+        if (window.Swal) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer);
+                    toast.addEventListener('mouseleave', Swal.resumeTimer);
+                }
+            });
+            Toast.fire({
+                icon: type === 'danger' ? 'error' : type,
+                title: title
+            });
+        } else {
+            console.log(`[Toast] ${type}: ${title}`);
+        }
+    }
+
+    async confirmLogout() {
+        if (window.Swal) {
+            const result = await Swal.fire({
+                title: '🚪 ยืนยันการออกจากระบบ',
+                text: 'คุณต้องการออกจากระบบ PR Care+ ใช่หรือไม่?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'ออกจากระบบ',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#64748b',
+                reverseButtons: true,
+                customClass: {
+                    popup: 'swal2-popup'
+                }
+            });
+            if (result.isConfirmed) {
+                authManager.logout();
+                this.showToast('ออกจากระบบเรียบร้อยแล้ว', 'info');
+                this.switchPage('dashboard');
+            }
+        } else {
+            const confirmed = confirm('คุณต้องการออกจากระบบใช่หรือไม่?');
+            if (confirmed) {
+                authManager.logout();
+                this.switchPage('dashboard');
+            }
+        }
     }
 }
 
