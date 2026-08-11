@@ -1937,3 +1937,352 @@ a { text-decoration: none; color: inherit; }
 
 .animate-fadein { animation: fadeIn 0.3s ease; }
 .animate-slideup { animation: slideUp 0.35s ease; }
+
+/* ============================================================
+   THEME SYSTEM — v2.4 Multi-Theme Support
+   Smooth transitions across all theme switches
+   ============================================================ */
+
+/* Global smooth transition when theme changes */
+body, .sidebar, .topbar, .btn, .glass-panel, .stat-card,
+.custom-table thead, .custom-table thead th,
+.login-left-banner, .login-card {
+    transition: background 0.45s ease, background-color 0.45s ease,
+                border-color 0.25s ease, color 0.25s ease;
+}
+
+/* ─── 🔴 Volcanic Ruby Red ─────────────────────────────────── */
+[data-theme="ruby"] {
+    --indigo-950: #3b0a0a;
+    --indigo-900: #7f1d1d;
+    --indigo-800: #991b1b;
+    --indigo-700: #b91c1c;
+    --indigo-600: #dc2626;
+    --indigo-500: #ef4444;
+    --indigo-400: #f87171;
+    --indigo-100: #fee2e2;
+    --indigo-50:  #fff1f2;
+
+    --amber-500: #fbbf24;
+    --amber-400: #fcd34d;
+    --amber-300: #fde68a;
+    --amber-100: #fef3c7;
+
+    --bg-body:   #fdf2f2;
+    --bg-card:   #ffffff;
+    --bg-card-hover: #fff8f8;
+    --bg-subtle: #fef2f2;
+
+    --border-light: #fecaca;
+    --border-focus: #ef4444;
+
+    --text-heading: #3b0a0a;
+    --text-body:    #5a1a1a;
+    --text-muted:   #854343;
+    --text-dim:     #b97070;
+
+    --color-success:  #059669;
+    --color-warning:  #d97706;
+    --color-danger:   #b91c1c;
+    --color-info:     #0284c7;
+
+    --sidebar-bg-start: #3b0a0a;
+    --sidebar-bg-end:   #7f1d1d;
+    --header-bg: linear-gradient(95deg, #3b0a0a 0%, #7f1d1d 50%, #991b1b 100%);
+
+    --shadow-sm:  0 1px 4px rgba(120, 10, 10, 0.10);
+    --shadow-md:  0 4px 16px rgba(120, 10, 10, 0.14);
+    --shadow-lg:  0 10px 32px rgba(120, 10, 10, 0.18);
+    --shadow-xl:  0 20px 60px rgba(120, 10, 10, 0.22);
+}
+[data-theme="ruby"] .sidebar {
+    background: linear-gradient(180deg, #3b0a0a 0%, #7f1d1d 60%, #991b1b 100%);
+}
+[data-theme="ruby"] .topbar {
+    background: linear-gradient(95deg, #3b0a0a 0%, #7f1d1d 50%, #991b1b 100%);
+}
+[data-theme="ruby"] .btn-primary {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    border-color: #dc2626;
+}
+[data-theme="ruby"] .btn-primary:hover {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+[data-theme="ruby"] .custom-table thead {
+    background: linear-gradient(90deg, #7f1d1d, #991b1b);
+}
+[data-theme="ruby"] .stat-card { border-left: 4px solid #dc2626; }
+[data-theme="ruby"] .nav-item a:hover,
+[data-theme="ruby"] .nav-item a.active { background: rgba(239,68,68,0.25); color: #fcd34d; }
+[data-theme="ruby"] .login-left-banner {
+    background: linear-gradient(160deg, #3b0a0a 0%, #7f1d1d 50%, #991b1b 100%);
+}
+[data-theme="ruby"] .badge.badge-normal { background: #dcfce7; color: #15803d; }
+
+/* ─── 🌊 Midnight Ocean ─────────────────────────────────────── */
+[data-theme="ocean"] {
+    --indigo-950: #0c1a2e;
+    --indigo-900: #0f2d4a;
+    --indigo-800: #0f4068;
+    --indigo-700: #075985;
+    --indigo-600: #0284c7;
+    --indigo-500: #0ea5e9;
+    --indigo-400: #38bdf8;
+    --indigo-100: #e0f2fe;
+    --indigo-50:  #f0f9ff;
+
+    --amber-500: #06b6d4;
+    --amber-400: #22d3ee;
+    --amber-300: #67e8f9;
+    --amber-100: #cffafe;
+
+    --bg-body:   #f0f7ff;
+    --bg-card:   #ffffff;
+    --bg-card-hover: #f8fbff;
+    --bg-subtle: #e8f4fd;
+
+    --border-light: #bae6fd;
+    --border-focus: #0ea5e9;
+
+    --text-heading: #0c1a2e;
+    --text-body:    #1a3050;
+    --text-muted:   #4a7090;
+    --text-dim:     #7aaac8;
+
+    --color-success:  #059669;
+    --color-warning:  #d97706;
+    --color-danger:   #e11d48;
+    --color-info:     #06b6d4;
+
+    --sidebar-bg-start: #0c1a2e;
+    --sidebar-bg-end:   #0f2d4a;
+    --header-bg: linear-gradient(95deg, #0c1a2e 0%, #0f2d4a 50%, #0f4068 100%);
+
+    --shadow-sm:  0 1px 4px rgba(2, 100, 160, 0.10);
+    --shadow-md:  0 4px 16px rgba(2, 100, 160, 0.14);
+    --shadow-lg:  0 10px 32px rgba(2, 100, 160, 0.18);
+    --shadow-xl:  0 20px 60px rgba(2, 100, 160, 0.22);
+}
+[data-theme="ocean"] .sidebar {
+    background: linear-gradient(180deg, #0c1a2e 0%, #0f2d4a 60%, #0f4068 100%);
+}
+[data-theme="ocean"] .topbar {
+    background: linear-gradient(95deg, #0c1a2e 0%, #0f2d4a 50%, #0f4068 100%);
+}
+[data-theme="ocean"] .btn-primary {
+    background: linear-gradient(135deg, #0284c7, #075985);
+    border-color: #0284c7;
+}
+[data-theme="ocean"] .btn-primary:hover {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+}
+[data-theme="ocean"] .custom-table thead {
+    background: linear-gradient(90deg, #0f2d4a, #0f4068);
+}
+[data-theme="ocean"] .stat-card { border-left: 4px solid #0ea5e9; }
+[data-theme="ocean"] .nav-item a:hover,
+[data-theme="ocean"] .nav-item a.active { background: rgba(14,165,233,0.25); color: #67e8f9; }
+[data-theme="ocean"] .login-left-banner {
+    background: linear-gradient(160deg, #0c1a2e 0%, #0f2d4a 50%, #0f4068 100%);
+}
+
+/* ─── 🌿 Emerald Forest ─────────────────────────────────────── */
+[data-theme="emerald"] {
+    --indigo-950: #022c22;
+    --indigo-900: #052e16;
+    --indigo-800: #064e3b;
+    --indigo-700: #047857;
+    --indigo-600: #059669;
+    --indigo-500: #10b981;
+    --indigo-400: #34d399;
+    --indigo-100: #d1fae5;
+    --indigo-50:  #ecfdf5;
+
+    --amber-500: #a78bfa;
+    --amber-400: #c4b5fd;
+    --amber-300: #ddd6fe;
+    --amber-100: #ede9fe;
+
+    --bg-body:   #f0fdf5;
+    --bg-card:   #ffffff;
+    --bg-card-hover: #f8fff9;
+    --bg-subtle: #ecfdf5;
+
+    --border-light: #a7f3d0;
+    --border-focus: #10b981;
+
+    --text-heading: #022c22;
+    --text-body:    #144030;
+    --text-muted:   #4a7060;
+    --text-dim:     #80b099;
+
+    --color-success:  #059669;
+    --color-warning:  #d97706;
+    --color-danger:   #e11d48;
+    --color-info:     #0284c7;
+
+    --sidebar-bg-start: #022c22;
+    --sidebar-bg-end:   #052e16;
+    --header-bg: linear-gradient(95deg, #022c22 0%, #052e16 50%, #064e3b 100%);
+
+    --shadow-sm:  0 1px 4px rgba(5, 100, 60, 0.10);
+    --shadow-md:  0 4px 16px rgba(5, 100, 60, 0.14);
+    --shadow-lg:  0 10px 32px rgba(5, 100, 60, 0.18);
+    --shadow-xl:  0 20px 60px rgba(5, 100, 60, 0.22);
+}
+[data-theme="emerald"] .sidebar {
+    background: linear-gradient(180deg, #022c22 0%, #052e16 60%, #064e3b 100%);
+}
+[data-theme="emerald"] .topbar {
+    background: linear-gradient(95deg, #022c22 0%, #052e16 50%, #064e3b 100%);
+}
+[data-theme="emerald"] .btn-primary {
+    background: linear-gradient(135deg, #059669, #047857);
+    border-color: #059669;
+}
+[data-theme="emerald"] .btn-primary:hover {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+[data-theme="emerald"] .custom-table thead {
+    background: linear-gradient(90deg, #052e16, #064e3b);
+}
+[data-theme="emerald"] .stat-card { border-left: 4px solid #10b981; }
+[data-theme="emerald"] .nav-item a:hover,
+[data-theme="emerald"] .nav-item a.active { background: rgba(16,185,129,0.22); color: #a7f3d0; }
+[data-theme="emerald"] .login-left-banner {
+    background: linear-gradient(160deg, #022c22 0%, #052e16 50%, #064e3b 100%);
+}
+
+/* ─── 💜 Royal Amethyst ─────────────────────────────────────── */
+[data-theme="amethyst"] {
+    --indigo-950: #1a0533;
+    --indigo-900: #2e1065;
+    --indigo-800: #4c1d95;
+    --indigo-700: #6d28d9;
+    --indigo-600: #7c3aed;
+    --indigo-500: #8b5cf6;
+    --indigo-400: #a78bfa;
+    --indigo-100: #ede9fe;
+    --indigo-50:  #faf5ff;
+
+    --amber-500: #f472b6;
+    --amber-400: #f9a8d4;
+    --amber-300: #fbcfe8;
+    --amber-100: #fce7f3;
+
+    --bg-body:   #fdf4ff;
+    --bg-card:   #ffffff;
+    --bg-card-hover: #fefaff;
+    --bg-subtle: #faf5ff;
+
+    --border-light: #e9d5ff;
+    --border-focus: #8b5cf6;
+
+    --text-heading: #1a0533;
+    --text-body:    #321060;
+    --text-muted:   #6e4a8a;
+    --text-dim:     #a07cc0;
+
+    --color-success:  #059669;
+    --color-warning:  #d97706;
+    --color-danger:   #e11d48;
+    --color-info:     #0284c7;
+
+    --sidebar-bg-start: #1a0533;
+    --sidebar-bg-end:   #2e1065;
+    --header-bg: linear-gradient(95deg, #1a0533 0%, #2e1065 50%, #4c1d95 100%);
+
+    --shadow-sm:  0 1px 4px rgba(100, 20, 160, 0.10);
+    --shadow-md:  0 4px 16px rgba(100, 20, 160, 0.14);
+    --shadow-lg:  0 10px 32px rgba(100, 20, 160, 0.18);
+    --shadow-xl:  0 20px 60px rgba(100, 20, 160, 0.22);
+}
+[data-theme="amethyst"] .sidebar {
+    background: linear-gradient(180deg, #1a0533 0%, #2e1065 60%, #4c1d95 100%);
+}
+[data-theme="amethyst"] .topbar {
+    background: linear-gradient(95deg, #1a0533 0%, #2e1065 50%, #4c1d95 100%);
+}
+[data-theme="amethyst"] .btn-primary {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    border-color: #7c3aed;
+}
+[data-theme="amethyst"] .btn-primary:hover {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+[data-theme="amethyst"] .custom-table thead {
+    background: linear-gradient(90deg, #2e1065, #4c1d95);
+}
+[data-theme="amethyst"] .stat-card { border-left: 4px solid #8b5cf6; }
+[data-theme="amethyst"] .nav-item a:hover,
+[data-theme="amethyst"] .nav-item a.active { background: rgba(139,92,246,0.25); color: #e9d5ff; }
+[data-theme="amethyst"] .login-left-banner {
+    background: linear-gradient(160deg, #1a0533 0%, #2e1065 50%, #4c1d95 100%);
+}
+
+/* ─── Theme Picker UI ─────────────────────────────────────────── */
+.theme-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+.theme-card {
+    border: 2px solid var(--border-light);
+    border-radius: 16px;
+    padding: 0;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    overflow: hidden;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+}
+.theme-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--indigo-500);
+}
+.theme-card.active {
+    border-color: var(--indigo-600);
+    box-shadow: 0 0 0 4px rgba(99,102,241,0.25), var(--shadow-md);
+}
+[data-theme="ruby"] .theme-card.active    { border-color: #dc2626; box-shadow: 0 0 0 4px rgba(220,38,38,0.2), var(--shadow-md); }
+[data-theme="ocean"] .theme-card.active   { border-color: #0284c7; box-shadow: 0 0 0 4px rgba(2,132,199,0.2), var(--shadow-md); }
+[data-theme="emerald"] .theme-card.active { border-color: #059669; box-shadow: 0 0 0 4px rgba(5,150,105,0.2), var(--shadow-md); }
+[data-theme="amethyst"] .theme-card.active{ border-color: #7c3aed; box-shadow: 0 0 0 4px rgba(124,58,237,0.2), var(--shadow-md); }
+
+.theme-card-preview {
+    height: 60px;
+    display: flex;
+}
+.theme-preview-bar { flex: 1; }
+.theme-card-body {
+    padding: 12px 14px;
+}
+.theme-card-name {
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-heading);
+    margin-bottom: 4px;
+}
+.theme-card-desc {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+.theme-card-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #10b981;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    display: none;
+}
+.theme-card.active .theme-card-badge { display: block; }
+

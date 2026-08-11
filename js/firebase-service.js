@@ -198,9 +198,36 @@ class FirebaseService {
                 await this.cloudPut(item.endpoint, cloudObject);
             }
         }
+
+        // Sync System Settings (theme, etc.) — always fetch, never batch-upload back
+        const settingsCloud = await this.cloudGet(CONFIG.FIREBASE.ENDPOINTS.SETTINGS);
+        if (settingsCloud && typeof settingsCloud === 'object' && Object.keys(settingsCloud).length > 0) {
+            const cached = this.getCache(CONFIG.STORAGE_KEYS.SETTINGS) || {};
+            if (JSON.stringify(cached) !== JSON.stringify(settingsCloud)) {
+                this.setCache(CONFIG.STORAGE_KEYS.SETTINGS, settingsCloud);
+                window.dispatchEvent(new CustomEvent('settingsUpdated', { detail: settingsCloud }));
+            }
+        }
+    }
+
+    // --- System Settings (Theme, etc.) ---
+    getSettings() {
+        return this.getCache(CONFIG.STORAGE_KEYS.SETTINGS) || { theme: 'indigo' };
+    }
+
+    async saveSettings(newSettings) {
+        const current = this.getSettings();
+        const merged = { ...current, ...newSettings };
+        this.setCache(CONFIG.STORAGE_KEYS.SETTINGS, merged);
+        window.dispatchEvent(new CustomEvent('settingsUpdated', { detail: merged }));
+        if (this.isOnline) {
+            await this.cloudPut(CONFIG.FIREBASE.ENDPOINTS.SETTINGS, merged);
+        }
+        return merged;
     }
 
     // --- Entity CRUD Operations ---
+
 
     // 1. Students
     getStudents() {

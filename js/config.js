@@ -4,8 +4,8 @@
  */
 
 const CONFIG = {
-    SYSTEM_VERSION: "2.3",
-    VERSION: "v2.3",
+    SYSTEM_VERSION: "2.4",
+    VERSION: "v2.4",
 
     // 1. Firebase Realtime Database Configuration
     FIREBASE: {
@@ -20,14 +20,15 @@ const CONFIG = {
             REFERRALS: "referrals",
             ACTIVITIES: "activities",
             USERS: "users",
-            SYSTEM_LOGS: "system_logs"
+            SYSTEM_LOGS: "system_logs",
+            SETTINGS: "settings"
         }
     },
 
     // 2. Cloudinary CDN Configuration
     CLOUDINARY: {
         CLOUD_NAME: "eseojbyy",
-        UPLOAD_PRESET: "ml_default", // Unsigned upload preset
+        UPLOAD_PRESET: "ml_default",
         UPLOAD_URL: "https://api.cloudinary.com/v1_1/eseojbyy/image/upload",
         MAX_FILE_SIZE_MB: 5
     },
@@ -42,7 +43,8 @@ const CONFIG = {
         REFERRALS: "prcare_referrals_cache",
         ACTIVITIES: "prcare_activities_cache",
         AUTH_USER: "prcare_auth_user",
-        LAST_SYNC: "prcare_last_sync_timestamp"
+        LAST_SYNC: "prcare_last_sync_timestamp",
+        SETTINGS: "prcare_settings_cache"
     },
 
     // 4. Academic Levels & System Constants
@@ -65,22 +67,59 @@ const CONFIG = {
 
     SCREENING_LEVELS: {
         NORMAL: { code: "normal", label: "ปกติ", color: "#10b981", bg: "rgba(16, 185, 129, 0.15)" },
-        RISK: { code: "risk", label: "เสี่ยง", color: "#f59e0b", bg: "rgba(245, 158, 11, 0.15)" },
-        PROBLEM: { code: "problem", label: "มีปัญหา/กระทำผิด", color: "#ef4444", bg: "rgba(239, 68, 68, 0.15)" }
+        RISK:    { code: "risk",   label: "เสี่ยง", color: "#f59e0b", bg: "rgba(245, 158, 11, 0.15)" },
+        PROBLEM: { code: "problem",label: "มีปัญหา/กระทำผิด", color: "#ef4444", bg: "rgba(239, 68, 68, 0.15)" }
     },
 
     OFFENSE_LEVELS: {
-        MINOR: { code: "minor", label: "เบา", color: "#3b82f6" },
+        MINOR:    { code: "minor",    label: "เบา",      color: "#3b82f6" },
         MODERATE: { code: "moderate", label: "ปานกลาง", color: "#f59e0b" },
-        SEVERE: { code: "severe", label: "ร้ายแรง", color: "#ef4444" }
+        SEVERE:   { code: "severe",   label: "ร้ายแรง",  color: "#ef4444" }
     },
 
     REFERRAL_TYPES: {
-        INTERNAL: { code: "internal", label: "ส่งต่อภายใน", icon: "arrow-down-left" },
+        INTERNAL: { code: "internal", label: "ส่งต่อภายใน",   icon: "arrow-down-left" },
         EXTERNAL: { code: "external", label: "ส่งต่อภายนอก", icon: "arrow-up-right" }
     },
 
-    VERSION: "v1.1"
+    // 5. Theme System — 5 Premium Themes
+    THEMES: {
+        indigo: {
+            id: "indigo",
+            name: "Deep Indigo",
+            nameTH: "🔵 Deep Indigo (ค่าเริ่มต้น)",
+            description: "ดีพ อินดิโก × ทองอำพัน — ธีมดั้งเดิมของระบบ",
+            preview: ["#1e1b4b", "#312e81", "#f59e0b"]
+        },
+        ruby: {
+            id: "ruby",
+            name: "Volcanic Ruby Red",
+            nameTH: "🔴 Volcanic Ruby Red",
+            description: "แดงรูบี้ลาวา × ทองส้มเพลิง — หรูหราร้อนแรง",
+            preview: ["#7f1d1d", "#991b1b", "#fbbf24"]
+        },
+        ocean: {
+            id: "ocean",
+            name: "Midnight Ocean",
+            nameTH: "🌊 Midnight Ocean",
+            description: "น้ำเงินมหาสมุทร × ฟ้าซีเอน — เย็นสงบลึกซึ้ง",
+            preview: ["#0c1a2e", "#0f2d4a", "#06b6d4"]
+        },
+        emerald: {
+            id: "emerald",
+            name: "Emerald Forest",
+            nameTH: "🌿 Emerald Forest",
+            description: "เขียวป่าลึก × ม่วงลาเวนเดอร์ — สดชื่นธรรมชาติ",
+            preview: ["#052e16", "#064e3b", "#a78bfa"]
+        },
+        amethyst: {
+            id: "amethyst",
+            name: "Royal Amethyst",
+            nameTH: "💜 Royal Amethyst",
+            description: "ม่วงอเมทิสต์ × ชมพูโรส — หรูหราราชวงศ์",
+            preview: ["#2e1065", "#4c1d95", "#f472b6"]
+        }
+    }
 };
 
 // Freeze Config

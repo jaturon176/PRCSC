@@ -75,11 +75,71 @@ class Application {
             authManager.applyUIPermissions();
             this.renderDashboard();
         });
+        window.addEventListener('settingsUpdated', (e) => {
+            const settings = e.detail || {};
+            if (settings.theme) {
+                this.applyTheme(settings.theme, false); // false = don't re-save
+            }
+        });
 
         // Initialize Student Select Options
         this.updateStudentDropdowns();
         this.updateVersionUI();
         this.initDropZones();
+        this.initTheme();
+    }
+
+    // ─── Theme System ──────────────────────────────────────
+    initTheme() {
+        const settings = firebaseService.getSettings();
+        this.applyTheme(settings.theme || 'indigo', false);
+    }
+
+    applyTheme(themeId, save = true) {
+        const validThemes = ['indigo', 'ruby', 'ocean', 'emerald', 'amethyst'];
+        if (!validThemes.includes(themeId)) themeId = 'indigo';
+        document.body.dataset.theme = themeId;
+        // Update active state on theme picker if it's rendered
+        document.querySelectorAll('.theme-card').forEach(card => {
+            card.classList.toggle('active', card.dataset.themeId === themeId);
+        });
+    }
+
+    async changeTheme(themeId) {
+        this.applyTheme(themeId, false);
+        await firebaseService.saveSettings({ theme: themeId });
+        const theme = CONFIG.THEMES[themeId];
+        if (window.Swal) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: `เปลี่ยนธีมเป็น ${theme ? theme.nameTH : themeId} แล้ว`,
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true
+            });
+        }
+    }
+
+    renderThemePicker() {
+        const container = document.getElementById('theme-picker-container');
+        if (!container) return;
+        const currentTheme = (firebaseService.getSettings() || {}).theme || 'indigo';
+        container.innerHTML = Object.values(CONFIG.THEMES).map(t => `
+            <div class="theme-card ${t.id === currentTheme ? 'active' : ''}" data-theme-id="${t.id}" onclick="app.changeTheme('${t.id}')" title="${t.description}">
+                <div class="theme-card-badge">✓ ใช้งานอยู่</div>
+                <div class="theme-card-preview">
+                    <div class="theme-preview-bar" style="background:${t.preview[0]};"></div>
+                    <div class="theme-preview-bar" style="background:${t.preview[1]};"></div>
+                    <div class="theme-preview-bar" style="background:${t.preview[2]};"></div>
+                </div>
+                <div class="theme-card-body">
+                    <div class="theme-card-name">${t.nameTH}</div>
+                    <div class="theme-card-desc">${t.description}</div>
+                </div>
+            </div>
+        `).join('');
     }
 
     initDropZones() {
@@ -200,6 +260,11 @@ class Application {
         // Re-render chart if switching to dashboard
         if (pageId === 'dashboard') {
             this.renderDashboardCharts();
+        }
+
+        // Render theme picker when admin page is shown
+        if (pageId === 'admin') {
+            this.renderThemePicker();
         }
     }
 
