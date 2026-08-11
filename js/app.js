@@ -79,6 +79,59 @@ class Application {
         // Initialize Student Select Options
         this.updateStudentDropdowns();
         this.updateVersionUI();
+        this.initDropZones();
+    }
+
+    initDropZones() {
+        // Student CSV drop zone
+        const csvInput = document.getElementById('csv-file-input');
+        const csvFilename = document.getElementById('student-csv-filename');
+        const csvFileDiv = document.getElementById('student-csv-selected-file');
+        if (csvInput) {
+            csvInput.addEventListener('change', () => {
+                if (csvInput.files.length > 0 && csvFilename && csvFileDiv) {
+                    csvFilename.textContent = csvInput.files[0].name;
+                    csvFileDiv.style.display = 'flex';
+                }
+            });
+        }
+        // Teacher CSV drop zone
+        const tchCsvInput = document.getElementById('teacher-csv-file-input');
+        const tchFilename = document.getElementById('teacher-csv-filename');
+        const tchFileDiv = document.getElementById('teacher-csv-selected-file');
+        if (tchCsvInput) {
+            tchCsvInput.addEventListener('change', () => {
+                if (tchCsvInput.files.length > 0 && tchFilename && tchFileDiv) {
+                    tchFilename.textContent = tchCsvInput.files[0].name;
+                    tchFileDiv.style.display = 'flex';
+                }
+            });
+        }
+        // Offense image drop zone
+        const offenseDropZone = document.getElementById('offense-drop-zone');
+        const offenseFileInput = document.getElementById('offense-file-input');
+        if (offenseDropZone && offenseFileInput) {
+            offenseDropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                offenseDropZone.classList.add('dragging');
+            });
+            offenseDropZone.addEventListener('dragleave', () => {
+                offenseDropZone.classList.remove('dragging');
+            });
+            offenseDropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                offenseDropZone.classList.remove('dragging');
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    this.handleOffenseImageSelect(file);
+                }
+            });
+            offenseFileInput.addEventListener('change', () => {
+                if (offenseFileInput.files.length > 0) {
+                    this.handleOffenseImageSelect(offenseFileInput.files[0]);
+                }
+            });
+        }
     }
 
     // --- Sample Data Purge ---
