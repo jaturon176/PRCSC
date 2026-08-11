@@ -83,6 +83,7 @@ class Application {
 
     // --- Seed Data Loader ---
     checkAndLoadSeedData() {
+        if (localStorage.getItem('prcare_seed_cleared_students') === 'true') return;
         const students = firebaseService.getStudents();
         if (!students || students.length === 0) {
             console.log('[App] Loading default sample Thai student data (ม.1-ม.6, ปวช.1-ปวช.3)...');
@@ -139,6 +140,7 @@ class Application {
     }
 
     checkAndLoadTeacherSeedData() {
+        if (localStorage.getItem('prcare_seed_cleared_teachers') === 'true') return;
         const teachers = firebaseService.getTeachers();
         if (!teachers || teachers.length === 0) {
             console.log('[App] Loading default sample Teacher data...');
@@ -362,6 +364,63 @@ class Application {
 
         document.getElementById('btn-clear-cache')?.addEventListener('click', () => {
             this.clearCache();
+        });
+
+        // Delete All Handlers
+        document.getElementById('btn-delete-all-students')?.addEventListener('click', async () => {
+            const students = firebaseService.getStudents();
+            if (students.length === 0) {
+                alert('ไม่มีข้อมูลนักเรียนในระบบ');
+                return;
+            }
+            const confirmed = await this.confirmDialog({
+                title: '⚠️ ยืนยันการลบข้อมูลนักเรียนทั้งหมด',
+                message: `คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนักเรียนทั้งหมด (${students.length} รายการ)? การดำเนินการนี้จะไม่สามารถย้อนกลับได้`,
+                type: 'danger',
+                confirmText: 'ลบข้อมูลนักเรียนทั้งหมด',
+                cancelText: 'ยกเลิก'
+            });
+            if (confirmed) {
+                localStorage.setItem('prcare_seed_cleared_students', 'true');
+                await firebaseService.deleteAllStudents();
+                alert('ลบข้อมูลนักเรียนทั้งหมดเรียบร้อยแล้ว');
+            }
+        });
+
+        document.getElementById('btn-delete-all-teachers')?.addEventListener('click', async () => {
+            const teachers = firebaseService.getTeachers();
+            if (teachers.length === 0) {
+                alert('ไม่มีข้อมูลครูในระบบ');
+                return;
+            }
+            const confirmed = await this.confirmDialog({
+                title: '⚠️ ยืนยันการลบข้อมูลครูทั้งหมด',
+                message: `คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลครูและบุคลากรทั้งหมด (${teachers.length} รายการ)? การดำเนินการนี้จะไม่สามารถย้อนกลับได้`,
+                type: 'danger',
+                confirmText: 'ลบข้อมูลครูทั้งหมด',
+                cancelText: 'ยกเลิก'
+            });
+            if (confirmed) {
+                localStorage.setItem('prcare_seed_cleared_teachers', 'true');
+                await firebaseService.deleteAllTeachers();
+                alert('ลบข้อมูลครูทั้งหมดเรียบร้อยแล้ว');
+            }
+        });
+
+        document.getElementById('btn-delete-all-system-data')?.addEventListener('click', async () => {
+            const confirmed = await this.confirmDialog({
+                title: '🚨 ยืนยันการลบข้อมูลทั้งหมดในระบบ',
+                message: 'คำเตือน: คุณต้องการลบข้อมูลทุกอย่างในระบบ (นักเรียน, ครู, ผลการคัดกรอง, ความผิด, ความดี, การส่งต่อ) ทั้งหมดใช่หรือไม่?',
+                type: 'danger',
+                confirmText: 'ลบข้อมูลทุกอย่างในระบบ',
+                cancelText: 'ยกเลิก'
+            });
+            if (confirmed) {
+                localStorage.setItem('prcare_seed_cleared_students', 'true');
+                localStorage.setItem('prcare_seed_cleared_teachers', 'true');
+                await firebaseService.deleteAllSystemData();
+                alert('ลบข้อมูลทั้งหมดในระบบเรียบร้อยแล้ว');
+            }
         });
 
         // CSV Import Controls

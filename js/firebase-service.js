@@ -234,6 +234,16 @@ class FirebaseService {
         return true;
     }
 
+    async deleteAllStudents() {
+        this.setCache(CONFIG.STORAGE_KEYS.STUDENTS, []);
+        window.dispatchEvent(new CustomEvent('studentsUpdated', { detail: [] }));
+
+        if (this.isOnline) {
+            await this.cloudDelete(CONFIG.FIREBASE.ENDPOINTS.STUDENTS);
+        }
+        return true;
+    }
+
     // 1.5 Teachers
     getTeachers() {
         return this.getCache(CONFIG.STORAGE_KEYS.TEACHERS) || [];
@@ -297,6 +307,36 @@ class FirebaseService {
 
         if (this.isOnline) {
             await this.cloudDelete(`${CONFIG.FIREBASE.ENDPOINTS.TEACHERS}/${realId}`);
+        }
+        return true;
+    }
+
+    async deleteAllTeachers() {
+        this.setCache(CONFIG.STORAGE_KEYS.TEACHERS, []);
+        window.dispatchEvent(new CustomEvent('teachersUpdated', { detail: [] }));
+
+        if (this.isOnline) {
+            await this.cloudDelete(CONFIG.FIREBASE.ENDPOINTS.TEACHERS);
+        }
+        return true;
+    }
+
+    async deleteAllSystemData() {
+        const collections = [
+            { key: CONFIG.STORAGE_KEYS.STUDENTS, endpoint: CONFIG.FIREBASE.ENDPOINTS.STUDENTS, event: 'studentsUpdated' },
+            { key: CONFIG.STORAGE_KEYS.TEACHERS, endpoint: CONFIG.FIREBASE.ENDPOINTS.TEACHERS, event: 'teachersUpdated' },
+            { key: CONFIG.STORAGE_KEYS.SCREENINGS, endpoint: CONFIG.FIREBASE.ENDPOINTS.SCREENINGS, event: 'screeningsUpdated' },
+            { key: CONFIG.STORAGE_KEYS.MERITS, endpoint: CONFIG.FIREBASE.ENDPOINTS.MERITS, event: 'meritsUpdated' },
+            { key: CONFIG.STORAGE_KEYS.OFFENSES, endpoint: CONFIG.FIREBASE.ENDPOINTS.OFFENSES, event: 'offensesUpdated' },
+            { key: CONFIG.STORAGE_KEYS.REFERRALS, endpoint: CONFIG.FIREBASE.ENDPOINTS.REFERRALS, event: 'referralsUpdated' }
+        ];
+
+        for (const item of collections) {
+            this.setCache(item.key, []);
+            window.dispatchEvent(new CustomEvent(item.event, { detail: [] }));
+            if (this.isOnline) {
+                await this.cloudDelete(item.endpoint);
+            }
         }
         return true;
     }
