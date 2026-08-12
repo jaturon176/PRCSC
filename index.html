@@ -347,8 +347,173 @@
                     </div>
                 </div>
 
+                <!-- PHQ-A Depression Screening Dashboard -->
+                <div class="glass-panel" style="margin-top: 20px;" id="panel-phqa-dashboard">
+                    <div class="panel-header" style="flex-wrap: wrap; gap: 12px;">
+                        <div>
+                            <h3 class="panel-title" style="font-size: 1.08rem;">
+                                <i class="ri-heart-pulse-fill" style="color: #e11d48;"></i>
+                                แดชบอร์ดภาวะซึมเศร้าในวัยรุ่น (PHQ-A) · แยกตาม 5 ระดับ
+                            </h3>
+                            <p style="color: #64748b; font-size: 0.84rem; margin-top: 2px;">
+                                ข้อมูลจากนักเรียนที่ทำแบบประเมิน PHQ-A • คะแนน 0–27 คะแนน
+                            </p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <span class="badge" id="phqa-total-badge" style="background: rgba(225,29,72,0.1); color: #e11d48; border: 1px solid rgba(225,29,72,0.2); font-weight: 700; font-size: 0.82rem; padding: 6px 14px; border-radius: 20px;">
+                                🧠 ประเมินแล้ว 0 ราย
+                            </span>
+                            <span class="badge" id="phqa-risk-badge" style="background: rgba(220,38,38,0.08); color: #b91c1c; border: 1px solid rgba(220,38,38,0.2); font-weight: 600; font-size: 0.8rem; padding: 5px 12px; border-radius: 20px; display: none;">
+                                🚨 เฝ้าระวัง 0 ราย
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Main PHQ-A Layout: Chart + Stats + Grade Table -->
+                    <div style="display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: start;">
+
+                        <!-- Left: Donut Chart -->
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                            <div style="position: relative; width: 200px; height: 200px;">
+                                <canvas id="chart-phqa-donut" width="200" height="200"></canvas>
+                                <div id="phqa-donut-center" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none;">
+                                    <div id="phqa-donut-total" style="font-size: 1.8rem; font-weight: 800; color: #0f172a; line-height: 1;">0</div>
+                                    <div style="font-size: 0.72rem; color: #64748b; font-weight: 600;">ราย</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 0.78rem; color: #64748b; text-align: center; line-height: 1.5;">
+                                <i class="ri-information-fill" style="color: #0284c7;"></i>
+                                แสดงสัดส่วนนักเรียน<br>จำแนกตามระดับภาวะซึมเศร้า
+                            </div>
+                        </div>
+
+                        <!-- Right: Stats + Grade Breakdown -->
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+
+                            <!-- 5 Level Stat Bars -->
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+
+                                <!-- Level 1: Normal -->
+                                <div class="phqa-level-row" style="background: rgba(5,150,105,0.06); border: 1px solid rgba(5,150,105,0.15); border-radius: 12px; padding: 10px 14px;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div style="width: 10px; height: 10px; border-radius: 50%; background: #059669;"></div>
+                                            <span style="font-weight: 700; color: #059669; font-size: 0.86rem;">ไม่มีภาวะซึมเศร้า (0–4)</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <strong id="phqa-cnt-normal" style="color: #0f172a; font-size: 0.9rem;">0 ราย</strong>
+                                            <span id="phqa-pct-normal" style="background: rgba(5,150,105,0.12); color: #059669; font-weight: 700; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px;">0%</span>
+                                        </div>
+                                    </div>
+                                    <div style="height: 6px; background: rgba(5,150,105,0.12); border-radius: 6px;">
+                                        <div id="phqa-bar-normal" style="height: 100%; width: 0%; background: linear-gradient(90deg, #059669, #10b981); border-radius: 6px; transition: width 0.7s ease;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Level 2: Mild -->
+                                <div class="phqa-level-row" style="background: rgba(2,132,199,0.06); border: 1px solid rgba(2,132,199,0.15); border-radius: 12px; padding: 10px 14px;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div style="width: 10px; height: 10px; border-radius: 50%; background: #0284c7;"></div>
+                                            <span style="font-weight: 700; color: #0284c7; font-size: 0.86rem;">มีภาวะซึมเศร้าเล็กน้อย (5–9)</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <strong id="phqa-cnt-mild" style="color: #0f172a; font-size: 0.9rem;">0 ราย</strong>
+                                            <span id="phqa-pct-mild" style="background: rgba(2,132,199,0.12); color: #0284c7; font-weight: 700; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px;">0%</span>
+                                        </div>
+                                    </div>
+                                    <div style="height: 6px; background: rgba(2,132,199,0.12); border-radius: 6px;">
+                                        <div id="phqa-bar-mild" style="height: 100%; width: 0%; background: linear-gradient(90deg, #0284c7, #38bdf8); border-radius: 6px; transition: width 0.7s ease;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Level 3: Moderate -->
+                                <div class="phqa-level-row" style="background: rgba(217,119,6,0.06); border: 1px solid rgba(217,119,6,0.15); border-radius: 12px; padding: 10px 14px;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div style="width: 10px; height: 10px; border-radius: 50%; background: #d97706;"></div>
+                                            <span style="font-weight: 700; color: #d97706; font-size: 0.86rem;">มีภาวะซึมเศร้าปานกลาง (10–14)</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <strong id="phqa-cnt-moderate" style="color: #0f172a; font-size: 0.9rem;">0 ราย</strong>
+                                            <span id="phqa-pct-moderate" style="background: rgba(217,119,6,0.12); color: #d97706; font-weight: 700; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px;">0%</span>
+                                        </div>
+                                    </div>
+                                    <div style="height: 6px; background: rgba(217,119,6,0.12); border-radius: 6px;">
+                                        <div id="phqa-bar-moderate" style="height: 100%; width: 0%; background: linear-gradient(90deg, #d97706, #fbbf24); border-radius: 6px; transition: width 0.7s ease;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Level 4: Severe High -->
+                                <div class="phqa-level-row" style="background: rgba(234,88,12,0.06); border: 1px solid rgba(234,88,12,0.15); border-radius: 12px; padding: 10px 14px;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div style="width: 10px; height: 10px; border-radius: 50%; background: #ea580c;"></div>
+                                            <span style="font-weight: 700; color: #ea580c; font-size: 0.86rem;">มีภาวะซึมเศร้ามาก (15–19)</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <strong id="phqa-cnt-severe-high" style="color: #0f172a; font-size: 0.9rem;">0 ราย</strong>
+                                            <span id="phqa-pct-severe-high" style="background: rgba(234,88,12,0.12); color: #ea580c; font-weight: 700; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px;">0%</span>
+                                        </div>
+                                    </div>
+                                    <div style="height: 6px; background: rgba(234,88,12,0.12); border-radius: 6px;">
+                                        <div id="phqa-bar-severe-high" style="height: 100%; width: 0%; background: linear-gradient(90deg, #ea580c, #fb923c); border-radius: 6px; transition: width 0.7s ease;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Level 5: Severe Extreme -->
+                                <div class="phqa-level-row" style="background: rgba(225,29,72,0.07); border: 1px solid rgba(225,29,72,0.2); border-radius: 12px; padding: 10px 14px;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div style="width: 10px; height: 10px; border-radius: 50%; background: #e11d48;"></div>
+                                            <span style="font-weight: 700; color: #e11d48; font-size: 0.86rem;">มีภาวะซึมเศร้ารุนแรง (20–27)</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <strong id="phqa-cnt-severe-extreme" style="color: #0f172a; font-size: 0.9rem;">0 ราย</strong>
+                                            <span id="phqa-pct-severe-extreme" style="background: rgba(225,29,72,0.12); color: #e11d48; font-weight: 700; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px;">0%</span>
+                                        </div>
+                                    </div>
+                                    <div style="height: 6px; background: rgba(225,29,72,0.12); border-radius: 6px;">
+                                        <div id="phqa-bar-severe-extreme" style="height: 100%; width: 0%; background: linear-gradient(90deg, #e11d48, #fb7185); border-radius: 6px; transition: width 0.7s ease;"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grade Breakdown Bar Chart & Table -->
+                    <div style="margin-top: 24px; border-top: 1px dashed var(--border-light); padding-top: 20px;">
+                        <h4 style="font-size: 0.92rem; font-weight: 700; color: var(--text-heading); margin-bottom: 14px; display: flex; align-items: center; gap: 6px;">
+                            <i class="ri-bar-chart-2-fill" style="color: #e11d48;"></i>
+                            จำนวนนักเรียนที่เข้ารับการประเมิน PHQ-A แยกตามระดับชั้น
+                        </h4>
+                        <div style="position: relative; height: 200px; margin-bottom: 20px;">
+                            <canvas id="chart-phqa-by-grade"></canvas>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="custom-table" style="font-size: 0.82rem;">
+                                <thead>
+                                    <tr id="phqa-grade-table-head">
+                                        <th>ระดับชั้น</th>
+                                        <th style="background: rgba(5,150,105,0.1); color: #059669;">ปกติ</th>
+                                        <th style="background: rgba(2,132,199,0.1); color: #0284c7;">เล็กน้อย</th>
+                                        <th style="background: rgba(217,119,6,0.1); color: #d97706;">ปานกลาง</th>
+                                        <th style="background: rgba(234,88,12,0.1); color: #ea580c;">มาก</th>
+                                        <th style="background: rgba(225,29,72,0.1); color: #e11d48;">รุนแรง</th>
+                                        <th>รวม</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="phqa-grade-table-body">
+                                    <tr><td colspan="7" style="text-align:center; color:#64748b; padding: 20px;">ยังไม่มีข้อมูลการประเมิน PHQ-A</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Live Student Care Stream Panel -->
-                <div class="glass-panel" style="margin-top: 10px;">
+                <div class="glass-panel" style="margin-top: 20px;">
                     <div class="panel-header">
                         <h3 class="panel-title"><i class="ri-history-line" style="color: #f59e0b;"></i> กิจกรรมการดูแลช่วยเหลือนักเรียนล่าสุด</h3>
                         <button class="btn btn-secondary btn-sm" onclick="app.renderDashboard()"><i class="ri-refresh-line"></i> รีเฟรชข้อมูล</button>
