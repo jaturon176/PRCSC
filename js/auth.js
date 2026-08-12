@@ -32,12 +32,16 @@ class AuthManager {
      */
     async login(role, username, password) {
         let userProfile = null;
-        const users = firebaseService.getUsers();
+        const users = firebaseService.getUsers() || [];
+        const cleanUser = (username || '').toString().trim();
+        const cleanPass = (password || '').toString().trim();
 
-        // 1. Search in Registered Users Manager Database
+        if (!cleanUser) return false;
+
+        // 1. Search in Registered Users Manager Database (Explicit User Credentials / Admin Overrides)
         const matchedUser = users.find(u => 
-            u.username && u.username.toLowerCase() === (username || '').toLowerCase() && 
-            (!password || u.password === password)
+            u.username && u.username.toString().trim().toLowerCase() === cleanUser.toLowerCase() && 
+            (!cleanPass || u.password === cleanPass || u.password === cleanUser)
         );
 
         if (matchedUser) {
@@ -49,36 +53,78 @@ class AuthManager {
                 roleTitle: CONFIG.ROLE_NAMES_TH[matchedUser.role] || matchedUser.role,
                 avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${matchedUser.role}_${matchedUser.username}`
             };
+        } else if (role === CONFIG.ROLES.TEACHER || (!role && cleanUser.replace(/\D/g, '').length >= 9)) {
+            // 2. Teacher Login: ใช้เบอร์โทรศัพท์ (Phone Number) เป็นชื่อผู้ใช้และรหัสผ่าน
+            const teachers = firebaseService.getTeachers() || [];
+            const normPhone = cleanUser.replace(/\D/g, ''); // strip spaces and hyphens
+
+            const teacherMatch = teachers.find(t => {
+                const tPhone = String(t.phone || t.tel || t.mobile || t.username || '').replace(/\D/g, '');
+                return (tPhone && normPhone && tPhone === normPhone) || (t.fullName && t.fullName.includes(cleanUser));
+            });
+
+            if (teacherMatch) {
+                userProfile = {
+                    id: teacherMatch.id || ('TCH_' + (normPhone || cleanUser)),
+                    name: teacherMatch.fullName || teacherMatch.name || 'ครู / บุคลากร',
+                    phone: teacherMatch.phone || cleanUser,
+                    role: CONFIG.ROLES.TEACHER,
+                    roleTitle: CONFIG.ROLE_NAMES_TH.teacher,
+                    avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=teacher_${normPhone || cleanUser}`
+                };
+            } else {
+                // Allow dynamic session for teacher using phone number as user & pass
+                userProfile = {
+                    id: 'TCH_' + (normPhone || cleanUser),
+                    name: `ครู (เบอร์โทร ${cleanUser})`,
+                    phone: cleanUser,
+                    role: CONFIG.ROLES.TEACHER,
+                    roleTitle: CONFIG.ROLE_NAMES_TH.teacher,
+                    avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=teacher_${cleanUser}`
+                };
+            }
         } else if (role === CONFIG.ROLES.STUDENT) {
-            const students = firebaseService.getStudents();
-            const studentMatch = students.find(s => s.studentId === username || (s.fullName && s.fullName.includes(username)));
-            
-            userProfile = {
-                id: studentMatch ? studentMatch.id : 'STD_USER',
-                studentId: studentMatch ? studentMatch.studentId : (username || ''),
-                name: studentMatch ? studentMatch.fullName : (username || 'นักเรียน'),
-                grade: studentMatch ? studentMatch.grade : '-',
-                room: studentMatch ? studentMatch.room : '-',
-                role: CONFIG.ROLES.STUDENT,
-                roleTitle: CONFIG.ROLE_NAMES_TH.student,
-                avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=student'
-            };
-        } else if (role === CONFIG.ROLES.TEACHER) {
-            userProfile = {
-                id: 'TCH_01',
-                name: username || 'ครูผู้ใช้งานระบบ',
-                role: CONFIG.ROLES.TEACHER,
-                roleTitle: CONFIG.ROLE_NAMES_TH.teacher,
-                avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=teacher'
-            };
-        } else if (role === CONFIG.ROLES.ADMIN) {
-            userProfile = {
-                id: 'ADM_01',
-                name: username || 'ผู้ดูแลระบบ (Admin)',
-                role: CONFIG.ROLES.ADMIN,
-                roleTitle: CONFIG.ROLE_NAMES_TH.admin,
-                avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=admin'
-            };
+            // 3. Student Login: ใช้รหัสประจำตัวนักเรียน (Student ID) เป็นชื่อผู้ใช้และรหัสผ่าน
+            const students = firebaseService.getStudents() || [];
+            const studentMatch = students.find(s => {
+                const sId = String(s.studentId || s.id || '').trim();
+                return sId.toLowerCase() === cleanUser.toLowerCase();
+            });
+
+            if (studentMatch) {
+                userProfile = {
+                    id: studentMatch.id || ('STD_' + studentMatch.studentId),
+                    studentId: studentMatch.studentId || cleanUser,
+                    name: studentMatch.fullName || (studentMatch.prefix ? `${studentMatch.prefix}${studentMatch.name} ${studentMatch.surname}` : `นักเรียน (${cleanUser})`),
+                    grade: studentMatch.grade || '-',
+                    room: studentMatch.room || '-',
+                    role: CONFIG.ROLES.STUDENT,
+                    roleTitle: CONFIG.ROLE_NAMES_TH.student,
+                    avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=student_${studentMatch.studentId || cleanUser}`
+                };
+            } else {
+                // Allow dynamic session for student using student ID as user & pass
+                userProfile = {
+                    id: 'STD_' + cleanUser,
+                    studentId: cleanUser,
+                    name: `นักเรียน (รหัสประจำตัว ${cleanUser})`,
+                    grade: '-',
+                    room: '-',
+                    role: CONFIG.ROLES.STUDENT,
+                    roleTitle: CONFIG.ROLE_NAMES_TH.student,
+                    avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=student_${cleanUser}`
+                };
+            }
+        } else if (role === CONFIG.ROLES.ADMIN || cleanUser === 'admin') {
+            if (cleanUser === 'admin' && (!cleanPass || cleanPass === 'admin123' || cleanPass === 'admin')) {
+                userProfile = {
+                    id: 'ADM_01',
+                    name: 'ผู้ดูแลระบบ (Administrator)',
+                    role: CONFIG.ROLES.ADMIN,
+                    roleTitle: CONFIG.ROLE_NAMES_TH.admin,
+                    avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=admin'
+                };
+            }
         }
 
         if (userProfile) {

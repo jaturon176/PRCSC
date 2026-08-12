@@ -1481,11 +1481,30 @@ class Application {
             }
         });
 
+        const userLabel = document.getElementById('page-login-user-label');
+        const passLabel = document.getElementById('page-login-pass-label');
         const usernameInput = document.getElementById('page-login-user');
-        if (usernameInput) {
-            if (role === 'teacher') usernameInput.value = 'teacher1';
-            else if (role === 'student') usernameInput.value = 'student1';
-            else if (role === 'admin') usernameInput.value = 'admin';
+        const passwordInput = document.getElementById('page-login-pass');
+        const hintText = document.getElementById('login-role-hint-text');
+
+        if (role === 'teacher') {
+            if (userLabel) userLabel.innerHTML = '<i class="ri-phone-line" style="color: #0284c7;"></i> เบอร์โทรศัพท์ (ชื่อผู้ใช้)';
+            if (passLabel) passLabel.innerHTML = '<i class="ri-lock-2-line" style="color: #0284c7;"></i> รหัสผ่าน (เบอร์โทรศัพท์)';
+            if (usernameInput) { usernameInput.placeholder = 'กรอกเบอร์โทรศัพท์ (เช่น 0812345678)...'; usernameInput.value = ''; }
+            if (passwordInput) { passwordInput.placeholder = 'กรอกเบอร์โทรศัพท์ซ้ำอีกครั้ง...'; passwordInput.value = ''; }
+            if (hintText) hintText.innerHTML = 'สำหรับครู: กรอกเบอร์โทรศัพท์เป็นทั้งชื่อผู้ใช้และรหัสผ่านในการเข้าใช้งาน';
+        } else if (role === 'student') {
+            if (userLabel) userLabel.innerHTML = '<i class="ri-id-card-line" style="color: #0284c7;"></i> รหัสประจำตัวนักเรียน (ชื่อผู้ใช้)';
+            if (passLabel) passLabel.innerHTML = '<i class="ri-lock-2-line" style="color: #0284c7;"></i> รหัสผ่าน (รหัสประจำตัวนักเรียน)';
+            if (usernameInput) { usernameInput.placeholder = 'กรอกรหัสประจำตัวนักเรียน (เช่น 67001)...'; usernameInput.value = ''; }
+            if (passwordInput) { passwordInput.placeholder = 'กรอกรหัสประจำตัวนักเรียนซ้ำอีกครั้ง...'; passwordInput.value = ''; }
+            if (hintText) hintText.innerHTML = 'สำหรับนักเรียน: กรอกรหัสประจำตัวนักเรียนเป็นทั้งชื่อผู้ใช้และรหัสผ่านในการเข้าใช้งาน';
+        } else if (role === 'admin') {
+            if (userLabel) userLabel.innerHTML = '<i class="ri-user-shield-line" style="color: #0284c7;"></i> ชื่อผู้ใช้ผู้ดูแลระบบ (Admin Username)';
+            if (passLabel) passLabel.innerHTML = '<i class="ri-lock-2-line" style="color: #0284c7;"></i> รหัสผ่าน (Password)';
+            if (usernameInput) { usernameInput.placeholder = 'admin'; usernameInput.value = 'admin'; }
+            if (passwordInput) { passwordInput.placeholder = '••••••••'; passwordInput.value = 'admin123'; }
+            if (hintText) hintText.innerHTML = 'สำหรับผู้ดูแลระบบ: กรอก Username (admin) และ Password (admin123)';
         }
     }
 
@@ -1507,8 +1526,8 @@ class Application {
             console.log('[App] Seeding initial User Accounts with Passwords...');
             const defaultUsers = [
                 { id: 'USR_ADMIN_01', username: 'admin', fullName: 'ผู้ดูแลระบบ (Admin)', role: 'admin', password: 'admin123', createdAt: new Date().toISOString() },
-                { id: 'USR_TEACHER_01', username: 'teacher1', fullName: 'ครูกิจการนักเรียน', role: 'teacher', password: 'teacher123', createdAt: new Date().toISOString() },
-                { id: 'USR_STUDENT_01', username: 'student1', fullName: 'นักเรียน', role: 'student', password: '123456', createdAt: new Date().toISOString() }
+                { id: 'USR_TEACHER_01', username: '0812345678', fullName: 'ครูกิจการนักเรียน (ตัวอย่างเบอร์โทร)', role: 'teacher', password: '0812345678', createdAt: new Date().toISOString() },
+                { id: 'USR_STUDENT_01', username: '67001', fullName: 'นักเรียน (ตัวอย่างรหัสนักเรียน)', role: 'student', password: '67001', createdAt: new Date().toISOString() }
             ];
             firebaseService.saveUsersBatch(defaultUsers);
         }

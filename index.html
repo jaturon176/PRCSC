@@ -76,22 +76,27 @@
                     <input type="hidden" id="page-login-role" value="teacher">
 
                     <div class="light-field-group">
-                        <label class="light-field-label">
-                            <i class="ri-user-3-line" style="color: #0284c7;"></i> ชื่อผู้ใช้งาน / รหัสนักเรียน / อีเมล
+                        <label class="light-field-label" id="page-login-user-label">
+                            <i class="ri-phone-line" style="color: #0284c7;"></i> เบอร์โทรศัพท์ (ชื่อผู้ใช้)
                         </label>
                         <div class="light-field-input-wrap">
-                            <input type="text" class="light-field-input" id="page-login-user" placeholder="กรอกชื่อผู้ใช้ หรือ รหัสนักเรียน..." value="ครูสมศักดิ์ รักเรียน" required>
+                            <input type="text" class="light-field-input" id="page-login-user" placeholder="กรอกเบอร์โทรศัพท์ (เช่น 0812345678)..." required>
                         </div>
                     </div>
 
                     <div class="light-field-group">
-                        <label class="light-field-label">
-                            <i class="ri-lock-2-line" style="color: #0284c7;"></i> รหัสผ่าน
+                        <label class="light-field-label" id="page-login-pass-label">
+                            <i class="ri-lock-2-line" style="color: #0284c7;"></i> รหัสผ่าน (เบอร์โทรศัพท์)
                         </label>
                         <div class="light-field-input-wrap">
-                            <input type="password" class="light-field-input" id="page-login-pass" value="123456" placeholder="••••••••" required>
+                            <input type="password" class="light-field-input" id="page-login-pass" placeholder="กรอกเบอร์โทรศัพท์อีกครั้ง..." required>
                             <button type="button" class="password-toggle-btn" onclick="app.togglePasswordVisibility('page-login-pass', this)"><i class="ri-eye-line"></i></button>
                         </div>
+                    </div>
+
+                    <div id="login-role-hint-badge" style="background: rgba(2, 132, 199, 0.08); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 10px; padding: 10px 14px; font-size: 0.84rem; color: #0369a1; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                        <i class="ri-information-line" style="font-size: 1.1rem; flex-shrink: 0;"></i>
+                        <span id="login-role-hint-text">สำหรับครู: กรอกเบอร์โทรศัพท์เป็นทั้งชื่อผู้ใช้และรหัสผ่านในการเข้าใช้งาน</span>
                     </div>
 
                     <button type="submit" class="btn-signin-submit">
@@ -612,6 +617,16 @@
                             <p style="color: var(--text-muted); font-size: 0.9rem;">บริหารจัดการบัญชีสิทธิ์ผู้ใช้งาน ชื่อผู้ใช้ (Username) และรหัสผ่าน (Password) ทั้งระบบ</p>
                         </div>
                         <button class="btn btn-primary" id="btn-add-user-account"><i class="ri-user-add-line"></i> เพิ่มบัญชีผู้ใช้ใหม่</button>
+                    </div>
+
+                    <div style="background: rgba(2, 132, 199, 0.07); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 12px; padding: 12px 16px; margin-bottom: 18px; font-size: 0.88rem; color: #0369a1; display: flex; align-items: center; gap: 10px;">
+                        <i class="ri-shield-keyhole-line" style="font-size: 1.3rem; flex-shrink: 0; color: #0284c7;"></i>
+                        <div>
+                            <strong>📌 รูปแบบการเข้าใช้งานระบบ (Login Standard Guidelines):</strong><br>
+                            • <strong>👨‍🏫 ครู / บุคลากร:</strong> ลงชื่อเข้าใช้โดยใช้ <u>เบอร์โทรศัพท์</u> เป็นทั้งชื่อผู้ใช้และรหัสผ่าน (เช่น <code>0812345678</code>)<br>
+                            • <strong>🎓 นักเรียน:</strong> ลงชื่อเข้าใช้โดยใช้ <u>รหัสประจำตัวนักเรียน</u> เป็นทั้งชื่อผู้ใช้และรหัสผ่าน (เช่น <code>67001</code>)<br>
+                            • <strong>🛡️ ผู้ดูแลระบบ:</strong> ลงชื่อเข้าใช้ด้วยบัญชี Admin (เช่น <code>admin</code> / <code>admin123</code>)
+                        </div>
                     </div>
 
                     <div class="table-responsive">
