@@ -645,9 +645,18 @@ class Application {
                 alertType = 'info';
             }
 
+            // Look up student details for dashboard aggregation
+            const students = firebaseService.getStudents();
+            const studentObj = students.find(s => (s.studentId || s.id) === studentId);
+            const studentGrade = studentObj ? (studentObj.grade || '') : '';
+            const studentName = studentObj ? `${studentObj.prefix || ''}${studentObj.fullName || studentObj.name || ''}` : studentId;
+
             const screening = {
                 type: 'depression',
                 studentId,
+                studentName,
+                grade: studentGrade,
+                phqaScore: totalScore,   // numeric score for dashboard aggregation
                 totalScore,
                 resultLevel,
                 levelLabel,
@@ -657,6 +666,7 @@ class Application {
                 assessor: authManager.getCurrentUser()?.name || 'ครูผู้ประเมิน',
                 assessedAt: new Date().toISOString()
             };
+
 
             await firebaseService.saveScreening(screening);
             this.closeModal('modal-depression-screening');
@@ -1088,6 +1098,234 @@ class Application {
                     }
                 }
             });
+        }
+
+        // 3. Render PHQ-A Depression Dashboard
+        this.renderDepressionDashboard();
+    }
+
+    renderDepressionDashboard() {
+        if (!window.Chart) return;
+
+        const screenings = firebaseService.getScreenings();
+        // Only PHQ-A / depression type screenings
+        const depressionRecords = screenings.filter(s => s.type === 'depression' && typeof s.phqaScore === 'number');
+
+        const total = depressionRecords.length;
+        const safeTotal = total || 1;
+
+        // Count by level
+        const counts = { normal: 0, mild: 0, moderate: 0, severeHigh: 0, severeExtreme: 0 };
+        depressionRecords.forEach(s => {
+            const score = s.phqaScore;
+            if (score <= 4) counts.normal++;
+            else if (score <= 9) counts.mild++;
+            else if (score <= 14) counts.moderate++;
+            else if (score <= 19) counts.severeHigh++;
+            else counts.severeExtreme++;
+        });
+
+        const riskCount = counts.moderate + counts.severeHigh + counts.severeExtreme;
+
+        // Update summary badges
+        const totalBadge = document.getElementById('phqa-total-badge');
+        const riskBadge = document.getElementById('phqa-risk-badge');
+        if (totalBadge) totalBadge.textContent = `🧠 ประเมินแล้ว ${total} ราย`;
+        if (riskBadge) {
+            riskBadge.textContent = `🚨 เฝ้าระวัง ${riskCount} ราย`;
+            riskBadge.style.display = riskCount > 0 ? 'inline-block' : 'none';
+        }
+
+        // Update center text
+        const centerTotal = document.getElementById('phqa-donut-total');
+        if (centerTotal) centerTotal.textContent = total;
+
+        // Helper: update a level row
+        const updateRow = (key, count) => {
+            const pct = Math.round((count / safeTotal) * 100);
+            const elCnt = document.getElementById(`phqa-cnt-${key}`);
+            const elPct = document.getElementById(`phqa-pct-${key}`);
+            const elBar = document.getElementById(`phqa-bar-${key}`);
+            if (elCnt) elCnt.textContent = `${count} ราย`;
+            if (elPct) elPct.textContent = total > 0 ? `${pct}%` : '0%';
+            if (elBar) elBar.style.width = total > 0 ? `${pct}%` : '0%';
+        };
+        updateRow('normal', counts.normal);
+        updateRow('mild', counts.mild);
+        updateRow('moderate', counts.moderate);
+        updateRow('severe-high', counts.severeHigh);
+        updateRow('severe-extreme', counts.severeExtreme);
+
+        // Donut Chart
+        const ctxDonut = document.getElementById('chart-phqa-donut')?.getContext('2d');
+        if (ctxDonut) {
+            if (this.charts.phqaDonut) this.charts.phqaDonut.destroy();
+            this.charts.phqaDonut = new Chart(ctxDonut, {
+                type: 'doughnut',
+                data: {
+                    labels: ['ไม่มีภาวะซึมเศร้า', 'เล็กน้อย', 'ปานกลาง', 'มาก', 'รุนแรง'],
+                    datasets: [{
+                        data: [counts.normal || (total === 0 ? 1 : 0), counts.mild, counts.moderate, counts.severeHigh, counts.severeExtreme],
+                        backgroundColor: ['#059669', '#0284c7', '#d97706', '#ea580c', '#e11d48'],
+                        borderWidth: 3,
+                        borderColor: '#ffffff',
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => {
+                                    if (total === 0) return ` ${ctx.label}: ไม่มีข้อมูล`;
+                                    const val = ctx.parsed;
+                                    const pct = Math.round((val / total) * 100);
+                                    return ` ${ctx.label}: ${val} ราย (${pct}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Grade-level breakdown table & stacked bar chart
+        const grades = ['ม.1', 'ม.2', 'ม.3', 'ม.4', 'ม.5', 'ม.6', 'ปวช.1', 'ปวช.2', 'ปวช.3'];
+        const gradeData = {};
+        grades.forEach(g => { gradeData[g] = { normal: 0, mild: 0, moderate: 0, severeHigh: 0, severeExtreme: 0, total: 0 }; });
+
+        depressionRecords.forEach(s => {
+            const grade = s.grade || s.studentGrade || '';
+            if (gradeData[grade] !== undefined) {
+                const score = s.phqaScore;
+                if (score <= 4) gradeData[grade].normal++;
+                else if (score <= 9) gradeData[grade].mild++;
+                else if (score <= 14) gradeData[grade].moderate++;
+                else if (score <= 19) gradeData[grade].severeHigh++;
+                else gradeData[grade].severeExtreme++;
+                gradeData[grade].total++;
+            }
+        });
+
+        // Filter only grades that have data
+        const activeGrades = grades.filter(g => gradeData[g].total > 0);
+
+        // Stacked Bar Chart by grade
+        const ctxBar = document.getElementById('chart-phqa-by-grade')?.getContext('2d');
+        if (ctxBar) {
+            if (this.charts.phqaGrade) this.charts.phqaGrade.destroy();
+            if (activeGrades.length > 0) {
+                this.charts.phqaGrade = new Chart(ctxBar, {
+                    type: 'bar',
+                    data: {
+                        labels: activeGrades,
+                        datasets: [
+                            {
+                                label: 'ไม่มีภาวะซึมเศร้า',
+                                data: activeGrades.map(g => gradeData[g].normal),
+                                backgroundColor: '#059669',
+                                borderRadius: { topLeft: 0, topRight: 0, bottomLeft: 4, bottomRight: 4 },
+                                stack: 'phqa'
+                            },
+                            {
+                                label: 'เล็กน้อย',
+                                data: activeGrades.map(g => gradeData[g].mild),
+                                backgroundColor: '#0284c7',
+                                stack: 'phqa'
+                            },
+                            {
+                                label: 'ปานกลาง',
+                                data: activeGrades.map(g => gradeData[g].moderate),
+                                backgroundColor: '#d97706',
+                                stack: 'phqa'
+                            },
+                            {
+                                label: 'มาก',
+                                data: activeGrades.map(g => gradeData[g].severeHigh),
+                                backgroundColor: '#ea580c',
+                                stack: 'phqa'
+                            },
+                            {
+                                label: 'รุนแรง',
+                                data: activeGrades.map(g => gradeData[g].severeExtreme),
+                                backgroundColor: '#e11d48',
+                                borderRadius: { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 },
+                                stack: 'phqa'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                stacked: true,
+                                ticks: { color: '#0f172a', font: { family: 'Prompt', weight: '600', size: 12 } },
+                                grid: { display: false }
+                            },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                ticks: {
+                                    color: '#334155',
+                                    font: { family: 'Prompt', weight: '600' },
+                                    stepSize: 1,
+                                    precision: 0
+                                },
+                                grid: { color: 'rgba(148,163,184,0.2)' }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    color: '#0f172a',
+                                    font: { family: 'Prompt', size: 11, weight: '600' },
+                                    padding: 12,
+                                    usePointStyle: true,
+                                    pointStyleWidth: 10
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: ctx => `ระดับชั้น ${ctx[0].label}`,
+                                    label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y} ราย`
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                // No data - show placeholder
+                ctxBar.canvas.style.display = 'none';
+            }
+        }
+
+        // Grade breakdown table
+        const tbody = document.getElementById('phqa-grade-table-body');
+        if (tbody) {
+            if (activeGrades.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#64748b; padding: 20px;">ยังไม่มีข้อมูลการประเมิน PHQ-A</td></tr>';
+            } else {
+                tbody.innerHTML = activeGrades.map(g => {
+                    const d = gradeData[g];
+                    const hasRisk = (d.moderate + d.severeHigh + d.severeExtreme) > 0;
+                    return `<tr${hasRisk ? ' style="background: rgba(225,29,72,0.03);"' : ''}>
+                        <td><strong>${g}</strong></td>
+                        <td style="color:#059669; font-weight:700;">${d.normal}</td>
+                        <td style="color:#0284c7; font-weight:700;">${d.mild}</td>
+                        <td style="color:#d97706; font-weight:700;">${d.moderate}</td>
+                        <td style="color:#ea580c; font-weight:700;">${d.severeHigh}</td>
+                        <td style="color:#e11d48; font-weight:700;">${d.severeExtreme}${d.severeExtreme > 0 ? ' 🚨' : ''}</td>
+                        <td><strong>${d.total}</strong></td>
+                    </tr>`;
+                }).join('');
+            }
         }
     }
 
