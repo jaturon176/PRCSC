@@ -1239,7 +1239,7 @@ class Application {
                     labels: ['ไม่มีภาวะซึมเศร้า', 'เล็กน้อย', 'ปานกลาง', 'มาก', 'รุนแรง'],
                     datasets: [{
                         data: [counts.normal || (total === 0 ? 1 : 0), counts.mild, counts.moderate, counts.severeHigh, counts.severeExtreme],
-                        backgroundColor: ['#059669', '#0284c7', '#d97706', '#ea580c', '#e11d48'],
+                        backgroundColor: ['#0284c7', '#059669', '#d97706', '#ea580c', '#e11d48'],
                         borderWidth: 3,
                         borderColor: '#ffffff',
                         hoverOffset: 6

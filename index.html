@@ -397,36 +397,36 @@
                             <div style="display: flex; flex-direction: column; gap: 8px;">
 
                                 <!-- Level 1: Normal -->
-                                <div class="phqa-level-row" style="background: rgba(5,150,105,0.06); border: 1px solid rgba(5,150,105,0.15); border-radius: 12px; padding: 10px 14px;">
-                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <div style="width: 10px; height: 10px; border-radius: 50%; background: #059669;"></div>
-                                            <span style="font-weight: 700; color: #059669; font-size: 0.86rem;">ไม่มีภาวะซึมเศร้า (0–4)</span>
-                                        </div>
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <strong id="phqa-cnt-normal" style="color: #0f172a; font-size: 0.9rem;">0 ราย</strong>
-                                            <span id="phqa-pct-normal" style="background: rgba(5,150,105,0.12); color: #059669; font-weight: 700; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px;">0%</span>
-                                        </div>
-                                    </div>
-                                    <div style="height: 6px; background: rgba(5,150,105,0.12); border-radius: 6px;">
-                                        <div id="phqa-bar-normal" style="height: 100%; width: 0%; background: linear-gradient(90deg, #059669, #10b981); border-radius: 6px; transition: width 0.7s ease;"></div>
-                                    </div>
-                                </div>
-
-                                <!-- Level 2: Mild -->
                                 <div class="phqa-level-row" style="background: rgba(2,132,199,0.06); border: 1px solid rgba(2,132,199,0.15); border-radius: 12px; padding: 10px 14px;">
                                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
                                         <div style="display: flex; align-items: center; gap: 8px;">
                                             <div style="width: 10px; height: 10px; border-radius: 50%; background: #0284c7;"></div>
-                                            <span style="font-weight: 700; color: #0284c7; font-size: 0.86rem;">มีภาวะซึมเศร้าเล็กน้อย (5–9)</span>
+                                            <span style="font-weight: 700; color: #0284c7; font-size: 0.86rem;">ไม่มีภาวะซึมเศร้า (0–4)</span>
                                         </div>
                                         <div style="display: flex; align-items: center; gap: 8px;">
-                                            <strong id="phqa-cnt-mild" style="color: #0f172a; font-size: 0.9rem;">0 ราย</strong>
-                                            <span id="phqa-pct-mild" style="background: rgba(2,132,199,0.12); color: #0284c7; font-weight: 700; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px;">0%</span>
+                                            <strong id="phqa-cnt-normal" style="color: #0f172a; font-size: 0.9rem;">0 ราย</strong>
+                                            <span id="phqa-pct-normal" style="background: rgba(2,132,199,0.12); color: #0284c7; font-weight: 700; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px;">0%</span>
                                         </div>
                                     </div>
                                     <div style="height: 6px; background: rgba(2,132,199,0.12); border-radius: 6px;">
-                                        <div id="phqa-bar-mild" style="height: 100%; width: 0%; background: linear-gradient(90deg, #0284c7, #38bdf8); border-radius: 6px; transition: width 0.7s ease;"></div>
+                                        <div id="phqa-bar-normal" style="height: 100%; width: 0%; background: linear-gradient(90deg, #0284c7, #38bdf8); border-radius: 6px; transition: width 0.7s ease;"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Level 2: Mild -->
+                                <div class="phqa-level-row" style="background: rgba(5,150,105,0.06); border: 1px solid rgba(5,150,105,0.15); border-radius: 12px; padding: 10px 14px;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div style="width: 10px; height: 10px; border-radius: 50%; background: #059669;"></div>
+                                            <span style="font-weight: 700; color: #059669; font-size: 0.86rem;">มีภาวะซึมเศร้าเล็กน้อย (5–9)</span>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <strong id="phqa-cnt-mild" style="color: #0f172a; font-size: 0.9rem;">0 ราย</strong>
+                                            <span id="phqa-pct-mild" style="background: rgba(5,150,105,0.12); color: #059669; font-weight: 700; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px;">0%</span>
+                                        </div>
+                                    </div>
+                                    <div style="height: 6px; background: rgba(5,150,105,0.12); border-radius: 6px;">
+                                        <div id="phqa-bar-mild" style="height: 100%; width: 0%; background: linear-gradient(90deg, #059669, #10b981); border-radius: 6px; transition: width 0.7s ease;"></div>
                                     </div>
                                 </div>
 
@@ -499,8 +499,8 @@
                                 <thead>
                                     <tr id="phqa-grade-table-head">
                                         <th>ระดับชั้น</th>
-                                        <th style="background: rgba(5,150,105,0.1); color: #059669;">ปกติ</th>
-                                        <th style="background: rgba(2,132,199,0.1); color: #0284c7;">เล็กน้อย</th>
+                                        <th style="background: rgba(2,132,199,0.1); color: #0284c7;">ปกติ</th>
+                                        <th style="background: rgba(5,150,105,0.1); color: #059669;">เล็กน้อย</th>
                                         <th style="background: rgba(217,119,6,0.1); color: #d97706;">ปานกลาง</th>
                                         <th style="background: rgba(234,88,12,0.1); color: #ea580c;">มาก</th>
                                         <th style="background: rgba(225,29,72,0.1); color: #e11d48;">รุนแรง</th>
