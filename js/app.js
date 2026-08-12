@@ -1361,6 +1361,28 @@ class Application {
         }
     }
 
+    openBehaviorModal() {
+        const user = authManager.getCurrentUser();
+        const students = firebaseService.getStudents();
+        const select = document.getElementById('screening-student-select');
+        if (select) {
+            select.innerHTML = '<option value="">-- เลือกนักเรียน --</option>';
+            students.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.studentId || s.id;
+                opt.textContent = `[${s.grade}/${s.room}] ${s.prefix || ''}${s.fullName || s.name} (${s.studentId || ''})`;
+                select.appendChild(opt);
+            });
+            if (user && user.role === 'student') {
+                select.value = user.studentId || user.id;
+                select.disabled = true;
+            } else {
+                select.disabled = false;
+            }
+        }
+        this.openModal('modal-screening');
+    }
+
     openDepressionModal() {
         const user = authManager.getCurrentUser();
         const students = firebaseService.getStudents();
@@ -2049,3 +2071,4 @@ class Application {
 }
 
 const app = new Application();
+window.app = app;
