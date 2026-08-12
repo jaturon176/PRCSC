@@ -1030,11 +1030,12 @@ class Application {
         const screenings = firebaseService.getScreenings();
         const offenses = firebaseService.getOffenses();
 
-        // 1. Calculate Screening Metrics & Percentages
-        const totalScreened = screenings.length || 1;
-        const normalCount = screenings.filter(s => s.resultLevel === 'normal').length;
-        const riskCount = screenings.filter(s => s.resultLevel === 'risk').length;
-        const problemCount = screenings.filter(s => s.resultLevel === 'problem').length;
+        // 1. Calculate Screening Metrics & Percentages (behavior screenings ONLY)
+        const behaviorScreenings = screenings.filter(s => s.type === 'behavior');
+        const totalScreened = behaviorScreenings.length || 1;
+        const normalCount = behaviorScreenings.filter(s => s.resultLevel === 'normal').length;
+        const riskCount = behaviorScreenings.filter(s => s.resultLevel === 'risk').length;
+        const problemCount = behaviorScreenings.filter(s => s.resultLevel === 'problem').length;
 
         const normalPct = Math.round((normalCount / totalScreened) * 100);
         const riskPct = Math.round((riskCount / totalScreened) * 100);
