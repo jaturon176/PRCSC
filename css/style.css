@@ -2504,7 +2504,11 @@ body, .sidebar, .topbar, .btn, .glass-panel, .stat-card,
     70%  { transform:scale(1.08) rotate(3deg); opacity:1; }
     100% { transform:scale(1) rotate(0deg); }
 }
-.brand-logo-img { animation: logoPop 0.55s cubic-bezier(0.34,1.56,0.64,1) both; }
+/* Assessment Cards polish */
+.assessment-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08) !important;
+}
 
 /* Clock blink colon */
 @keyframes clockBlink { 0%,100% { opacity:1; } 50% { opacity:0.35; } }

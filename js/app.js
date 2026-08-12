@@ -7,6 +7,7 @@ class Application {
     constructor() {
         this.charts = {};
         this.currentView = 'dashboard';
+        this.currentScreeningTab = 'behavior';
         this.selectedOffenseProofFile = null;
 
         // Initialize App on DOM Ready
@@ -547,7 +548,7 @@ class Application {
             }
         });
 
-        // Screening Form Submit
+        // Screening Form Submit (Behavior Risk)
         document.getElementById('form-screening')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const studentId = document.getElementById('screening-student-select').value;
@@ -562,6 +563,7 @@ class Application {
             else if (totalScore >= 2) resultLevel = 'risk';
 
             const screening = {
+                type: 'behavior',
                 studentId,
                 totalScore,
                 resultLevel,
@@ -572,14 +574,96 @@ class Application {
             await firebaseService.saveScreening(screening);
             this.closeModal('modal-screening');
             this.showAlert('บันทึกผลการคัดกรองสำเร็จ 🎉', `ผลการประเมินคัดกรอง: <strong>${CONFIG.SCREENING_LEVELS[resultLevel.toUpperCase()].label}</strong>`, 'success');
+            this.switchScreeningTab('behavior');
         });
+
+        // Depression Screening Form Submit (PHQ-A - Exact Form & Scoring)
+        document.getElementById('form-depression-screening')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const studentId = document.getElementById('dep-student-select').value;
+            let totalScore = 0;
+            const qScores = [];
+            for (let i = 1; i <= 9; i++) {
+                const val = parseInt(document.getElementById(`dep-q${i}`)?.value || 0);
+                qScores.push(val);
+                totalScore += val;
+            }
+
+            const ext1 = document.getElementById('dep-ext1')?.value || 'no';
+            const ext2 = document.getElementById('dep-ext2')?.value || 'no';
+            const isSuicideRisk = qScores[8] > 0 || ext1 === 'yes' || ext2 === 'yes';
+
+            // Exact PHQ-A Scoring Scale & Interpretation from Image 2
+            let resultLevel = 'normal';
+            let levelLabel = 'ไม่มีภาวะซึมเศร้า';
+            let advice = 'ขณะนี้ยังไม่พบภาวะซึมเศร้าที่ชัดเจน';
+            let alertType = 'success';
+
+            if (totalScore >= 20) {
+                resultLevel = 'severe_extreme';
+                levelLabel = 'มีภาวะซึมเศร้ารุนแรง';
+                advice = 'ควรปรึกษาแพทย์ เพื่อวินิจฉัยและบำบัดรักษา';
+                alertType = 'error';
+            } else if (totalScore >= 15) {
+                resultLevel = 'severe_high';
+                levelLabel = 'มีภาวะซึมเศร้ามาก';
+                advice = 'ควรปรึกษาแพทย์ เพื่อวินิจฉัยและบำบัดรักษา';
+                alertType = 'error';
+            } else if (totalScore >= 10) {
+                resultLevel = 'moderate';
+                levelLabel = 'มีภาวะซึมเศร้าปานกลาง';
+                advice = 'ควรปรึกษาแพทย์ เพื่อวินิจฉัยและบำบัดรักษา';
+                alertType = 'warning';
+            } else if (totalScore >= 5) {
+                resultLevel = 'mild';
+                levelLabel = 'มีภาวะซึมเศร้าเล็กน้อย';
+                advice = 'ควรหากิจกรรมที่ช่วยผ่อนคลายอารมณ์ หรือปรึกษาบุคคลใกล้ชิดที่ไว้ใจ';
+                alertType = 'info';
+            }
+
+            const screening = {
+                type: 'depression',
+                studentId,
+                totalScore,
+                resultLevel,
+                levelLabel,
+                advice,
+                qScores,
+                extRisk: { ext1, ext2, isSuicideRisk },
+                assessor: authManager.getCurrentUser()?.name || 'ครูผู้ประเมิน',
+                assessedAt: new Date().toISOString()
+            };
+
+            await firebaseService.saveScreening(screening);
+            this.closeModal('modal-depression-screening');
+
+            const extraNotice = isSuicideRisk 
+                ? '<br><span style="color:#e11d48; font-weight:700;">🚨 หมายเหตุ: พบความเสี่ยงต่อการคิดทำร้ายตนเอง/ฆ่าตัวตาย ควรได้รับการประเมินความเสี่ยงและเฝ้าระวังการฆ่าตัวตายด่วน!</span>' 
+                : '';
+
+            this.showAlert(
+                'บันทึกผลการประเมิน PHQ-A สำเร็จ 🎉', 
+                `<strong>ผลการประเมิน (คะแนนรวม ${totalScore}/27):</strong> ${levelLabel}<br><small style="color:var(--text-muted);">คำแนะนำ: ${advice}</small>${extraNotice}`, 
+                isSuicideRisk ? 'warning' : alertType
+            );
+            this.switchScreeningTab('depression');
+        });
+
         document.getElementById('btn-open-screening')?.addEventListener('click', () => {
             const user = authManager.getCurrentUser();
+            const students = firebaseService.getStudents();
             const select = document.getElementById('screening-student-select');
             if (select) {
+                select.innerHTML = '<option value="">-- เลือกนักเรียน --</option>';
+                students.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.studentId || s.id;
+                    opt.textContent = `[${s.grade}/${s.room}] ${s.prefix || ''}${s.fullName || s.name} (${s.studentId || ''})`;
+                    select.appendChild(opt);
+                });
                 if (user && user.role === 'student') {
-                    select.value = user.studentId;
-                    select.disabled = true; // ล็อกไม่ให้เลือกนักเรียนคนอื่นเมื่อประเมินตนเอง
+                    select.value = user.studentId || user.id;
+                    select.disabled = true;
                 } else {
                     select.disabled = false;
                 }
@@ -1277,36 +1361,156 @@ class Application {
         }
     }
 
+    openDepressionModal() {
+        const user = authManager.getCurrentUser();
+        const students = firebaseService.getStudents();
+        const select = document.getElementById('dep-student-select');
+        if (select) {
+            select.innerHTML = '<option value="">-- เลือกนักเรียน --</option>';
+            students.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.studentId || s.id;
+                opt.textContent = `[${s.grade}/${s.room}] ${s.prefix || ''}${s.fullName || s.name} (${s.studentId || ''})`;
+                select.appendChild(opt);
+            });
+            if (user && user.role === 'student') {
+                select.value = user.studentId || user.id;
+                select.disabled = true;
+            } else {
+                select.disabled = false;
+            }
+        }
+        for (let i = 1; i <= 9; i++) {
+            const el = document.getElementById(`dep-q${i}`);
+            if (el) el.value = "0";
+        }
+        this.openModal('modal-depression-screening');
+    }
+
+    switchScreeningTab(tabType) {
+        this.currentScreeningTab = tabType;
+        const btnBehavior = document.getElementById('tab-scr-behavior');
+        const btnDepression = document.getElementById('tab-scr-depression');
+
+        if (tabType === 'depression') {
+            btnBehavior?.classList.remove('active');
+            btnDepression?.classList.add('active');
+        } else {
+            btnBehavior?.classList.add('active');
+            btnDepression?.classList.remove('active');
+        }
+
+        this.renderScreenings();
+    }
+
     renderScreenings() {
         const tbody = document.getElementById('table-screenings-body');
         if (!tbody) return;
-        let screenings = firebaseService.getScreenings();
+        const allScreenings = firebaseService.getScreenings();
         const students = firebaseService.getStudents();
         const user = authManager.getCurrentUser();
 
+        // Calculate card counts for both 2 assessments
+        const behaviorScreenings = allScreenings.filter(s => !s.type || s.type === 'behavior');
+        const depressionScreenings = allScreenings.filter(s => s.type === 'depression');
+
+        const cntBehaviorEl = document.getElementById('cnt-behavior-num');
+        const cntDepressionEl = document.getElementById('cnt-depression-num');
+        if (cntBehaviorEl) cntBehaviorEl.textContent = behaviorScreenings.length;
+        if (cntDepressionEl) cntDepressionEl.textContent = depressionScreenings.length;
+
+        const currentTab = this.currentScreeningTab || 'behavior';
+        let targetScreenings = currentTab === 'depression' ? depressionScreenings : behaviorScreenings;
+
         // If Student role, filter to student's own screening records
         if (user && user.role === 'student') {
-            screenings = screenings.filter(s => s.studentId === user.studentId || s.studentId === user.id);
+            targetScreenings = targetScreenings.filter(s => s.studentId === user.studentId || s.studentId === user.id);
+        }
+
+        const tableTitleEl = document.getElementById('screening-table-title');
+        if (tableTitleEl) {
+            tableTitleEl.textContent = currentTab === 'depression' 
+                ? 'ประวัติผลการประเมินภาวะซึมเศร้าในวัยรุ่น (PHQ-A)' 
+                : 'ประวัติผลการคัดกรองพฤติกรรมเสี่ยง (4 ด้าน)';
+        }
+
+        const thead = document.getElementById('table-screenings-head');
+        if (thead) {
+            if (currentTab === 'depression') {
+                thead.innerHTML = `
+                    <tr>
+                        <th>นักเรียน</th>
+                        <th>ระดับภาวะซึมเศร้า (PHQ-A)</th>
+                        <th>คะแนนรวม (0-27)</th>
+                        <th>คำแนะนำ / การเฝ้าระวัง</th>
+                        <th>ครู/ผู้ประเมิน</th>
+                        <th>วันที่ประเมิน</th>
+                    </tr>
+                `;
+            } else {
+                thead.innerHTML = `
+                    <tr>
+                        <th>นักเรียน</th>
+                        <th>ผลการคัดกรอง</th>
+                        <th>คะแนนรวมความเสี่ยง</th>
+                        <th>ครู/ผู้ประเมิน</th>
+                        <th>วันที่ประเมิน</th>
+                    </tr>
+                `;
+            }
         }
 
         tbody.innerHTML = '';
-        if (screenings.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#64748b;">ยังไม่มีผลการคัดกรองพฤติกรรม</td></tr>';
+        if (targetScreenings.length === 0) {
+            const colspan = currentTab === 'depression' ? 6 : 5;
+            tbody.innerHTML = `<tr><td colspan="${colspan}" style="text-align:center; color:#64748b; padding: 24px;">ยังไม่มีประวัติ${currentTab === 'depression' ? 'การประเมินภาวะซึมเศร้า (PHQ-A)' : 'การคัดกรองพฤติกรรมเสี่ยง'}</td></tr>`;
             return;
         }
 
-        screenings.forEach(scr => {
-            const student = students.find(s => s.studentId === scr.studentId || s.id === scr.studentId);
-            const levelInfo = CONFIG.SCREENING_LEVELS[scr.resultLevel.toUpperCase()] || CONFIG.SCREENING_LEVELS.NORMAL;
+        const depLevelsMap = {
+            normal: { label: 'ไม่มีภาวะซึมเศร้า', bg: 'rgba(5,150,105,0.1)', color: '#059669', advice: 'ขณะนี้ยังไม่พบภาวะซึมเศร้าที่ชัดเจน' },
+            mild: { label: 'มีภาวะซึมเศร้าเล็กน้อย', bg: 'rgba(2,132,199,0.1)', color: '#0284c7', advice: 'ควรหากิจกรรมที่ช่วยผ่อนคลายอารมณ์ หรือปรึกษาบุคคลใกล้ชิดที่ไว้ใจ' },
+            moderate: { label: 'มีภาวะซึมเศร้าปานกลาง', bg: 'rgba(217,119,6,0.1)', color: '#d97706', advice: 'ควรปรึกษาแพทย์ เพื่อวินิจฉัยและบำบัดรักษา' },
+            severe_high: { label: 'มีภาวะซึมเศร้ามาก', bg: 'rgba(234,88,12,0.1)', color: '#ea580c', advice: 'ควรปรึกษาแพทย์ เพื่อวินิจฉัยและบำบัดรักษา' },
+            severe_extreme: { label: 'มีภาวะซึมเศร้ารุนแรง', bg: 'rgba(225,29,72,0.12)', color: '#e11d48', advice: 'ควรปรึกษาแพทย์ เพื่อวินิจฉัยและบำบัดรักษา' }
+        };
 
+        targetScreenings.forEach(scr => {
+            const student = students.find(s => s.studentId === scr.studentId || s.id === scr.studentId);
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${student ? `${student.prefix || ''}${student.fullName} (${student.grade}/${student.room})` : (user && user.role === 'student' ? user.name : scr.studentId)}</td>
-                <td><span class="badge" style="background:${levelInfo.bg}; color:${levelInfo.color}; border:1px solid ${levelInfo.color};">${levelInfo.label}</span></td>
-                <td>${scr.totalScore} คะแนน</td>
-                <td>${scr.assessor}</td>
-                <td>${new Date(scr.assessedAt).toLocaleDateString('th-TH')}</td>
-            `;
+
+            if (scr.type === 'depression') {
+                const depInfo = depLevelsMap[scr.resultLevel] || depLevelsMap.normal;
+                const isRisk = scr.extRisk?.isSuicideRisk || (scr.qScores && scr.qScores[8] > 0);
+
+                const riskBadge = isRisk 
+                    ? `<br><span class="badge" style="background:rgba(225,29,72,0.15); color:#be123c; border:1px solid #e11d48; font-size:0.75rem; margin-top:4px; font-weight:700;">🚨 เสี่ยงฆ่าตัวตาย/ทำร้ายตนเอง (เฝ้าระวังด่วน)</span>`
+                    : '';
+
+                tr.innerHTML = `
+                    <td><strong>${student ? `${student.prefix || ''}${student.fullName} (${student.grade}/${student.room})` : (user && user.role === 'student' ? user.name : scr.studentId)}</strong></td>
+                    <td>
+                        <span class="badge" style="background:${depInfo.bg}; color:${depInfo.color}; border:1px solid ${depInfo.color}; font-weight:700; font-size:0.85rem;">
+                            ${scr.levelLabel || depInfo.label}
+                        </span>
+                        ${riskBadge}
+                    </td>
+                    <td><strong style="color:var(--text-heading); font-size:0.95rem;">${scr.totalScore} / 27</strong></td>
+                    <td style="max-width:280px; font-size:0.85rem; color:var(--text-muted); line-height:1.4;">${scr.advice || depInfo.advice}</td>
+                    <td>${scr.assessor || '-'}</td>
+                    <td>${scr.assessedAt ? new Date(scr.assessedAt).toLocaleDateString('th-TH') : '-'}</td>
+                `;
+            } else {
+                const levelInfo = CONFIG.SCREENING_LEVELS[scr.resultLevel?.toUpperCase()] || CONFIG.SCREENING_LEVELS.NORMAL;
+                tr.innerHTML = `
+                    <td><strong>${student ? `${student.prefix || ''}${student.fullName} (${student.grade}/${student.room})` : (user && user.role === 'student' ? user.name : scr.studentId)}</strong></td>
+                    <td><span class="badge" style="background:${levelInfo.bg}; color:${levelInfo.color}; border:1px solid ${levelInfo.color}; font-weight:600;">${levelInfo.label}</span></td>
+                    <td><strong style="color:var(--text-heading);">${scr.totalScore} คะแนน</strong></td>
+                    <td>${scr.assessor || '-'}</td>
+                    <td>${scr.assessedAt ? new Date(scr.assessedAt).toLocaleDateString('th-TH') : '-'}</td>
+                `;
+            }
+
             tbody.appendChild(tr);
         });
     }
