@@ -63,40 +63,36 @@
             <!-- Right Form Side -->
             <div class="login-right-form">
                 <h2 class="login-form-heading">เข้าสู่ระบบ</h2>
-                <div class="login-form-subheading">กรอกชื่อผู้ใช้และรหัสผ่านของคุณเพื่อเข้าใช้งาน</div>
+                <div class="login-form-subheading">กรอกชื่อผู้ใช้และรหัสผ่านเพื่อเข้าใช้งานระบบ PR Care+</div>
 
-                <!-- Role Switcher Pills -->
-                <div class="role-switcher-group">
-                    <button type="button" class="role-pill-btn active" id="role-pill-teacher" onclick="app.setLoginRole('teacher')">👨‍🏫 ครู / กิจการนักเรียน</button>
-                    <button type="button" class="role-pill-btn" id="role-pill-student" onclick="app.setLoginRole('student')">🎓 นักเรียน</button>
-                    <button type="button" class="role-pill-btn" id="role-pill-admin" onclick="app.setLoginRole('admin')">🛡️ ผู้ดูแลระบบ</button>
-                </div>
-
-                <form id="standalone-login-form">
-                    <input type="hidden" id="page-login-role" value="teacher">
+                <form id="standalone-login-form" style="margin-top: 20px;">
+                    <input type="hidden" id="page-login-role" value="auto">
 
                     <div class="light-field-group">
                         <label class="light-field-label" id="page-login-user-label">
-                            <i class="ri-phone-line" style="color: #0284c7;"></i> เบอร์โทรศัพท์ (ชื่อผู้ใช้)
+                            <i class="ri-user-3-line" style="color: #0284c7;"></i> ชื่อผู้ใช้งาน (Username)
                         </label>
                         <div class="light-field-input-wrap">
-                            <input type="text" class="light-field-input" id="page-login-user" placeholder="กรอกเบอร์โทรศัพท์ (เช่น 0812345678)..." required>
+                            <input type="text" class="light-field-input" id="page-login-user" placeholder="เบอร์โทรศัพท์ (ครู) / รหัสนักเรียน / Admin" required>
                         </div>
                     </div>
 
                     <div class="light-field-group">
                         <label class="light-field-label" id="page-login-pass-label">
-                            <i class="ri-lock-2-line" style="color: #0284c7;"></i> รหัสผ่าน (เบอร์โทรศัพท์)
+                            <i class="ri-lock-2-line" style="color: #0284c7;"></i> รหัสผ่าน (Password)
                         </label>
                         <div class="light-field-input-wrap">
-                            <input type="password" class="light-field-input" id="page-login-pass" placeholder="กรอกเบอร์โทรศัพท์อีกครั้ง..." required>
+                            <input type="password" class="light-field-input" id="page-login-pass" placeholder="เบอร์โทรศัพท์ (ครู) / รหัสนักเรียน / Admin" required>
                             <button type="button" class="password-toggle-btn" onclick="app.togglePasswordVisibility('page-login-pass', this)"><i class="ri-eye-line"></i></button>
                         </div>
                     </div>
 
-                    <div id="login-role-hint-badge" style="background: rgba(2, 132, 199, 0.08); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 10px; padding: 10px 14px; font-size: 0.84rem; color: #0369a1; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-                        <i class="ri-information-line" style="font-size: 1.1rem; flex-shrink: 0;"></i>
-                        <span id="login-role-hint-text">สำหรับครู: กรอกเบอร์โทรศัพท์เป็นทั้งชื่อผู้ใช้และรหัสผ่านในการเข้าใช้งาน</span>
+                    <div id="login-role-hint-badge" style="background: rgba(2, 132, 199, 0.07); border: 1px solid rgba(2, 132, 199, 0.18); border-radius: 10px; padding: 10px 14px; font-size: 0.82rem; color: #0369a1; margin-bottom: 18px; line-height: 1.5;">
+                        <div style="font-weight: 700; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                            <i class="ri-information-fill" style="color: #0284c7; font-size: 1rem;"></i> รูปแบบการลงชื่อเข้าใช้งาน:
+                        </div>
+                        • <strong>ครู / บุคลากร:</strong> ใช้ <u>เบอร์โทรศัพท์</u> เป็นชื่อผู้ใช้และรหัสผ่าน<br>
+                        • <strong>นักเรียน:</strong> ใช้ <u>รหัสประจำตัวนักเรียน</u> เป็นชื่อผู้ใช้และรหัสผ่าน
                     </div>
 
                     <button type="submit" class="btn-signin-submit">

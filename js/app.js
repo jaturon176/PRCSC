@@ -313,17 +313,28 @@ class Application {
             this.confirmLogout();
         });
 
-        // Form Standalone Login Submit
+        // Form Standalone Login Submit (Smart Auto Role Login)
         document.getElementById('standalone-login-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const role = document.getElementById('page-login-role').value;
             const username = document.getElementById('page-login-user').value;
             const password = document.getElementById('page-login-pass').value;
 
-            const success = await authManager.login(role, username, password);
+            if (!username || !username.trim()) {
+                this.showAlert('แจ้งเตือน', 'กรุณากรอกชื่อผู้ใช้ / เบอร์โทรศัพท์ / รหัสนักเรียน', 'warning');
+                return;
+            }
+
+            const success = await authManager.login(null, username, password);
             if (success) {
                 document.getElementById('login-screen-view')?.classList.add('hidden');
-                console.log(`[App] Logged in successfully as ${role}`);
+                const user = authManager.getCurrentUser();
+                this.showToast(`ยินดีต้อนรับ ${user?.name || ''} เข้าสู่ระบบ`, 'success');
+            } else {
+                this.showAlert(
+                    'ลงชื่อเข้าใช้ไม่สำเร็จ', 
+                    'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง<br><small style="color:var(--text-muted);">• ครู: ใช้เบอร์โทรศัพท์เป็นชื่อผู้ใช้และรหัสผ่าน<br>• นักเรียน: ใช้รหัสประจำตัวนักเรียนเป็นชื่อผู้ใช้และรหัสผ่าน<br>• Admin: ใช้บัญชีผู้ดูแลระบบ</small>', 
+                    'error'
+                );
             }
         });
 
