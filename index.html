@@ -62,10 +62,16 @@
 
             <!-- Right Form Side -->
             <div class="login-right-form">
-                <h2 class="login-form-heading">เข้าสู่ระบบ</h2>
-                <div class="login-form-subheading">กรอกชื่อผู้ใช้และรหัสผ่านเพื่อเข้าใช้งานระบบ PR Care+</div>
+                <!-- Login Icon & Header (centered) -->
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <div style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border-radius: 20px; background: linear-gradient(135deg, #0284c7 0%, #6366f1 100%); box-shadow: 0 8px 24px rgba(99,102,241,0.25); margin-bottom: 14px;">
+                        <i class="ri-login-circle-line" style="font-size: 2rem; color: #fff;"></i>
+                    </div>
+                    <h2 class="login-form-heading" style="text-align: center; margin: 0 0 6px 0;">เข้าสู่ระบบ</h2>
+                    <div class="login-form-subheading" style="text-align: center; font-size: 0.88rem;">กรอกชื่อผู้ใช้และรหัสผ่านเพื่อเข้าใช้งานระบบ PR Care+</div>
+                </div>
 
-                <form id="standalone-login-form" style="margin-top: 20px;">
+                <form id="standalone-login-form">
                     <input type="hidden" id="page-login-role" value="auto">
 
                     <div class="light-field-group">
@@ -87,7 +93,7 @@
                         </div>
                     </div>
 
-                    <div id="login-role-hint-badge" style="background: rgba(2, 132, 199, 0.07); border: 1px solid rgba(2, 132, 199, 0.18); border-radius: 10px; padding: 10px 14px; font-size: 0.82rem; color: #0369a1; margin-bottom: 18px; line-height: 1.5;">
+                    <div id="login-role-hint-badge" style="background: rgba(2, 132, 199, 0.07); border: 1px solid rgba(2, 132, 199, 0.18); border-radius: 10px; padding: 10px 14px; font-size: 0.82rem; color: #0369a1; margin-bottom: 18px; line-height: 1.6;">
                         <div style="font-weight: 700; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
                             <i class="ri-information-fill" style="color: #0284c7; font-size: 1rem;"></i> รูปแบบการลงชื่อเข้าใช้งาน:
                         </div>
@@ -96,17 +102,13 @@
                     </div>
 
                     <button type="submit" class="btn-signin-submit">
-                        <i class="ri-key-2-line"></i> เข้าสู่ระบบ (Sign In)
+                        <i class="ri-login-circle-line"></i> เข้าสู่ระบบ (Sign In)
                     </button>
                 </form>
 
-                <div class="login-security-badge">
+                <div class="login-security-badge" style="justify-content: center; margin-top: 20px;">
                     <i class="ri-shield-check-line" style="color: #0284c7;"></i>
-                    <span>256-Bit Encrypted Realtime Cloud Security System (Firebase DB)</span>
-                </div>
-
-                <div class="login-copyright-footer" style="text-align: center; margin-top: 18px; font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 4px; flex-wrap: wrap;">
-                    © 2026 PR-Care+ Developed by Krunoii <span id="app-login-version" class="version-pill-badge">(v1.9)</span>
+                    <span style="font-size: 0.78rem; color: var(--text-muted);">256-Bit Encrypted Realtime Cloud Security System (Firebase DB)</span>
                 </div>
             </div>
         </div>
