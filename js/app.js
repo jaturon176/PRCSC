@@ -505,6 +505,9 @@ class Application {
         document.getElementById('del-scope-room')?.addEventListener('change', () => this.updateDeleteScopeSummary());
         document.getElementById('btn-confirm-delete-student-scope')?.addEventListener('click', () => this.confirmDeleteStudentScope());
 
+        document.getElementById('btn-open-delete-screening-modal')?.addEventListener('click', () => {
+            this.openDeleteScreeningModal();
+        });
         document.getElementById('del-scr-type')?.addEventListener('change', () => this.updateDeleteScreeningScopeSummary());
         document.getElementById('del-scr-grade')?.addEventListener('change', () => this.updateDeleteScreeningScopeSummary());
         document.getElementById('del-scr-room')?.addEventListener('change', () => this.updateDeleteScreeningScopeSummary());
