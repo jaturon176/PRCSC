@@ -116,7 +116,11 @@ class Application {
                 title: `เปลี่ยนธีมเป็น ${theme ? theme.nameTH : themeId} แล้ว`,
                 showConfirmButton: false,
                 timer: 2500,
-                timerProgressBar: true
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer);
+                    toast.addEventListener('mouseleave', Swal.resumeTimer);
+                }
             });
         }
     }
@@ -1359,14 +1363,14 @@ class Application {
                 title: `📷 รูปภาพหลักฐาน: ${title}`,
                 imageUrl: url,
                 imageAlt: title,
-                imageWidth: 640,
+                imageWidth: 600,
                 imageHeight: 'auto',
                 showCloseButton: true,
-                confirmButtonText: '<i class="ri-check-line"></i> ปิดหน้าต่าง',
+                showConfirmButton: true,
+                confirmButtonText: 'ปิดหน้าต่าง',
                 confirmButtonColor: '#4f46e5',
-                customClass: {
-                    popup: 'swal2-popup'
-                }
+                allowOutsideClick: true,
+                allowEscapeKey: true
             });
         } else {
             window.open(url, '_blank');
