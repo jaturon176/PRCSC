@@ -4,8 +4,8 @@
  */
 
 const CONFIG = {
-    SYSTEM_VERSION: "2.4",
-    VERSION: "v2.4",
+    SYSTEM_VERSION: "2.5",
+    VERSION: "v2.5",
 
     // 1. Firebase Realtime Database Configuration
     FIREBASE: {
@@ -82,42 +82,67 @@ const CONFIG = {
         EXTERNAL: { code: "external", label: "ส่งต่อภายนอก", icon: "arrow-up-right" }
     },
 
-    // 5. Theme System — 5 Premium Themes
+    // 5. Theme System — 10 Premium Themes (5 Dark + 5 Light)
     THEMES: {
         indigo: {
-            id: "indigo",
-            name: "Deep Indigo",
+            id: "indigo", name: "Deep Indigo",
             nameTH: "🔵 Deep Indigo (ค่าเริ่มต้น)",
             description: "ดีพ อินดิโก × ทองอำพัน — ธีมดั้งเดิมของระบบ",
-            preview: ["#1e1b4b", "#312e81", "#f59e0b"]
+            preview: ["#1e1b4b", "#312e81", "#f59e0b"], group: "dark"
         },
         ruby: {
-            id: "ruby",
-            name: "Volcanic Ruby Red",
+            id: "ruby", name: "Volcanic Ruby Red",
             nameTH: "🔴 Volcanic Ruby Red",
             description: "แดงรูบี้ลาวา × ทองส้มเพลิง — หรูหราร้อนแรง",
-            preview: ["#7f1d1d", "#991b1b", "#fbbf24"]
+            preview: ["#7f1d1d", "#991b1b", "#fbbf24"], group: "dark"
         },
         ocean: {
-            id: "ocean",
-            name: "Midnight Ocean",
+            id: "ocean", name: "Midnight Ocean",
             nameTH: "🌊 Midnight Ocean",
             description: "น้ำเงินมหาสมุทร × ฟ้าซีเอน — เย็นสงบลึกซึ้ง",
-            preview: ["#0c1a2e", "#0f2d4a", "#06b6d4"]
+            preview: ["#0c1a2e", "#0f2d4a", "#06b6d4"], group: "dark"
         },
         emerald: {
-            id: "emerald",
-            name: "Emerald Forest",
+            id: "emerald", name: "Emerald Forest",
             nameTH: "🌿 Emerald Forest",
             description: "เขียวป่าลึก × ม่วงลาเวนเดอร์ — สดชื่นธรรมชาติ",
-            preview: ["#052e16", "#064e3b", "#a78bfa"]
+            preview: ["#052e16", "#064e3b", "#a78bfa"], group: "dark"
         },
         amethyst: {
-            id: "amethyst",
-            name: "Royal Amethyst",
+            id: "amethyst", name: "Royal Amethyst",
             nameTH: "💜 Royal Amethyst",
             description: "ม่วงอเมทิสต์ × ชมพูโรส — หรูหราราชวงศ์",
-            preview: ["#2e1065", "#4c1d95", "#f472b6"]
+            preview: ["#2e1065", "#4c1d95", "#f472b6"], group: "dark"
+        },
+        snow: {
+            id: "snow", name: "Snow White",
+            nameTH: "☀️ Snow White",
+            description: "น้ำเงินสะอาด × ขาวบริสุทธิ์ — คลีนทันสมัย",
+            preview: ["#1e3a5f", "#1e40af", "#f59e0b"], group: "light"
+        },
+        sakura: {
+            id: "sakura", name: "Sakura Blossom",
+            nameTH: "🌸 Sakura Blossom",
+            description: "ชมพูซากุระ × ส้มอบอุ่น — อ่อนหวานสวยงาม",
+            preview: ["#500724", "#831843", "#fb923c"], group: "light"
+        },
+        sunrise: {
+            id: "sunrise", name: "Golden Sunrise",
+            nameTH: "🌅 Golden Sunrise",
+            description: "ส้มทองพระอาทิตย์ขึ้น × ครีมอบอุ่น — สดใสพลังงาน",
+            preview: ["#431407", "#7c2d12", "#f59e0b"], group: "light"
+        },
+        mint: {
+            id: "mint", name: "Arctic Mint",
+            nameTH: "🌿 Arctic Mint",
+            description: "เขียวมินต์สดชื่น × ฟ้าน้ำ — สะอาดสบายตา",
+            preview: ["#022a26", "#134e48", "#06b6d4"], group: "light"
+        },
+        gray: {
+            id: "gray", name: "Soft Gray",
+            nameTH: "🌥️ Soft Gray",
+            description: "เทาองค์กร × ม่วงอินดิโก — คลาสสิกอ่านง่าย",
+            preview: ["#0f172a", "#1e293b", "#818cf8"], group: "light"
         }
     }
 };

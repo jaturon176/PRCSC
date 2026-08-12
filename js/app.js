@@ -96,10 +96,9 @@ class Application {
     }
 
     applyTheme(themeId, save = true) {
-        const validThemes = ['indigo', 'ruby', 'ocean', 'emerald', 'amethyst'];
+        const validThemes = ['indigo', 'ruby', 'ocean', 'emerald', 'amethyst', 'snow', 'sakura', 'sunrise', 'mint', 'gray'];
         if (!validThemes.includes(themeId)) themeId = 'indigo';
         document.body.dataset.theme = themeId;
-        // Update active state on theme picker if it's rendered
         document.querySelectorAll('.theme-card').forEach(card => {
             card.classList.toggle('active', card.dataset.themeId === themeId);
         });
@@ -126,7 +125,11 @@ class Application {
         const container = document.getElementById('theme-picker-container');
         if (!container) return;
         const currentTheme = (firebaseService.getSettings() || {}).theme || 'indigo';
-        container.innerHTML = Object.values(CONFIG.THEMES).map(t => `
+        const allThemes = Object.values(CONFIG.THEMES);
+        const darkThemes = allThemes.filter(t => t.group === 'dark' || !t.group);
+        const lightThemes = allThemes.filter(t => t.group === 'light');
+
+        const renderCard = (t) => `
             <div class="theme-card ${t.id === currentTheme ? 'active' : ''}" data-theme-id="${t.id}" onclick="app.changeTheme('${t.id}')" title="${t.description}">
                 <div class="theme-card-badge">✓ ใช้งานอยู่</div>
                 <div class="theme-card-preview">
@@ -139,7 +142,22 @@ class Application {
                     <div class="theme-card-desc">${t.description}</div>
                 </div>
             </div>
-        `).join('');
+        `;
+
+        container.innerHTML = `
+            <div style="grid-column:1/-1; margin-bottom: 4px;">
+                <span style="font-size:0.82rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px;">
+                    <i class="ri-moon-fill" style="color:var(--indigo-500);"></i> ธีมโทนเข้ม (Dark)
+                </span>
+            </div>
+            ${darkThemes.map(renderCard).join('')}
+            <div style="grid-column:1/-1; margin-top: 12px; margin-bottom: 4px; border-top: 1px solid var(--border-light); padding-top: 16px;">
+                <span style="font-size:0.82rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.8px;">
+                    <i class="ri-sun-fill" style="color:#f59e0b;"></i> ธีมโทนสว่าง (Light)
+                </span>
+            </div>
+            ${lightThemes.map(renderCard).join('')}
+        `;
     }
 
     initDropZones() {
