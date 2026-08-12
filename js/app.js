@@ -1107,9 +1107,29 @@ class Application {
     renderDepressionDashboard() {
         if (!window.Chart) return;
 
+        const allStudents = firebaseService.getStudents();
         const screenings = firebaseService.getScreenings();
-        // Only PHQ-A / depression type screenings
-        const depressionRecords = screenings.filter(s => s.type === 'depression' && typeof s.phqaScore === 'number');
+
+        // Filter depression records — support both old (totalScore) and new (phqaScore) formats
+        const depressionRecords = screenings
+            .filter(s => s.type === 'depression')
+            .map(s => {
+                // Resolve phqaScore: prefer explicit field, fallback to totalScore
+                const score = typeof s.phqaScore === 'number' ? s.phqaScore
+                            : typeof s.totalScore === 'number' ? s.totalScore
+                            : null;
+                if (score === null) return null;
+
+                // Resolve grade: prefer stored grade, else look up from students list
+                let grade = s.grade || s.studentGrade || '';
+                if (!grade && s.studentId) {
+                    const stu = allStudents.find(st => (st.studentId || st.id) === s.studentId);
+                    if (stu) grade = stu.grade || '';
+                }
+
+                return { ...s, phqaScore: score, grade };
+            })
+            .filter(s => s !== null);
 
         const total = depressionRecords.length;
         const safeTotal = total || 1;
@@ -1124,6 +1144,7 @@ class Application {
             else if (score <= 19) counts.severeHigh++;
             else counts.severeExtreme++;
         });
+
 
         const riskCount = counts.moderate + counts.severeHigh + counts.severeExtreme;
 
