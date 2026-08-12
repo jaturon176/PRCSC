@@ -249,7 +249,56 @@ class AuthManager {
             if (userRoleBadgeEl) userRoleBadgeEl.textContent = 'กรุณาล็อกอิน';
         }
 
-        // Show/Hide Role-restricted Elements
+        // --- 1. Sidebar Menu Permissions ---
+        const navMenu = document.querySelector('.nav-menu');
+        if (navMenu) {
+            const navItems = navMenu.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                const page = item.querySelector('a')?.getAttribute('data-page');
+                if (role === 'admin') {
+                    // Admin can see ALL menus
+                    item.style.display = '';
+                } else if (role === 'teacher') {
+                    // Teacher can see ALL menus EXCEPT admin (ตั้งค่าและจัดการผู้ใช้)
+                    if (page === 'admin' || item.classList.contains('admin-only')) {
+                        item.style.display = 'none';
+                    } else {
+                        item.style.display = '';
+                    }
+                } else if (role === 'student') {
+                    // Student can ONLY see 'screening' menu
+                    if (page === 'screening') {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                } else {
+                    item.style.display = '';
+                }
+            });
+        }
+
+        // --- 2. Student Restrictions in Screening Page ---
+        // Hide assessment history table & results panel for Students (ไม่สามารถดูผลการประเมินทั้งของตนเองและของผู้อื่น)
+        const historyPanel = document.getElementById('screening-history-panel');
+        if (historyPanel) {
+            if (role === 'student') {
+                historyPanel.style.display = 'none';
+            } else {
+                historyPanel.style.display = '';
+            }
+        }
+
+        // Hide "ดูผลประเมิน" buttons on assessment cards for Students
+        document.querySelectorAll('.btn-view-results, [onclick*="switchScreeningTab"]').forEach(el => {
+            if (role === 'student') {
+                el.style.display = 'none';
+            } else {
+                el.style.display = '';
+            }
+        });
+
+        // --- 3. Role-based Element Toggles ---
         document.querySelectorAll('[data-require-role]').forEach(el => {
             const requiredRoles = el.getAttribute('data-require-role').split(',');
             if (user && requiredRoles.includes(user.role)) {
@@ -259,12 +308,19 @@ class AuthManager {
             }
         });
 
-        // Hide Edit Buttons for Students (keep student-allowed visible)
-        document.querySelectorAll('.teacher-only, .admin-only').forEach(el => {
-            if (role === 'student' && !el.classList.contains('student-allowed')) {
-                el.style.display = 'none';
-            } else {
+        document.querySelectorAll('.admin-only').forEach(el => {
+            if (role === 'admin') {
                 el.style.display = '';
+            } else {
+                el.style.display = 'none';
+            }
+        });
+
+        document.querySelectorAll('.teacher-only').forEach(el => {
+            if (role === 'admin' || role === 'teacher') {
+                el.style.display = '';
+            } else {
+                el.style.display = 'none';
             }
         });
     }

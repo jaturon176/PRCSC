@@ -2510,6 +2510,18 @@ body, .sidebar, .topbar, .btn, .glass-panel, .stat-card,
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08) !important;
 }
 
+/* Strict Role-based Permission Overrides */
+body[data-user-role="student"] .btn-view-results,
+body[data-user-role="student"] #screening-history-panel,
+body[data-user-role="student"] .teacher-only,
+body[data-user-role="student"] .admin-only {
+    display: none !important;
+}
+
+body[data-user-role="teacher"] .admin-only {
+    display: none !important;
+}
+
 /* Clock blink colon */
 @keyframes clockBlink { 0%,100% { opacity:1; } 50% { opacity:0.35; } }
 .live-clock i { animation: clockBlink 1.2s ease infinite; }

@@ -29,6 +29,12 @@ class Application {
 
         // 4. Check Auth Status & Apply Permissions
         authManager.applyUIPermissions();
+        const activeUser = authManager.getCurrentUser();
+        if (activeUser && activeUser.role === 'student') {
+            this.switchPage('screening');
+        } else {
+            this.switchPage('dashboard');
+        }
 
         // 5. Render Initial Dashboard Views & Charts
         this.startLiveClock();
@@ -256,6 +262,19 @@ class Application {
     }
 
     switchPage(pageId) {
+        const user = authManager.getCurrentUser();
+
+        // Enforce strict Role Page Boundaries
+        if (user && user.role === 'student') {
+            // Student is ONLY allowed to access 'screening'
+            pageId = 'screening';
+        } else if (user && user.role === 'teacher') {
+            // Teacher cannot access 'admin' (ตั้งค่าและจัดการผู้ใช้)
+            if (pageId === 'admin') {
+                pageId = 'dashboard';
+            }
+        }
+
         this.currentView = pageId;
 
         // Update active nav link
@@ -330,6 +349,11 @@ class Application {
                 document.getElementById('login-screen-view')?.classList.add('hidden');
                 const user = authManager.getCurrentUser();
                 this.showToast(`ยินดีต้อนรับ ${user?.name || ''} เข้าสู่ระบบ`, 'success');
+                if (user?.role === 'student') {
+                    this.switchPage('screening');
+                } else {
+                    this.switchPage('dashboard');
+                }
             } else {
                 const titleMap = {
                     user_not_found: 'ไม่พบผู้ใช้งานในฐานข้อมูล ⚠️',
