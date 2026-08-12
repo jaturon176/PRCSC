@@ -25,10 +25,11 @@ class AuthManager {
     }
 
     /**
-     * Authenticate User with Smart Auto Role Detection
+     * Authenticate User with Specific Database & Password Error Messaging
      * @param {string} role 'student' | 'teacher' | 'admin' (optional)
      * @param {string} username 
      * @param {string} password 
+     * @returns {Promise<{success: boolean, message: string, reason?: string, user?: object}>}
      */
     async login(role, username, password) {
         let userProfile = null;
@@ -39,17 +40,38 @@ class AuthManager {
         const cleanUser = (username || '').toString().trim();
         const cleanPass = (password || '').toString().trim();
 
-        if (!cleanUser) return false;
+        if (!cleanUser) {
+            return {
+                success: false,
+                reason: 'empty_username',
+                message: 'กรุณากรอกชื่อผู้ใช้งาน / เบอร์โทรศัพท์ / รหัสนักเรียน'
+            };
+        }
 
-        const normPhone = cleanUser.replace(/\D/g, '');
+        const normUserDigits = cleanUser.replace(/\D/g, '');
+        const normPassDigits = cleanPass.replace(/\D/g, '');
+        const cleanNum = (str) => String(str || '').replace(/\D/g, '').replace(/^0+/, '');
 
         // 1. Search in Registered Users Database (Explicit User Credentials / Admin Overrides)
         const matchedUser = users.find(u => 
-            u.username && u.username.toString().trim().toLowerCase() === cleanUser.toLowerCase() && 
-            (!cleanPass || u.password === cleanPass || u.password === cleanUser)
+            u.username && u.username.toString().trim().toLowerCase() === cleanUser.toLowerCase()
         );
 
         if (matchedUser) {
+            const isPassValid = !cleanPass || 
+                                matchedUser.password === cleanPass || 
+                                matchedUser.password === cleanUser || 
+                                (matchedUser.role === 'student' && cleanNum(cleanPass) === cleanNum(cleanUser)) ||
+                                (matchedUser.role === 'teacher' && normPassDigits === normUserDigits);
+
+            if (!isPassValid) {
+                return {
+                    success: false,
+                    reason: 'invalid_password',
+                    message: 'รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบรหัสผ่านอีกครั้ง'
+                };
+            }
+
             userProfile = {
                 id: matchedUser.id,
                 username: matchedUser.username,
@@ -60,7 +82,15 @@ class AuthManager {
             };
         } 
         // 2. Check Admin Credentials
-        else if (cleanUser.toLowerCase() === 'admin' && (!cleanPass || cleanPass === 'admin123' || cleanPass === 'admin')) {
+        else if (cleanUser.toLowerCase() === 'admin') {
+            if (cleanPass !== 'admin' && cleanPass !== 'admin123') {
+                return {
+                    success: false,
+                    reason: 'invalid_password',
+                    message: 'รหัสผ่านสำหรับผู้ดูแลระบบ (Admin) ไม่ถูกต้อง กรุณาตรวจสอบรหัสผ่านอีกครั้ง'
+                };
+            }
+
             userProfile = {
                 id: 'ADM_01',
                 name: 'ผู้ดูแลระบบ (Administrator)',
@@ -69,61 +99,76 @@ class AuthManager {
                 avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=admin'
             };
         }
-        // 3. Search in Students Database by Student ID
-        else if (role === CONFIG.ROLES.STUDENT || students.some(s => String(s.studentId || s.id || '').trim().toLowerCase() === cleanUser.toLowerCase())) {
+        // 3. Search in Students & Teachers Databases
+        else {
             const studentMatch = students.find(s => {
-                const sId = String(s.studentId || s.id || '').trim();
-                return sId.toLowerCase() === cleanUser.toLowerCase();
+                const sId = String(s.studentId || s.id || s.code || '').trim();
+                return sId.toLowerCase() === cleanUser.toLowerCase() || 
+                       (cleanNum(sId) && cleanNum(cleanUser) && cleanNum(sId) === cleanNum(cleanUser));
+            });
+
+            const teacherMatch = teachers.find(t => {
+                const tPhone = String(t.phone || t.tel || t.mobile || t.username || '').replace(/\D/g, '');
+                return (tPhone && normUserDigits && (tPhone === normUserDigits || cleanNum(tPhone) === cleanNum(normUserDigits))) || 
+                       (t.fullName && t.fullName.toLowerCase().includes(cleanUser.toLowerCase()));
             });
 
             if (studentMatch) {
+                const sId = String(studentMatch.studentId || studentMatch.id || cleanUser).trim();
+                const expectedPass = studentMatch.password || sId;
+                const isPassValid = !cleanPass || 
+                                    cleanPass === expectedPass || 
+                                    cleanPass === cleanUser || 
+                                    cleanNum(cleanPass) === cleanNum(sId);
+
+                if (!isPassValid) {
+                    return {
+                        success: false,
+                        reason: 'invalid_password',
+                        message: 'รหัสผ่านไม่ถูกต้อง (สำหรับนักเรียน รหัสผ่านคือรหัสประจำตัวนักเรียน)'
+                    };
+                }
+
                 userProfile = {
-                    id: studentMatch.id || ('STD_' + studentMatch.studentId),
-                    studentId: studentMatch.studentId || cleanUser,
-                    name: studentMatch.fullName || (studentMatch.prefix ? `${studentMatch.prefix}${studentMatch.name} ${studentMatch.surname}` : `นักเรียน (${cleanUser})`),
+                    id: studentMatch.id || ('STD_' + sId),
+                    studentId: sId,
+                    name: studentMatch.fullName || `${studentMatch.prefix || ''}${studentMatch.name || ''} ${studentMatch.surname || ''}`.trim() || `นักเรียน (${sId})`,
                     grade: studentMatch.grade || '-',
                     room: studentMatch.room || '-',
                     role: CONFIG.ROLES.STUDENT,
                     roleTitle: CONFIG.ROLE_NAMES_TH.student,
-                    avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=student_${studentMatch.studentId || cleanUser}`
+                    avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=student_${sId}`
                 };
-            } else {
-                userProfile = {
-                    id: 'STD_' + cleanUser,
-                    studentId: cleanUser,
-                    name: `นักเรียน (รหัสประจำตัว ${cleanUser})`,
-                    grade: '-',
-                    room: '-',
-                    role: CONFIG.ROLES.STUDENT,
-                    roleTitle: CONFIG.ROLE_NAMES_TH.student,
-                    avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=student_${cleanUser}`
-                };
-            }
-        }
-        // 4. Search in Teachers Database by Phone Number
-        else if (role === CONFIG.ROLES.TEACHER || normPhone.length >= 9 || teachers.some(t => String(t.phone || t.tel || t.mobile || '').replace(/\D/g, '') === normPhone)) {
-            const teacherMatch = teachers.find(t => {
-                const tPhone = String(t.phone || t.tel || t.mobile || t.username || '').replace(/\D/g, '');
-                return (tPhone && normPhone && tPhone === normPhone) || (t.fullName && t.fullName.includes(cleanUser));
-            });
+            } else if (teacherMatch) {
+                const tPhone = String(teacherMatch.phone || teacherMatch.tel || teacherMatch.mobile || cleanUser).replace(/\D/g, '');
+                const expectedPass = teacherMatch.password || tPhone || cleanUser;
+                const isPassValid = !cleanPass || 
+                                    cleanPass === expectedPass || 
+                                    cleanPass === cleanUser || 
+                                    normPassDigits === tPhone;
 
-            if (teacherMatch) {
+                if (!isPassValid) {
+                    return {
+                        success: false,
+                        reason: 'invalid_password',
+                        message: 'รหัสผ่านไม่ถูกต้อง (สำหรับครู รหัสผ่านคือเบอร์โทรศัพท์)'
+                    };
+                }
+
                 userProfile = {
-                    id: teacherMatch.id || ('TCH_' + (normPhone || cleanUser)),
+                    id: teacherMatch.id || ('TCH_' + (tPhone || cleanUser)),
                     name: teacherMatch.fullName || teacherMatch.name || 'ครู / บุคลากร',
                     phone: teacherMatch.phone || cleanUser,
                     role: CONFIG.ROLES.TEACHER,
                     roleTitle: CONFIG.ROLE_NAMES_TH.teacher,
-                    avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=teacher_${normPhone || cleanUser}`
+                    avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=teacher_${cleanUser}`
                 };
             } else {
-                userProfile = {
-                    id: 'TCH_' + (normPhone || cleanUser),
-                    name: `ครู (เบอร์โทร ${cleanUser})`,
-                    phone: cleanUser,
-                    role: CONFIG.ROLES.TEACHER,
-                    roleTitle: CONFIG.ROLE_NAMES_TH.teacher,
-                    avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=teacher_${cleanUser}`
+                // Not found in any database collection!
+                return {
+                    success: false,
+                    reason: 'user_not_found',
+                    message: `ไม่พบชื่อผู้ใช้งาน "${cleanUser}" ในฐานข้อมูล<br><small style="color:var(--text-muted);">กรุณาตรวจสอบชื่อผู้ใช้งาน หรือติดต่อผู้ดูแลระบบ (Admin)</small>`
                 };
             }
         }
@@ -132,9 +177,17 @@ class AuthManager {
             this.currentUser = userProfile;
             localStorage.setItem(CONFIG.STORAGE_KEYS.AUTH_USER, JSON.stringify(userProfile));
             window.dispatchEvent(new CustomEvent('authStateChanged', { detail: userProfile }));
-            return true;
+            return {
+                success: true,
+                user: userProfile
+            };
         }
-        return false;
+
+        return {
+            success: false,
+            reason: 'user_not_found',
+            message: 'ไม่พบชื่อผู้ใช้งานในฐานข้อมูล กรุณาติดต่อผู้ดูแลระบบ (Admin)'
+        };
     }
 
     logout() {

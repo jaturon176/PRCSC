@@ -313,7 +313,7 @@ class Application {
             this.confirmLogout();
         });
 
-        // Form Standalone Login Submit (Smart Auto Role Login)
+        // Form Standalone Login Submit (Smart Auto Role Login with Specific Errors)
         document.getElementById('standalone-login-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = document.getElementById('page-login-user').value;
@@ -324,17 +324,20 @@ class Application {
                 return;
             }
 
-            const success = await authManager.login(null, username, password);
-            if (success) {
+            const res = await authManager.login(null, username, password);
+            if (res && res.success) {
                 document.getElementById('login-screen-view')?.classList.add('hidden');
                 const user = authManager.getCurrentUser();
                 this.showToast(`ยินดีต้อนรับ ${user?.name || ''} เข้าสู่ระบบ`, 'success');
             } else {
-                this.showAlert(
-                    'ลงชื่อเข้าใช้ไม่สำเร็จ', 
-                    'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง<br><small style="color:var(--text-muted);">• ครู: ใช้เบอร์โทรศัพท์เป็นชื่อผู้ใช้และรหัสผ่าน<br>• นักเรียน: ใช้รหัสประจำตัวนักเรียนเป็นชื่อผู้ใช้และรหัสผ่าน<br>• Admin: ใช้บัญชีผู้ดูแลระบบ</small>', 
-                    'error'
-                );
+                const titleMap = {
+                    user_not_found: 'ไม่พบผู้ใช้งานในฐานข้อมูล ⚠️',
+                    invalid_password: 'รหัสผ่านไม่ถูกต้อง ❌',
+                    empty_username: 'แจ้งเตือน ⚠️'
+                };
+                const alertTitle = (res && res.reason && titleMap[res.reason]) ? titleMap[res.reason] : 'ลงชื่อเข้าใช้ไม่สำเร็จ ❌';
+                const alertMsg = (res && res.message) ? res.message : 'ไม่พบข้อมูลผู้ใช้ในระบบ กรุณาติดต่อผู้ดูแลระบบ (Admin)';
+                this.showAlert(alertTitle, alertMsg, 'error');
             }
         });
 
