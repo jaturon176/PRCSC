@@ -1300,14 +1300,14 @@ class Application {
                             {
                                 label: 'ไม่มีภาวะซึมเศร้า',
                                 data: activeGrades.map(g => gradeData[g].normal),
-                                backgroundColor: '#059669',
+                                backgroundColor: '#0284c7',
                                 borderRadius: { topLeft: 0, topRight: 0, bottomLeft: 4, bottomRight: 4 },
                                 stack: 'phqa'
                             },
                             {
                                 label: 'เล็กน้อย',
                                 data: activeGrades.map(g => gradeData[g].mild),
-                                backgroundColor: '#0284c7',
+                                backgroundColor: '#059669',
                                 stack: 'phqa'
                             },
                             {
