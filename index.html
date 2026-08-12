@@ -1222,7 +1222,26 @@
         </div>
     </div>
 
+    <!-- Dedicated Image Preview Modal (Guaranteed 100% Reliable Close & Click Behavior) -->
+    <div class="modal-overlay" id="modal-image-preview" style="z-index: 3000;" onclick="if(event.target === this) app.closeModal('modal-image-preview')">
+        <div class="modal-content" style="max-width: 640px; text-align: center; padding: 22px 24px; border-radius: 20px; box-shadow: var(--shadow-xl); position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border-light);">
+                <h4 id="preview-image-title" style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-heading); display: flex; align-items: center; gap: 8px;">
+                    <i class="ri-image-line" style="color: var(--indigo-500);"></i> รูปภาพหลักฐาน
+                </h4>
+                <button type="button" class="btn-close" onclick="app.closeModal('modal-image-preview')" style="background: rgba(0,0,0,0.06); border: none; font-size: 1.5rem; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-heading); transition: all 0.2s ease;">&times;</button>
+            </div>
+            <div style="max-height: 65vh; overflow-y: auto; margin-bottom: 18px; border-radius: 12px; background: rgba(0,0,0,0.03); padding: 8px; display: flex; align-items: center; justify-content: center;">
+                <img id="preview-image-src" src="" alt="รูปภาพหลักฐาน" style="max-width: 100%; max-height: 60vh; object-fit: contain; border-radius: 8px; box-shadow: var(--shadow-md);">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="app.closeModal('modal-image-preview')" style="width: 100%; padding: 11px; border-radius: 12px; font-weight: 700; font-size: 1rem; justify-content: center;">
+                <i class="ri-check-line"></i> ปิดหน้าต่าง
+            </button>
+        </div>
+    </div>
+
     <!-- Custom Confirmation Pop-up Modal -->
+
     <div class="modal-overlay" id="modal-confirm-dialog" style="z-index: 2500;">
         <div class="modal-content" style="max-width: 440px; text-align: center; padding: 32px 28px;">
             <div class="confirm-icon-wrapper danger" id="confirm-dialog-icon">

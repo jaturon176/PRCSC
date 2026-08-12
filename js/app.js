@@ -292,6 +292,13 @@ class Application {
 
     // --- Global Event Handlers & Modal Setup ---
     setupEventListeners() {
+        // Global ESC key listener to close any active modal overlay
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+            }
+        });
+
         // Standalone Modern Login Screen Controls
         document.getElementById('btn-open-login')?.addEventListener('click', () => {
             const loginScreenView = document.getElementById('login-screen-view');
@@ -1358,7 +1365,16 @@ class Application {
 
     previewImage(url, title = 'รูปภาพหลักฐาน') {
         if (!url) return;
-        if (window.Swal) {
+        const modal = document.getElementById('modal-image-preview');
+        const imgEl = document.getElementById('preview-image-src');
+        const titleEl = document.getElementById('preview-image-title');
+        if (modal && imgEl) {
+            imgEl.src = url;
+            if (titleEl) {
+                titleEl.innerHTML = `<i class="ri-image-line" style="color: var(--indigo-500);"></i> รูปภาพหลักฐาน: ${title}`;
+            }
+            this.openModal('modal-image-preview');
+        } else if (window.Swal) {
             Swal.fire({
                 title: `📷 รูปภาพหลักฐาน: ${title}`,
                 imageUrl: url,
