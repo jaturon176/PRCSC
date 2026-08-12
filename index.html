@@ -732,9 +732,11 @@
                                 🧠 ผลการประเมินภาวะซึมเศร้า (PHQ-A)
                             </button>
                         </div>
-                        <h4 id="screening-table-title" style="font-size: 0.92rem; font-weight: 600; color: var(--text-muted); margin: 0;">
-                            แสดงผลประวัติการประเมินล่าสุด
-                        </h4>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <button class="btn btn-danger btn-sm teacher-only" id="btn-open-delete-screening-modal" onclick="app.openDeleteScreeningModal()">
+                                <i class="ri-delete-bin-line"></i> ลบผลการประเมิน (รายห้อง/ทั้งหมด)
+                            </button>
+                        </div>
                     </div>
 
                     <div class="table-responsive">
@@ -1599,6 +1601,80 @@
                     <button type="submit" class="btn btn-primary"><i class="ri-upload-2-line"></i> นำเข้าข้อมูลครู</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal: Delete Screening Scope (ลบผลประเมินรายคน/รายห้อง/ทั้งหมด) -->
+    <div class="modal-overlay" id="modal-delete-screening-scope">
+        <div class="modal-content" style="max-width: 540px;">
+            <div class="modal-header">
+                <h3><i class="ri-delete-bin-3-line" style="color: #e11d48;"></i> ลบผลการประเมินนักเรียน (รายห้อง / รายประเภท / ทั้งหมด)</h3>
+                <button class="btn-close" onclick="app.closeModal('modal-delete-screening-scope')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">ประเภทแบบประเมินที่ต้องการลบ *</label>
+                    <select class="form-select" id="del-scr-type">
+                        <option value="all">-- ลบทุกประเภท (พฤติกรรม 4 ด้าน & PHQ-A) --</option>
+                        <option value="behavior">🛡️ เฉพาะแบบประเมินคัดกรองพฤติกรรมเสี่ยง (4 ด้าน)</option>
+                        <option value="depression">🧠 เฉพาะแบบประเมินภาวะซึมเศร้า (PHQ-A)</option>
+                    </select>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-group">
+                        <label class="form-label">ระดับชั้น *</label>
+                        <select class="form-select" id="del-scr-grade">
+                            <option value="all">-- ทุกระดับชั้น --</option>
+                            <option value="ม.1">มัธยมศึกษาปีที่ 1 (ม.1)</option>
+                            <option value="ม.2">มัธยมศึกษาปีที่ 2 (ม.2)</option>
+                            <option value="ม.3">มัธยมศึกษาปีที่ 3 (ม.3)</option>
+                            <option value="ม.4">มัธยมศึกษาปีที่ 4 (ม.4)</option>
+                            <option value="ม.5">มัธยมศึกษาปีที่ 5 (ม.5)</option>
+                            <option value="ม.6">มัธยมศึกษาปีที่ 6 (ม.6)</option>
+                            <option value="ปวช.1">ปวช.1</option>
+                            <option value="ปวช.2">ปวช.2</option>
+                            <option value="ปวช.3">ปวช.3</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ห้องเรียน *</label>
+                        <select class="form-select" id="del-scr-room">
+                            <option value="all">-- ทุกห้องเรียน --</option>
+                            <option value="1">ห้อง 1</option>
+                            <option value="2">ห้อง 2</option>
+                            <option value="3">ห้อง 3</option>
+                            <option value="4">ห้อง 4</option>
+                            <option value="5">ห้อง 5</option>
+                            <option value="6">ห้อง 6</option>
+                            <option value="7">ห้อง 7</option>
+                            <option value="8">ห้อง 8</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Scope Summary Badge Box -->
+                <div style="margin-top: 14px; padding: 14px 16px; background: rgba(225,29,72,0.06); border: 1px dashed rgba(225,29,72,0.25); border-radius: 12px; font-size: 0.88rem;">
+                    <div style="font-weight: 700; color: #be123c; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                        <i class="ri-error-warning-fill"></i> ขอบเขตรายการที่จะถูกลบ:
+                    </div>
+                    <div id="del-scr-scope-summary" style="color: var(--text-heading); font-weight: 600;">
+                        พบข้อมูลที่จะถูกลบ 0 รายการ
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer" style="flex-wrap: wrap; gap: 10px; justify-content: space-between;">
+                <button type="button" class="btn btn-secondary" onclick="app.closeModal('modal-delete-screening-scope')">ยกเลิก</button>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn btn-danger" id="btn-confirm-delete-scr-scope" onclick="app.confirmDeleteScreeningScope()">
+                        <i class="ri-delete-bin-line"></i> ลบตามขอบเขตที่เลือก
+                    </button>
+                    <button type="button" class="btn btn-danger" style="background: #991b1b; border-color: #7f1d1d;" onclick="app.confirmDeleteAllScreenings()">
+                        <i class="ri-delete-bin-7-line"></i> ลบทั้งหมดในระบบ
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 

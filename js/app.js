@@ -505,6 +505,10 @@ class Application {
         document.getElementById('del-scope-room')?.addEventListener('change', () => this.updateDeleteScopeSummary());
         document.getElementById('btn-confirm-delete-student-scope')?.addEventListener('click', () => this.confirmDeleteStudentScope());
 
+        document.getElementById('del-scr-type')?.addEventListener('change', () => this.updateDeleteScreeningScopeSummary());
+        document.getElementById('del-scr-grade')?.addEventListener('change', () => this.updateDeleteScreeningScopeSummary());
+        document.getElementById('del-scr-room')?.addEventListener('change', () => this.updateDeleteScreeningScopeSummary());
+
         document.getElementById('btn-delete-all-teachers')?.addEventListener('click', async () => {
             const teachers = firebaseService.getTeachers();
             const confirmed = await this.confirmDialog({
@@ -1750,6 +1754,7 @@ class Application {
                         <th>คำแนะนำ / การเฝ้าระวัง</th>
                         <th>ครู/ผู้ประเมิน</th>
                         <th>วันที่ประเมิน</th>
+                        <th class="teacher-only">จัดการ</th>
                     </tr>
                 `;
             } else {
@@ -1760,6 +1765,7 @@ class Application {
                         <th>คะแนนรวมความเสี่ยง</th>
                         <th>ครู/ผู้ประเมิน</th>
                         <th>วันที่ประเมิน</th>
+                        <th class="teacher-only">จัดการ</th>
                     </tr>
                 `;
             }
@@ -1767,7 +1773,7 @@ class Application {
 
         tbody.innerHTML = '';
         if (targetScreenings.length === 0) {
-            const colspan = currentTab === 'depression' ? 6 : 5;
+            const colspan = currentTab === 'depression' ? 7 : 6;
             tbody.innerHTML = `<tr><td colspan="${colspan}" style="text-align:center; color:#64748b; padding: 24px;">ยังไม่มีประวัติ${currentTab === 'depression' ? 'การประเมินภาวะซึมเศร้า (PHQ-A)' : 'การคัดกรองพฤติกรรมเสี่ยง'}</td></tr>`;
             return;
         }
@@ -1804,6 +1810,9 @@ class Application {
                     <td style="max-width:280px; font-size:0.85rem; color:var(--text-muted); line-height:1.4;">${scr.advice || depInfo.advice}</td>
                     <td>${scr.assessor || '-'}</td>
                     <td>${scr.assessedAt ? new Date(scr.assessedAt).toLocaleDateString('th-TH') : '-'}</td>
+                    <td class="teacher-only">
+                        <button class="btn btn-danger btn-sm" onclick="app.deleteSingleScreening('${scr.id}')"><i class="ri-delete-bin-line"></i> ลบ</button>
+                    </td>
                 `;
             } else {
                 const levelInfo = CONFIG.SCREENING_LEVELS[scr.resultLevel?.toUpperCase()] || CONFIG.SCREENING_LEVELS.NORMAL;
@@ -1813,11 +1822,16 @@ class Application {
                     <td><strong style="color:var(--text-heading);">${scr.totalScore} คะแนน</strong></td>
                     <td>${scr.assessor || '-'}</td>
                     <td>${scr.assessedAt ? new Date(scr.assessedAt).toLocaleDateString('th-TH') : '-'}</td>
+                    <td class="teacher-only">
+                        <button class="btn btn-danger btn-sm" onclick="app.deleteSingleScreening('${scr.id}')"><i class="ri-delete-bin-line"></i> ลบ</button>
+                    </td>
                 `;
             }
 
             tbody.appendChild(tr);
         });
+
+        authManager.applyUIPermissions();
     }
 
     renderMerits() {
@@ -2199,6 +2213,102 @@ class Application {
         const newVer = `v${major}.${minor}`;
         this.setVersion(newVer);
         return newVer;
+    }
+
+    // --- Screening Deletion Handlers (Single / Scope / All) ---
+    async deleteSingleScreening(id) {
+        const confirmed = await this.confirmDialog({
+            title: '🗑️ ยืนยันการลบผลการประเมิน',
+            message: 'คุณแน่ใจหรือไม่ว่าต้องการลบผลการประเมินรายการนี้ออกจากระบบ? การดำเนินการนี้จะไม่สามารถย้อนกลับได้',
+            type: 'danger',
+            confirmText: 'ลบรายการนี้'
+        });
+        if (confirmed) {
+            await firebaseService.deleteScreening(id);
+            this.showAlert('ลบข้อมูลสำเร็จ 🎉', 'ลบผลการประเมินรายการที่เลือกเรียบร้อยแล้ว', 'success');
+        }
+    }
+
+    openDeleteScreeningModal() {
+        this.updateDeleteScreeningScopeSummary();
+        this.openModal('modal-delete-screening-scope');
+    }
+
+    updateDeleteScreeningScopeSummary() {
+        const type = document.getElementById('del-scr-type')?.value || 'all';
+        const grade = document.getElementById('del-scr-grade')?.value || 'all';
+        const room = document.getElementById('del-scr-room')?.value || 'all';
+
+        const allStudents = firebaseService.getStudents();
+        const screenings = firebaseService.getScreenings();
+
+        const targets = screenings.filter(s => {
+            if (type !== 'all' && s.type !== type) return false;
+
+            let sGrade = s.grade || s.studentGrade || '';
+            let sRoom = s.room || s.studentRoom || '';
+            if (!sGrade || !sRoom) {
+                const stu = allStudents.find(st => (st.studentId || st.id) === s.studentId);
+                if (stu) {
+                    if (!sGrade) sGrade = stu.grade || '';
+                    if (!sRoom) sRoom = stu.room || '';
+                }
+            }
+
+            if (grade !== 'all' && sGrade !== grade && !sGrade.startsWith(grade)) return false;
+            if (room !== 'all' && sRoom !== room && sRoom !== `ห้อง ${room}` && sRoom !== room.toString()) return false;
+
+            return true;
+        });
+
+        const summaryEl = document.getElementById('del-scr-scope-summary');
+        if (summaryEl) {
+            const typeLabel = type === 'behavior' ? 'เฉพาะคัดกรอง 4 ด้าน' : type === 'depression' ? 'เฉพาะ PHQ-A' : 'ทุกประเภท';
+            const gradeLabel = grade === 'all' ? 'ทุกระดับชั้น' : grade;
+            const roomLabel = room === 'all' ? 'ทุกห้องเรียน' : `ห้อง ${room}`;
+            summaryEl.innerHTML = `พบผลการประเมินที่เข้าเงื่อนไข (${typeLabel} \| ${gradeLabel} \| ${roomLabel}): <strong style="color:#e11d48; font-size:1.1rem;">${targets.length}</strong> รายการ`;
+        }
+    }
+
+    async confirmDeleteScreeningScope() {
+        const type = document.getElementById('del-scr-type')?.value || 'all';
+        const grade = document.getElementById('del-scr-grade')?.value || 'all';
+        const room = document.getElementById('del-scr-room')?.value || 'all';
+
+        const gradeLabel = grade === 'all' ? 'ทุกระดับชั้น' : grade;
+        const roomLabel = room === 'all' ? 'ทุกห้องเรียน' : `ห้อง ${room}`;
+        const typeLabel = type === 'behavior' ? 'คัดกรองพฤติกรรมเสี่ยง 4 ด้าน' : type === 'depression' ? 'ภาวะซึมเศร้า (PHQ-A)' : 'ทั้งหมดทุกประเภท';
+
+        const confirmed = await this.confirmDialog({
+            title: '⚠️ ยืนยันการลบผลการประเมินตามขอบเขต',
+            message: `คุณแน่ใจหรือไม่ว่าต้องการลบผลการประเมิน (${typeLabel}) ของระดับชั้น [${gradeLabel} ${roomLabel}]? การดำเนินการนี้ไม่สามารถย้อนกลับได้`,
+            type: 'danger',
+            confirmText: 'ยืนยันลบตามขอบเขต'
+        });
+
+        if (confirmed) {
+            const count = await firebaseService.deleteScreeningsScope({ type, grade, room });
+            this.closeModal('modal-delete-screening-scope');
+            this.showAlert('ลบข้อมูลสำเร็จ 🎉', `ลบผลการประเมินตามขอบเขตสำเร็จจำนวน ${count} รายการ`, 'success');
+        }
+    }
+
+    async confirmDeleteAllScreenings() {
+        const type = document.getElementById('del-scr-type')?.value || 'all';
+        const typeLabel = type === 'behavior' ? 'คัดกรองพฤติกรรมเสี่ยง 4 ด้าน' : type === 'depression' ? 'ภาวะซึมเศร้า (PHQ-A)' : 'ทั้งหมดทุกประเภท';
+
+        const confirmed = await this.confirmDialog({
+            title: '🚨 ยืนยันการลบผลการประเมินทั้งหมดในระบบ',
+            message: `คำเตือน: คุณแน่ใจหรือไม่ว่าต้องการลบผลการประเมิน [${typeLabel}] ของนักเรียนทุกระดับชั้นทั้งหมดในระบบ?`,
+            type: 'danger',
+            confirmText: 'ลบผลการประเมินทั้งหมด'
+        });
+
+        if (confirmed) {
+            const count = await firebaseService.deleteAllScreenings(type);
+            this.closeModal('modal-delete-screening-scope');
+            this.showAlert('ลบข้อมูลสำเร็จ 🎉', `ลบผลการประเมินทั้งหมดในระบบเรียบร้อยแล้ว (${count} รายการ)`, 'success');
+        }
     }
 
     // --- Custom Confirmation Dialog Helper ---

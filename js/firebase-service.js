@@ -554,6 +554,96 @@ class FirebaseService {
         return screening;
     }
 
+    async deleteScreening(screeningId) {
+        let screenings = this.getScreenings();
+        const target = screenings.find(s => s.id === screeningId);
+        const realId = target ? target.id : screeningId;
+        screenings = screenings.filter(s => s.id !== realId);
+
+        this.setCache(CONFIG.STORAGE_KEYS.SCREENINGS, screenings);
+        window.dispatchEvent(new CustomEvent('screeningsUpdated', { detail: screenings }));
+
+        if (this.isOnline) {
+            await this.cloudDelete(`${CONFIG.FIREBASE.ENDPOINTS.SCREENINGS}/${realId}`);
+        }
+        return true;
+    }
+
+    async deleteScreeningsScope({ type, grade, room }) {
+        this.isSavingBatch = true;
+        try {
+            const allStudents = this.getStudents();
+            let screenings = this.getScreenings();
+
+            const toDelete = screenings.filter(s => {
+                // Type filter
+                if (type && type !== 'all' && s.type !== type) return false;
+
+                // Grade & Room filter
+                let sGrade = s.grade || s.studentGrade || '';
+                let sRoom = s.room || s.studentRoom || '';
+                if (!sGrade || !sRoom) {
+                    const stu = allStudents.find(st => (st.studentId || st.id) === s.studentId);
+                    if (stu) {
+                        if (!sGrade) sGrade = stu.grade || '';
+                        if (!sRoom) sRoom = stu.room || '';
+                    }
+                }
+
+                if (grade && grade !== 'all') {
+                    if (sGrade !== grade && !sGrade.startsWith(grade)) return false;
+                }
+
+                if (room && room !== 'all') {
+                    if (sRoom !== room && sRoom !== `ห้อง ${room}` && sRoom !== room.toString()) return false;
+                }
+
+                return true;
+            });
+
+            const deleteIds = new Set(toDelete.map(d => d.id));
+            const remaining = screenings.filter(s => !deleteIds.has(s.id));
+
+            this.setCache(CONFIG.STORAGE_KEYS.SCREENINGS, remaining);
+            window.dispatchEvent(new CustomEvent('screeningsUpdated', { detail: remaining }));
+
+            if (this.isOnline) {
+                for (const item of toDelete) {
+                    await this.cloudDelete(`${CONFIG.FIREBASE.ENDPOINTS.SCREENINGS}/${item.id}`);
+                }
+            }
+            return toDelete.length;
+        } finally {
+            this.isSavingBatch = false;
+        }
+    }
+
+    async deleteAllScreenings(type = 'all') {
+        let screenings = this.getScreenings();
+        let remaining = [];
+        let toDelete = screenings;
+
+        if (type && type !== 'all') {
+            remaining = screenings.filter(s => s.type !== type);
+            toDelete = screenings.filter(s => s.type === type);
+        }
+
+        this.setCache(CONFIG.STORAGE_KEYS.SCREENINGS, remaining);
+        window.dispatchEvent(new CustomEvent('screeningsUpdated', { detail: remaining }));
+
+        if (this.isOnline) {
+            if (type === 'all') {
+                await this.cloudPut(CONFIG.FIREBASE.ENDPOINTS.SCREENINGS, null);
+                await this.cloudDelete(CONFIG.FIREBASE.ENDPOINTS.SCREENINGS);
+            } else {
+                const cloudObject = {};
+                remaining.forEach(s => { cloudObject[s.id] = s; });
+                await this.cloudPut(CONFIG.FIREBASE.ENDPOINTS.SCREENINGS, cloudObject);
+            }
+        }
+        return toDelete.length;
+    }
+
     // 3. Merits & Promotion
     getMerits() {
         return this.getCache(CONFIG.STORAGE_KEYS.MERITS) || [];
