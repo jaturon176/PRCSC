@@ -333,6 +333,51 @@ class Application {
             this.confirmLogout();
         });
 
+        // User Avatar Upload Event Handler
+        document.getElementById('user-avatar-file-input')?.addEventListener('change', (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                this.showAlert('แจ้งเตือน', 'กรุณาเลือกไฟล์รูปภาพเท่านั้น (JPG, PNG, WEBP)', 'warning');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const maxDim = 250;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > maxDim) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        }
+                    } else {
+                        if (height > maxDim) {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                    authManager.updateAvatar(resizedDataUrl);
+                    this.showToast('อัปเปลี่ยนรูปโปรไฟล์เรียบร้อยแล้ว 🎉', 'success');
+                };
+                img.src = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
         // Form Standalone Login Submit (Smart Auto Role Login with Specific Errors)
         document.getElementById('standalone-login-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();

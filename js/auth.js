@@ -200,6 +200,23 @@ class AuthManager {
         return this.currentUser;
     }
 
+    updateAvatar(newAvatarUrl) {
+        if (!this.currentUser) return;
+        this.currentUser.avatar = newAvatarUrl;
+        localStorage.setItem(CONFIG.STORAGE_KEYS.AUTH_USER, JSON.stringify(this.currentUser));
+
+        // Save to users database if registered user exists
+        const users = firebaseService.getUsers() || [];
+        const matched = users.find(u => u.id === this.currentUser.id || (u.username && u.username === this.currentUser.username));
+        if (matched) {
+            matched.avatar = newAvatarUrl;
+            firebaseService.saveUser(matched);
+        }
+
+        const userAvatarEl = document.getElementById('user-avatar');
+        if (userAvatarEl) userAvatarEl.src = newAvatarUrl;
+    }
+
     hasRole(role) {
         if (!this.currentUser) return false;
         if (this.currentUser.role === CONFIG.ROLES.ADMIN) return true; // Admin has all rights

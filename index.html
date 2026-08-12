@@ -154,13 +154,16 @@
                 </div>
 
                 <div class="header-right">
-                    <div class="user-profile-btn" id="btn-open-login">
-                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=teacher" class="user-avatar" id="user-avatar" alt="Avatar">
+                    <div class="user-profile-card">
+                        <div class="user-avatar-upload-wrapper" onclick="document.getElementById('user-avatar-file-input').click()" title="คลิกเพื่อเปลี่ยนรูปโปรไฟล์">
+                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=teacher" class="user-avatar" id="user-avatar" alt="Avatar">
+                            <div class="user-avatar-edit-overlay" title="อัปโหลดรูปโปรไฟล์"><i class="ri-camera-fill"></i></div>
+                            <input type="file" id="user-avatar-file-input" accept="image/*" style="display: none;">
+                        </div>
                         <div class="user-info">
                             <div class="user-name" id="user-profile-name">ครูผู้ใช้งานระบบ</div>
                             <div class="user-role-badge" id="user-role-badge">👨‍🏫 ครูกิจการนักเรียน</div>
                         </div>
-                        <i class="ri-arrow-down-s-line" style="color: var(--text-muted);"></i>
                     </div>
                     <button class="btn btn-secondary btn-sm" id="btn-logout" title="ออกจากระบบ"><i class="ri-logout-box-r-line"></i></button>
                 </div>
@@ -1754,12 +1757,12 @@
     </div>
 
     <!-- Load Application Scripts -->
-    <script src="js/config.js?v=2.6"></script>
-    <script src="js/firebase-service.js?v=2.6"></script>
-    <script src="js/cloudinary-service.js?v=2.6"></script>
-    <script src="js/pdf-generator.js?v=2.6"></script>
-    <script src="js/csv-importer.js?v=2.6"></script>
-    <script src="js/auth.js?v=2.6"></script>
-    <script src="js/app.js?v=2.6"></script>
+    <script src="js/config.js?v=2.7"></script>
+    <script src="js/firebase-service.js?v=2.7"></script>
+    <script src="js/cloudinary-service.js?v=2.7"></script>
+    <script src="js/pdf-generator.js?v=2.7"></script>
+    <script src="js/csv-importer.js?v=2.7"></script>
+    <script src="js/auth.js?v=2.7"></script>
+    <script src="js/app.js?v=2.7"></script>
 </body>
 </html>
