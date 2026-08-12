@@ -2486,9 +2486,11 @@ body, .sidebar, .topbar, .btn, .glass-panel, .stat-card,
     to   { opacity:1; transform:scale(1) translateY(0); }
 }
 
-/* SweetAlert2 polish — only apply to normal popups, NOT toasts */
-.swal2-popup:not(.swal2-toast) {
+/* SweetAlert2 polish — only apply animation while opening (.swal2-show), NOT closing (.swal2-hide) or toasts */
+.swal2-popup.swal2-show:not(.swal2-toast) {
     animation: swalSlideIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.swal2-popup:not(.swal2-toast) {
     border-radius: 20px !important;
 }
 @keyframes swalSlideIn {

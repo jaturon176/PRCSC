@@ -517,8 +517,15 @@ class Application {
                 const parsed = await csvImporter.parseMultipleCSV(fileInput.files);
                 await firebaseService.saveStudentsBatch(parsed);
                 this.closeModal('modal-csv-import');
-                const countMsg = fileInput.files.length > 1 
-                    ? `นำเข้าข้อมูลนักเรียนจาก ${fileInput.files.length} ไฟล์ สำเร็จรวมทั้งหมด ${parsed.length} คน 🎉`
+
+                // Reset file input and selected filenames display
+                const numFiles = fileInput.files.length;
+                fileInput.value = '';
+                const selectedFileDiv = document.getElementById('student-csv-selected-file');
+                if (selectedFileDiv) selectedFileDiv.style.display = 'none';
+
+                const countMsg = numFiles > 1 
+                    ? `นำเข้าข้อมูลนักเรียนจาก ${numFiles} ไฟล์ สำเร็จรวมทั้งหมด ${parsed.length} คน 🎉`
                     : `นำเข้าข้อมูลนักเรียนสำเร็จจำนวน ${parsed.length} คน 🎉`;
                 this.showAlert('นำเข้าข้อมูลสำเร็จ 🎉', countMsg, 'success');
             } catch (err) {
