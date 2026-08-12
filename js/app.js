@@ -1763,9 +1763,8 @@ class Application {
                 icon: iconMap[type] || 'info',
                 confirmButtonText: 'ตกลง',
                 confirmButtonColor: btnColorMap[type] || '#be123c',
-                customClass: {
-                    popup: 'swal2-popup'
-                }
+                allowOutsideClick: true,
+                allowEscapeKey: true
             });
         } else {
             alert(`${title}\n${message}`);
@@ -1806,9 +1805,8 @@ class Application {
                 confirmButtonColor: '#e11d48',
                 cancelButtonColor: '#64748b',
                 reverseButtons: true,
-                customClass: {
-                    popup: 'swal2-popup'
-                }
+                allowOutsideClick: true,
+                allowEscapeKey: true
             });
             if (result.isConfirmed) {
                 authManager.logout();
