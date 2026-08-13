@@ -257,6 +257,18 @@ class FirebaseService {
         if (this.isOnline) {
             await this.cloudPut(`${CONFIG.FIREBASE.ENDPOINTS.STUDENTS}/${student.id}`, student);
         }
+
+        // Auto Sync User Account Credential to Server /users node
+        if (student.studentId) {
+            await this.saveUser({
+                id: 'USR_STD_' + student.studentId,
+                username: student.studentId,
+                fullName: `${student.prefix || ''}${student.fullName}`.trim(),
+                role: 'student',
+                password: student.password || student.studentId
+            });
+        }
+
         return student;
     }
 
@@ -287,6 +299,24 @@ class FirebaseService {
                 merged.forEach(s => { cloudObject[s.id] = s; });
                 await this.cloudPut(CONFIG.FIREBASE.ENDPOINTS.STUDENTS, cloudObject);
             }
+
+            // Auto Sync Batch User Account Credentials to Server /users node
+            const userAccs = [];
+            merged.forEach(s => {
+                if (s.studentId) {
+                    userAccs.push({
+                        id: 'USR_STD_' + s.studentId,
+                        username: s.studentId,
+                        fullName: `${s.prefix || ''}${s.fullName}`.trim(),
+                        role: 'student',
+                        password: s.password || s.studentId
+                    });
+                }
+            });
+            if (userAccs.length > 0) {
+                await this.saveUsersBatch(userAccs);
+            }
+
             return merged;
         } finally {
             this.isSavingBatch = false;
@@ -382,6 +412,19 @@ class FirebaseService {
         if (this.isOnline) {
             await this.cloudPut(`${CONFIG.FIREBASE.ENDPOINTS.TEACHERS}/${teacher.id}`, teacher);
         }
+
+        // Auto Sync Teacher User Account Credential to Server /users node
+        const phoneClean = String(teacher.phone || teacher.tel || teacher.mobile || '').replace(/\D/g, '');
+        if (phoneClean) {
+            await this.saveUser({
+                id: 'USR_TCH_' + phoneClean,
+                username: phoneClean,
+                fullName: teacher.fullName || teacher.name || 'ครู/บุคลากร',
+                role: 'teacher',
+                password: teacher.password || phoneClean
+            });
+        }
+
         return teacher;
     }
 
