@@ -2114,16 +2114,7 @@ class Application {
     }
     // --- User Accounts Seed Data & Methods ---
     checkAndLoadUserSeedData() {
-        const users = firebaseService.getUsers();
-        if (!users || users.length === 0) {
-            console.log('[App] Seeding initial User Accounts with Passwords...');
-            const defaultUsers = [
-                { id: 'USR_ADMIN_01', username: 'admin', fullName: 'ผู้ดูแลระบบ (Admin)', role: 'admin', password: 'admin123', createdAt: new Date().toISOString() },
-                { id: 'USR_TEACHER_01', username: '0812345678', fullName: 'ครูกิจการนักเรียน (ตัวอย่างเบอร์โทร)', role: 'teacher', password: '0812345678', createdAt: new Date().toISOString() },
-                { id: 'USR_STUDENT_01', username: '67001', fullName: 'นักเรียน (ตัวอย่างรหัสนักเรียน)', role: 'student', password: '67001', createdAt: new Date().toISOString() }
-            ];
-            firebaseService.saveUsersBatch(defaultUsers);
-        }
+        // Preserves all server user accounts from Firebase Cloud
     }
 
     renderUserList() {

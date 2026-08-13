@@ -534,10 +534,26 @@ class FirebaseService {
     }
 
     async saveUsersBatch(newUsersList) {
-        const users = this.getUsers();
-        const map = new Map();
-        users.forEach(u => map.set(u.username || u.id, u));
+        if (!newUsersList || newUsersList.length === 0) return [];
 
+        const map = new Map();
+        
+        // 1. Merge current local cache
+        const localUsers = this.getUsers();
+        localUsers.forEach(u => map.set(u.username || u.id, u));
+
+        // 2. Fetch latest from cloud if online to avoid losing existing cloud users
+        if (this.isOnline) {
+            const cloudData = await this.cloudGet(CONFIG.FIREBASE.ENDPOINTS.USERS);
+            if (cloudData && typeof cloudData === 'object') {
+                const cloudList = Array.isArray(cloudData) 
+                    ? cloudData.filter(Boolean) 
+                    : Object.keys(cloudData).map(k => ({ id: k, ...cloudData[k] }));
+                cloudList.forEach(u => map.set(u.username || u.id, u));
+            }
+        }
+
+        // 3. Merge new batch list
         newUsersList.forEach(u => {
             if (!u.id) u.id = 'USR_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
             u.updatedAt = new Date().toISOString();
