@@ -1419,9 +1419,10 @@ a { text-decoration: none; color: inherit; }
     align-items: center;
     justify-content: center;
     z-index: 2000;
-    padding: 20px;
+    padding: 16px;
     transition: opacity 0.3s ease, visibility 0.3s ease;
-    overflow: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 #login-screen-view::before {
@@ -1939,9 +1940,16 @@ a { text-decoration: none; color: inherit; }
     #top-header { padding: 0 16px; }
     .user-info { display: none; }
 
-    .login-card { flex-direction: column; max-width: 480px; }
-    .login-left-banner { width: 100%; padding: 30px 24px; }
-    .login-right-form { padding: 28px 24px; }
+    .login-card { flex-direction: column; max-width: 440px; min-height: auto; width: 100%; border-radius: 20px; }
+    .login-left-banner { width: 100%; padding: 18px 20px; }
+    .login-left-banner .login-features-header,
+    .login-left-banner .login-feature-item,
+    .login-left-banner .login-divider,
+    .login-left-banner .login-banner-copyright { display: none !important; }
+    .login-left-banner .login-logo-img { width: 48px; height: 48px; }
+    .login-left-banner .login-title-main { font-size: 1.3rem; margin-top: 4px; }
+    .login-left-banner .login-title-sub { font-size: 0.8rem; margin-top: 2px; }
+    .login-right-form { padding: 22px 20px 26px; }
 }
 
 @media (max-width: 480px) {
