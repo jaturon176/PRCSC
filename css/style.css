@@ -1898,6 +1898,25 @@ a { text-decoration: none; color: inherit; }
     margin: 16px 0;
 }
 
+/* Default Layout Grids */
+.phqa-dashboard-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+.assessment-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+}
+.backend-cloud-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
 /* ============================================================
    RESPONSIVE BREAKPOINTS
    ============================================================ */
@@ -1922,23 +1941,44 @@ a { text-decoration: none; color: inherit; }
     #main-wrapper { margin-left: 0; }
     .mobile-toggle { display: block; }
 
-    .content-page { padding: 14px 16px; }
+    .content-page { padding: 12px 14px; }
 
-    .hero-welcome-banner { padding: 20px 22px; }
+    .hero-welcome-banner { padding: 16px 18px; }
     .banner-title { font-size: 1.25rem; }
 
-    .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-    .stat-card { padding: 16px 18px; }
-    .stat-val { font-size: 1.8rem; }
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-card { padding: 14px 14px; }
+    .stat-val { font-size: 1.6rem; }
 
-    .panel-header { flex-direction: column; align-items: flex-start; }
+    .panel-header { flex-direction: column; align-items: flex-start; gap: 8px; }
     .modal-content { border-radius: var(--radius-lg); }
     .modal-body { padding: 18px 20px; }
     .modal-header { padding: 18px 20px 14px; }
     .modal-footer { padding: 14px 20px 18px; }
 
-    #top-header { padding: 0 16px; }
-    .user-info { display: none; }
+    #top-header { padding: 0 10px !important; }
+    .status-indicator .status-text { display: none !important; }
+    .status-indicator { padding: 5px 8px !important; }
+    .header-right { gap: 8px !important; }
+    .user-profile-card { padding: 4px 8px 4px 6px !important; max-width: 130px !important; }
+    .user-info { display: none !important; }
+
+    .phqa-dashboard-layout { grid-template-columns: 1fr !important; gap: 16px !important; }
+    .assessment-cards-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
+    .backend-cloud-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
+
+    .assessment-card > div:last-child {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+    }
+    .assessment-card > div:last-child > div:last-child {
+        width: 100% !important;
+        display: flex !important;
+    }
+    .assessment-card > div:last-child > div:last-child button {
+        flex: 1 !important;
+    }
 
     .login-card { flex-direction: column; max-width: 440px; min-height: auto; width: 100%; border-radius: 20px; }
     .login-left-banner { width: 100%; padding: 18px 20px; }
@@ -1958,6 +1998,10 @@ a { text-decoration: none; color: inherit; }
     .filter-bar input, .filter-bar select { min-width: 100%; }
     .banner-actions { display: none; }
     .page-title-bar h2 { font-size: 1.2rem; }
+
+    .phqa-level-row { padding: 8px 10px !important; }
+    .phqa-level-row span { font-size: 0.78rem !important; }
+    .phqa-level-row strong { font-size: 0.8rem !important; }
 }
 
 /* ============================================================
