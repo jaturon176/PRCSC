@@ -1422,10 +1422,19 @@ class Application {
             );
         }
         if (gradeFilter) {
-            students = students.filter(s => s.grade === gradeFilter || (s.grade && s.grade.startsWith(gradeFilter)));
+            students = students.filter(s => {
+                const gStr = String(s.grade || '').trim();
+                return gStr === gradeFilter || gStr.startsWith(gradeFilter + '/') || gStr.startsWith(gradeFilter);
+            });
         }
         if (roomFilter) {
-            students = students.filter(s => s.room === roomFilter || s.room === `ห้อง ${roomFilter}`);
+            const cleanRoomFilter = String(roomFilter).replace(/\D/g, '');
+            students = students.filter(s => {
+                const rStr = String(s.room || '').trim();
+                const gStr = String(s.grade || '').trim();
+                const rNum = rStr.replace(/\D/g, '') || (gStr.includes('/') ? (gStr.split('/')[1] || '').replace(/\D/g, '') : '');
+                return !cleanRoomFilter || rNum === cleanRoomFilter || rStr === roomFilter || rStr === `ห้อง ${roomFilter}`;
+            });
         }
 
         // Automatic Sorting: Grade ➔ Room (numeric) ➔ Student Number (numeric)
