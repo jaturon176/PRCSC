@@ -39,12 +39,12 @@ class FirebaseService {
             this.syncAllFromCloud();
             this.initRealtimeSSE();
         }
-        // Poll Firebase REST endpoint every 2 seconds for ultra-fast multi-user live sync
+        // Poll Firebase REST endpoint every 10 seconds for multi-user live sync
         this.syncInterval = setInterval(() => {
             if (this.isOnline && !this.isSavingBatch) {
                 this.syncAllFromCloud();
             }
-        }, 2000);
+        }, 10000);
     }
 
     initRealtimeSSE() {
@@ -179,7 +179,7 @@ class FirebaseService {
             const cloudData = await this.cloudGet(item.endpoint);
             const currentCache = this.getCache(item.key) || [];
 
-            if (cloudData !== null && typeof cloudData === 'object' && Object.keys(cloudData).length > 0) {
+            if (cloudData !== null && typeof cloudData === 'object') {
                 let itemsList = [];
                 if (!Array.isArray(cloudData)) {
                     itemsList = Object.keys(cloudData).map(id => ({
@@ -190,8 +190,11 @@ class FirebaseService {
                     itemsList = cloudData.filter(Boolean);
                 }
 
-                this.setCache(item.key, itemsList);
-                window.dispatchEvent(new CustomEvent(item.event, { detail: itemsList }));
+                // ONLY update cache and dispatch update event if data actually changed!
+                if (JSON.stringify(currentCache) !== JSON.stringify(itemsList)) {
+                    this.setCache(item.key, itemsList);
+                    window.dispatchEvent(new CustomEvent(item.event, { detail: itemsList }));
+                }
             } else if (cloudData !== null && typeof cloudData === 'object' && Object.keys(cloudData).length === 0 && currentCache.length > 0) {
                 // Cloud is empty but local device has newly added items -> Sync local items UP to cloud!
                 const cloudObject = {};
