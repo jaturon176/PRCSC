@@ -187,7 +187,7 @@ class PDFGenerator {
             page-break-inside: avoid;
         }
         .sig-box { text-align: center; width: 42%; font-size: 10pt; }
-        .sig-line { margin-top: 28px; border-top: 1px dotted #64748b; padding-top: 4px; }
+        .sig-line { margin-top: 28px; padding-top: 4px; }
 
         /* ===== PRINT OVERRIDES ===== */
         @media print {
