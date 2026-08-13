@@ -9,6 +9,7 @@ class FirebaseService {
         this.listeners = new Map();
         this.isOnline = navigator.onLine;
         this.syncInterval = null;
+        this.memoryCache = {};
 
         // Register Online/Offline Event Listeners
         window.addEventListener('online', () => this.handleOnlineState(true));
@@ -72,11 +73,16 @@ class FirebaseService {
         }
     }
 
-    // --- Helper: LocalStorage Fast Cache (0ms) ---
+    // --- Helper: LocalStorage & RAM Memory Cache ---
     getCache(key) {
+        if (this.memoryCache[key]) {
+            return this.memoryCache[key];
+        }
         try {
             const data = localStorage.getItem(key);
-            return data ? JSON.parse(data) : null;
+            const parsed = data ? JSON.parse(data) : null;
+            if (parsed) this.memoryCache[key] = parsed;
+            return parsed;
         } catch (e) {
             console.error(`[FirebaseService] Error reading cache ${key}:`, e);
             return null;
@@ -84,6 +90,7 @@ class FirebaseService {
     }
 
     setCache(key, data) {
+        this.memoryCache[key] = data;
         try {
             localStorage.setItem(key, JSON.stringify(data));
         } catch (e) {
@@ -94,9 +101,8 @@ class FirebaseService {
     // --- Core Generic REST API Callers ---
     async cloudGet(endpoint) {
         try {
-            const response = await fetch(`${this.baseUrl}${endpoint}.json`, {
-                headers: { 'Cache-Control': 'no-cache' }
-            });
+            const url = `${this.baseUrl}${endpoint}.json?t=${Date.now()}`;
+            const response = await fetch(url);
             if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
             const data = await response.json();
             return data || {};
@@ -184,11 +190,9 @@ class FirebaseService {
                     itemsList = cloudData.filter(Boolean);
                 }
 
-                if (JSON.stringify(currentCache) !== JSON.stringify(itemsList)) {
-                    this.setCache(item.key, itemsList);
-                    window.dispatchEvent(new CustomEvent(item.event, { detail: itemsList }));
-                }
-            } else if ((cloudData === null || (typeof cloudData === 'object' && Object.keys(cloudData).length === 0)) && currentCache.length > 0) {
+                this.setCache(item.key, itemsList);
+                window.dispatchEvent(new CustomEvent(item.event, { detail: itemsList }));
+            } else if (cloudData !== null && typeof cloudData === 'object' && Object.keys(cloudData).length === 0 && currentCache.length > 0) {
                 // Cloud is empty but local device has newly added items -> Sync local items UP to cloud!
                 const cloudObject = {};
                 currentCache.forEach(it => {
