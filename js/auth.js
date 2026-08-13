@@ -33,9 +33,9 @@ class AuthManager {
      */
     async login(role, username, password) {
         let userProfile = null;
-        const users = firebaseService.getUsers() || [];
-        const students = firebaseService.getStudents() || [];
-        const teachers = firebaseService.getTeachers() || [];
+        let users = firebaseService.getUsers() || [];
+        let students = firebaseService.getStudents() || [];
+        let teachers = firebaseService.getTeachers() || [];
 
         const cleanUser = (username || '').toString().trim();
         const cleanPass = (password || '').toString().trim();
@@ -48,12 +48,20 @@ class AuthManager {
             };
         }
 
+        // Force fetch latest cloud data if local cache is empty on new device / mobile
+        if ((!students.length || !users.length) && firebaseService.isOnline) {
+            await firebaseService.syncAllFromCloud();
+            users = firebaseService.getUsers() || [];
+            students = firebaseService.getStudents() || [];
+            teachers = firebaseService.getTeachers() || [];
+        }
+
         const normUserDigits = cleanUser.replace(/\D/g, '');
         const normPassDigits = cleanPass.replace(/\D/g, '');
         const cleanNum = (str) => String(str || '').replace(/\D/g, '').replace(/^0+/, '');
 
         // 1. Search in Registered Users Database (Explicit User Credentials / Admin Overrides)
-        const matchedUser = users.find(u => 
+        let matchedUser = users.find(u => 
             u.username && u.username.toString().trim().toLowerCase() === cleanUser.toLowerCase()
         );
 
