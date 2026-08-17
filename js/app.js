@@ -269,7 +269,7 @@ class Application {
         if (user && user.role === 'student') {
             // Student is ONLY allowed to access 'screening'
             pageId = 'screening';
-        } else if (user && ['teacher', 'hospital', 'police', 'msdhs'].includes(user.role)) {
+        } else if (user && ['teacher', 'guidance', 'angel', 'hospital', 'police', 'msdhs'].includes(user.role)) {
             // Non-admin roles cannot access 'admin' (ตั้งค่าและจัดการผู้ใช้)
             if (pageId === 'admin') {
                 pageId = 'dashboard';
@@ -2279,6 +2279,12 @@ class Application {
             } else if (u.role === 'student') {
                 roleBadge = 'badge-minor';
                 roleTitle = '🎓 นักเรียน';
+            } else if (u.role === 'guidance') {
+                roleBadge = 'badge-normal';
+                roleTitle = '👩‍🏫 ครูแนะแนว';
+            } else if (u.role === 'angel') {
+                roleBadge = 'badge-minor';
+                roleTitle = '🧚‍♀️ ครูนางฟ้า';
             } else if (u.role === 'hospital') {
                 roleBadge = 'badge-normal';
                 roleTitle = '🏥 โรงพยาบาล';

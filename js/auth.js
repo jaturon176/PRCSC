@@ -233,7 +233,7 @@ class AuthManager {
 
     canEditData() {
         if (!this.currentUser) return false;
-        return ['teacher', 'admin', 'hospital', 'police', 'msdhs'].includes(this.currentUser.role);
+        return ['teacher', 'guidance', 'angel', 'admin', 'hospital', 'police', 'msdhs'].includes(this.currentUser.role);
     }
 
     canManageAdmin() {
@@ -283,8 +283,8 @@ class AuthManager {
                 if (role === 'admin') {
                     // Admin can see ALL menus
                     item.style.display = '';
-                } else if (role === 'teacher') {
-                    // Teacher can see ALL menus EXCEPT admin (ตั้งค่าและจัดการผู้ใช้)
+                } else if (['teacher', 'guidance', 'angel'].includes(role)) {
+                    // Teacher, Guidance, Angel can see ALL menus EXCEPT admin (ตั้งค่าและจัดการผู้ใช้)
                     if (page === 'admin' || item.classList.contains('admin-only')) {
                         item.style.display = 'none';
                     } else {
@@ -354,7 +354,7 @@ class AuthManager {
         });
 
         document.querySelectorAll('.teacher-only').forEach(el => {
-            if (['admin', 'teacher', 'hospital', 'police', 'msdhs'].includes(role)) {
+            if (['admin', 'teacher', 'guidance', 'angel', 'hospital', 'police', 'msdhs'].includes(role)) {
                 el.style.display = '';
             } else {
                 el.style.display = 'none';

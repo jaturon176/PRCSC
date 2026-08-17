@@ -19,8 +19,8 @@
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Custom Design System v4.4 -->
-    <link rel="stylesheet" href="css/style.css?v=4.4">
+    <!-- Custom Design System v4.5 -->
+    <link rel="stylesheet" href="css/style.css?v=4.5">
 </head>
 <body data-theme="indigo">
     <!-- DEDICATED FULLSCREEN LOGIN PAGE (Matching User Reference Image Design) -->
@@ -947,7 +947,7 @@
                         <i class="ri-shield-keyhole-line" style="font-size: 1.3rem; flex-shrink: 0; color: #0284c7;"></i>
                         <div>
                             <strong>📌 รูปแบบการเข้าใช้งานระบบ (Login Standard Guidelines):</strong><br>
-                            • <strong>👨‍🏫 ครู / บุคลากร:</strong> ลงชื่อเข้าใช้โดยใช้ <u>เบอร์โทรศัพท์</u> เป็นทั้งชื่อผู้ใช้และรหัสผ่าน (เช่น <code>0812345678</code>)<br>
+                            • <strong>👨‍🏫 ครู / ครูแนะแนว / ครูนางฟ้า / บุคลากร:</strong> ลงชื่อเข้าใช้โดยใช้ <u>เบอร์โทรศัพท์</u> เป็นทั้งชื่อผู้ใช้และรหัสผ่าน (เช่น <code>0812345678</code>)<br>
                             • <strong>🎓 นักเรียน:</strong> ลงชื่อเข้าใช้โดยใช้ <u>รหัสประจำตัวนักเรียน</u> เป็นทั้งชื่อผู้ใช้และรหัสผ่าน (เช่น <code>67001</code>)<br>
                             • <strong>🛡️ ผู้ดูแลระบบ:</strong> ลงชื่อเข้าใช้ด้วยบัญชี Admin (เช่น <code>admin</code> / <code>admin123</code>)<br>
                             • <strong>🏥 ภายนอก (รพ. / ตำรวจ / พม.):</strong> ลงชื่อเข้าใช้ด้วยชื่อผู้ใช้และรหัสผ่านที่ได้รับมอบหมาย
@@ -1048,6 +1048,8 @@
                         <label class="form-label">เลือกรอบบทบาทการใช้งาน (Role)</label>
                         <select class="form-select" id="login-role">
                             <option value="teacher">👨‍🏫 ครู / ครูกิจการนักเรียน / ครูประจำชั้น</option>
+                            <option value="guidance">👩‍🏫 ครูแนะแนว</option>
+                            <option value="angel">🧚‍♀️ ครูนางฟ้า</option>
                             <option value="student">🎓 นักเรียน (ดูโปรไฟล์และกิจกรรมทำความดี)</option>
                             <option value="admin">🛡️ ผู้ดูแลระบบ (Administrator)</option>
                             <option value="hospital">🏥 โรงพยาบาล / บุคลากรทางการแพทย์</option>
@@ -1783,6 +1785,8 @@
                             <label class="form-label">บทบาทใช้งาน (Role) *</label>
                             <select class="form-select" id="usr-role" required>
                                 <option value="teacher">👨‍🏫 ครู / ครูกิจการนักเรียน</option>
+                                <option value="guidance">👩‍🏫 ครูแนะแนว</option>
+                                <option value="angel">🧚‍♀️ ครูนางฟ้า</option>
                                 <option value="student">🎓 นักเรียน</option>
                                 <option value="admin">🛡️ ผู้ดูแลระบบ (Admin)</option>
                                 <option value="hospital">🏥 โรงพยาบาล / สาธารณสุข</option>
@@ -1839,12 +1843,12 @@
     </div>
 
     <!-- Load Application Scripts -->
-    <script src="js/config.js?v=4.4"></script>
-    <script src="js/firebase-service.js?v=4.4"></script>
-    <script src="js/cloudinary-service.js?v=4.4"></script>
-    <script src="js/pdf-generator.js?v=4.4"></script>
-    <script src="js/csv-importer.js?v=4.4"></script>
-    <script src="js/auth.js?v=4.4"></script>
-    <script src="js/app.js?v=4.4"></script>
+    <script src="js/config.js?v=4.5"></script>
+    <script src="js/firebase-service.js?v=4.5"></script>
+    <script src="js/cloudinary-service.js?v=4.5"></script>
+    <script src="js/pdf-generator.js?v=4.5"></script>
+    <script src="js/csv-importer.js?v=4.5"></script>
+    <script src="js/auth.js?v=4.5"></script>
+    <script src="js/app.js?v=4.5"></script>
 </body>
 </html>

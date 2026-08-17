@@ -56,6 +56,8 @@ const CONFIG = {
     ROLES: {
         STUDENT: "student",
         TEACHER: "teacher",
+        GUIDANCE: "guidance",
+        ANGEL: "angel",
         ADMIN: "admin",
         HOSPITAL: "hospital",
         POLICE: "police",
@@ -65,6 +67,8 @@ const CONFIG = {
     ROLE_NAMES_TH: {
         student: "🎓 นักเรียน",
         teacher: "👨‍🏫 ครู / ครูกิจการนักเรียน",
+        guidance: "👩‍🏫 ครูแนะแนว",
+        angel: "🧚‍♀️ ครูนางฟ้า",
         admin: "🛡️ ผู้ดูแลระบบ (Administrator)",
         hospital: "🏥 โรงพยาบาล / สาธารณสุข",
         police: "👮 สถานีตำรวจ",
