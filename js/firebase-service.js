@@ -25,8 +25,9 @@ class FirebaseService {
         const statusEl = document.getElementById('network-status');
         if (statusEl) {
             statusEl.className = online ? 'status-indicator online' : 'status-indicator offline';
-            statusEl.title = online ? 'ซิงค์ข้อมูลเรียลไทม์กับ Firebase เรียบร้อย' : 'ทำงานในโหมดแคช ออฟไลน์ (LocalStorage)';
-            statusEl.querySelector('.status-text').textContent = online ? 'Online (Firebase Sync)' : 'Offline (Local Cache)';
+            statusEl.title = online ? 'ซิงค์ข้อมูลเรียลไทม์เรียบร้อย' : 'ทำงานในโหมดแคช ออฟไลน์ (LocalStorage)';
+            const textEl = statusEl.querySelector('.status-text');
+            if (textEl) textEl.textContent = online ? 'Online' : 'Offline';
         }
         if (online) {
             this.syncAllFromCloud();
