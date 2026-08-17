@@ -19,8 +19,8 @@
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Custom Design System v3.5 -->
-    <link rel="stylesheet" href="css/style.css?v=3.5">
+    <!-- Custom Design System v4.2 -->
+    <link rel="stylesheet" href="css/style.css?v=4.2">
 </head>
 <body data-theme="indigo">
     <!-- DEDICATED FULLSCREEN LOGIN PAGE (Matching User Reference Image Design) -->
@@ -636,78 +636,157 @@
                 </div>
             </main>
 
-            <!-- Page 3: Screening (การคัดกรองนักเรียน) -->
+            <!-- Page 3: Screening (การคัดกรองนักเรียนและสุขภาวะทางจิตวิทยา) -->
             <main class="content-page" id="page-screening">
-                <!-- Page Header -->
-                <div style="margin-bottom: 20px;">
-                    <h2 class="panel-title" style="font-size: 1.4rem; display: flex; align-items: center; gap: 10px;">
-                        <i class="ri-heart-pulse-fill" style="color: var(--primary-color);"></i> ระบบคัดกรองพฤติกรรมและสุขภาวะทางจิตวิทยานักเรียน
-                    </h2>
-                    <p style="color: var(--text-muted); font-size: 0.92rem; margin-top: 4px;">
-                        เลือกทำแบบประเมินพฤติกรรมเสี่ยง 4 ด้าน หรือแบบประเมินภาวะซึมเศร้าในวัยรุ่น (PHQ-A) พร้อมสรุปผลเรียลไทม์
-                    </p>
+
+                <!-- 1. Colorful Premium Hero Banner -->
+                <div class="screening-hero-banner">
+                    <div class="screening-hero-content">
+                        <div class="screening-hero-badge">
+                            <span class="pulse-sparkle">✨</span>
+                            <span>ระบบประเมินและคัดกรองสุขภาวะจิตวิทยาและพฤติกรรมเรียลไทม์</span>
+                        </div>
+                        <h2 class="screening-hero-title">
+                            ระบบคัดกรองพฤติกรรมและสุขภาวะทางจิตวิทยานักเรียน
+                        </h2>
+                        <p class="screening-hero-desc">
+                            เครื่องมือคัดกรองมาตรฐานครอบคลุม 4 มิติพฤติกรรมเสี่ยง และแบบประเมินภาวะซึมเศร้าในวัยรุ่น (PHQ-A 9 ข้อคำถาม) พร้อมวิเคราะห์ผลประเมินทันทีและเชื่อมโยงส่งต่อช่วยเหลือสหวิชาชีพ
+                        </p>
+                        <div class="screening-hero-tags">
+                            <div class="hero-stat-chip behavior-chip">
+                                <div class="chip-icon"><i class="ri-shield-user-line"></i></div>
+                                <div class="chip-text">
+                                    <span class="chip-label">คัดกรองพฤติกรรม 4 ด้าน</span>
+                                    <strong class="chip-val" id="hero-cnt-behavior">0 ราย</strong>
+                                </div>
+                            </div>
+                            <div class="hero-stat-chip depression-chip">
+                                <div class="chip-icon"><i class="ri-heart-pulse-line"></i></div>
+                                <div class="chip-text">
+                                    <span class="chip-label">ประเมิน PHQ-A สุขภาพจิต</span>
+                                    <strong class="chip-val" id="hero-cnt-depression">0 ราย</strong>
+                                </div>
+                            </div>
+                            <div class="hero-stat-chip alert-chip">
+                                <div class="chip-icon"><i class="ri-alarm-warning-line"></i></div>
+                                <div class="chip-text">
+                                    <span class="chip-label">ระบบเฝ้าระวังด่วน</span>
+                                    <strong class="chip-val" id="hero-cnt-risk">อัตโนมัติ 24 ชม.</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="screening-hero-art">
+                        <div class="floating-bubble bubble-1"><i class="ri-mental-health-line"></i></div>
+                        <div class="floating-bubble bubble-2"><i class="ri-shield-check-line"></i></div>
+                        <div class="floating-bubble bubble-3"><i class="ri-heart-3-line"></i></div>
+                    </div>
                 </div>
 
-                <!-- 2 Assessment Display Cards Grid -->
-                <div class="assessment-cards-grid">
+                <!-- 2. Dual Colorful Assessment Showcase Cards -->
+                <div class="screening-cards-container">
 
-                    <!-- Card 1: Risk Behavior Assessment -->
-                    <div class="glass-panel assessment-card" style="position: relative; overflow: hidden; border-left: 5px solid #0284c7; transition: transform 0.25s ease, box-shadow 0.25s ease; display: flex; flex-direction: column;">
-                        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px;">
-                            <div style="width: 52px; height: 52px; border-radius: 16px; background: linear-gradient(135deg, rgba(2,132,199,0.15), rgba(99,102,241,0.15)); display: flex; align-items: center; justify-content: center; color: #0284c7; font-size: 1.6rem; flex-shrink: 0;">
+                    <!-- Card 1: 4-Dimension Risk Behavior -->
+                    <div class="vibrant-assessment-card card-behavior">
+                        <div class="card-glow-bar behavior-glow"></div>
+                        <div class="card-top-row">
+                            <div class="card-badge-tag behavior-tag">
+                                <i class="ri-shield-check-fill"></i> แบบประเมินชุดที่ 1
+                            </div>
+                            <div class="card-status-pill">
+                                <span class="dot-indicator green"></span>
+                                <span>4 ด้านหลัก</span>
+                            </div>
+                        </div>
+
+                        <div class="card-main-header">
+                            <div class="card-avatar-box behavior-box">
                                 <i class="ri-shield-user-fill"></i>
                             </div>
-                            <span class="badge" style="background: rgba(2,132,199,0.1); color: #0284c7; border: 1px solid rgba(2,132,199,0.25); font-weight: 600; font-size: 0.8rem; padding: 5px 12px; border-radius: 20px;">
-                                🛡️ คัดกรอง 4 ด้าน
-                            </span>
+                            <div>
+                                <h3 class="card-heading">แบบประเมินคัดกรองพฤติกรรมเสี่ยง 4 ด้าน</h3>
+                                <div class="card-subheading">Behavioral Risk Screening Assessment</div>
+                            </div>
                         </div>
-                        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-heading); margin-bottom: 8px; line-height: 1.35;">
-                            1. แบบประเมินคัดกรองพฤติกรรมเสี่ยงต่อการกระทำความผิด
-                        </h3>
-                        <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.55; margin-bottom: 20px;">
-                            ประเมินครอบคลุม 4 ด้านสำคัญ: การเรียน, พฤติกรรม/วินัย, สารเสพติด/ความเสี่ยง, และสภาพเศรษฐกิจครอบครัว เพื่อวางแผนช่วยเหลือและเฝ้าระวังตรงจุด
+
+                        <p class="card-description">
+                            ประเมินความเสี่ยงและปัญหาพฤติกรรมครอบคลุม 4 มิติสำคัญ เพื่อวางแผนป้องกัน ช่วยเหลือ และส่งเสริมวินัยเชิงบวกอย่างตรงจุด
                         </p>
-                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; border-top: 1px dashed var(--border-light); padding-top: 14px;">
-                            <span class="badge" id="card-cnt-behavior" style="background: var(--bg-hover); color: var(--text-muted); font-size: 0.78rem; font-weight: 500;">
-                                📊 ประเมินแล้ว <strong id="cnt-behavior-num" style="color: #0284c7;">0</strong> ราย
-                            </span>
-                            <div style="display: flex; gap: 8px;">
-                                <button class="btn btn-secondary btn-sm btn-view-results" onclick="app.switchScreeningTab('behavior')">
-                                    <i class="ri-history-line"></i> ดูผลประเมิน
+
+                        <div class="dimension-chips-list">
+                            <span class="dim-pill dim-study"><i class="ri-book-read-line"></i> 1. ด้านการเรียน</span>
+                            <span class="dim-pill dim-discipline"><i class="ri-flashlight-line"></i> 2. ด้านวินัย/พฤติกรรม</span>
+                            <span class="dim-pill dim-substance"><i class="ri-forbid-2-line"></i> 3. ด้านสารเสพติด/ความเสี่ยง</span>
+                            <span class="dim-pill dim-finance"><i class="ri-home-heart-line"></i> 4. ด้านเศรษฐกิจครอบครัว</span>
+                        </div>
+
+                        <div class="card-action-footer">
+                            <div class="stat-progress-summary">
+                                <div class="stat-icon-wrap"><i class="ri-bar-chart-box-line"></i></div>
+                                <div>
+                                    <div class="stat-num-text">ประเมินแล้ว <strong id="cnt-behavior-num">0</strong> ราย</div>
+                                    <div class="stat-sub-text">บันทึกแบบประเมินพฤติกรรม</div>
+                                </div>
+                            </div>
+                            <div class="action-btn-group">
+                                <button class="btn-screening-secondary btn-view-results" onclick="app.switchScreeningTab('behavior')">
+                                    <i class="ri-history-line"></i> <span>ดูผลประเมิน</span>
                                 </button>
-                                <button class="btn btn-primary btn-sm student-allowed" onclick="app.openBehaviorModal()">
-                                    <i class="ri-edit-box-line"></i> ทำแบบประเมิน
+                                <button class="btn-screening-primary behavior-btn student-allowed" onclick="app.openBehaviorModal()">
+                                    <i class="ri-edit-circle-line"></i> <span>เริ่มทำแบบประเมิน</span>
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Card 2: Adolescent Depression Assessment (PHQ-A) -->
-                    <div class="glass-panel assessment-card" style="position: relative; overflow: hidden; border-left: 5px solid #e11d48; transition: transform 0.25s ease, box-shadow 0.25s ease; display: flex; flex-direction: column;">
-                        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px;">
-                            <div style="width: 52px; height: 52px; border-radius: 16px; background: linear-gradient(135deg, rgba(225,29,72,0.15), rgba(244,63,94,0.15)); display: flex; align-items: center; justify-content: center; color: #e11d48; font-size: 1.6rem; flex-shrink: 0;">
+                    <!-- Card 2: PHQ-A Adolescent Depression Assessment -->
+                    <div class="vibrant-assessment-card card-depression">
+                        <div class="card-glow-bar depression-glow"></div>
+                        <div class="card-top-row">
+                            <div class="card-badge-tag depression-tag">
+                                <i class="ri-heart-pulse-fill"></i> แบบประเมินชุดที่ 2
+                            </div>
+                            <div class="card-status-pill">
+                                <span class="dot-indicator rose"></span>
+                                <span>PHQ-A (9 ข้อ)</span>
+                            </div>
+                        </div>
+
+                        <div class="card-main-header">
+                            <div class="card-avatar-box depression-box">
                                 <i class="ri-heart-pulse-fill"></i>
                             </div>
-                            <span class="badge" style="background: rgba(225,29,72,0.1); color: #e11d48; border: 1px solid rgba(225,29,72,0.25); font-weight: 600; font-size: 0.8rem; padding: 5px 12px; border-radius: 20px;">
-                                🧠 สุขภาพจิตวัยรุ่น (PHQ-A)
-                            </span>
+                            <div>
+                                <h3 class="card-heading">แบบประเมินภาวะซึมเศร้าในวัยรุ่น (PHQ-A)</h3>
+                                <div class="card-subheading">Patient Health Questionnaire for Adolescents</div>
+                            </div>
                         </div>
-                        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-heading); margin-bottom: 8px; line-height: 1.35;">
-                            2. แบบประเมินภาวะซึมเศร้าในวัยรุ่น (PHQ-A)
-                        </h3>
-                        <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.55; margin-bottom: 20px;">
-                            แบบประเมินและคัดกรองภาวะซึมเศร้าและสุขภาพจิตในวัยรุ่น (9 ข้อคำถาม) เพื่อประเมินระดับอารมณ์ เฝ้าระวัง ให้คำปรึกษา และส่งต่อผู้เชี่ยวชาญทันท่วงที
+
+                        <p class="card-description">
+                            แบบคัดกรองภาวะซึมเศร้า 9 ข้อคำถามมาตรฐาน พร้อมระบบจำแนก 5 ระดับความรุนแรง และแจ้งเตือนความเสี่ยงการทำร้ายตนเองทันท่วงที
                         </p>
-                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; border-top: 1px dashed var(--border-light); padding-top: 14px;">
-                            <span class="badge" id="card-cnt-depression" style="background: var(--bg-hover); color: var(--text-muted); font-size: 0.78rem; font-weight: 500;">
-                                📊 ประเมินแล้ว <strong id="cnt-depression-num" style="color: #e11d48;">0</strong> ราย
-                            </span>
-                            <div style="display: flex; gap: 8px;">
-                                <button class="btn btn-secondary btn-sm btn-view-results" onclick="app.switchScreeningTab('depression')">
-                                    <i class="ri-history-line"></i> ดูผลประเมิน
+
+                        <div class="dimension-chips-list">
+                            <span class="dim-pill dim-phq-1"><i class="ri-mental-health-line"></i> 9 ข้อคำถามประเมินอารมณ์</span>
+                            <span class="dim-pill dim-phq-2"><i class="ri-pulse-line"></i> จำแนก 5 ระดับความเสี่ยง</span>
+                            <span class="dim-pill dim-phq-3"><i class="ri-alarm-warning-line"></i> ระบบเฝ้าระวังเคสฉุกเฉิน</span>
+                            <span class="dim-pill dim-phq-4"><i class="ri-hospital-line"></i> ส่งต่อ รพ. / สาธารณสุข</span>
+                        </div>
+
+                        <div class="card-action-footer">
+                            <div class="stat-progress-summary">
+                                <div class="stat-icon-wrap phq-icon"><i class="ri-heart-line"></i></div>
+                                <div>
+                                    <div class="stat-num-text">ประเมินแล้ว <strong id="cnt-depression-num" style="color: #e11d48;">0</strong> ราย</div>
+                                    <div class="stat-sub-text">แบบประเมินสุขภาพจิต PHQ-A</div>
+                                </div>
+                            </div>
+                            <div class="action-btn-group">
+                                <button class="btn-screening-secondary btn-view-results" onclick="app.switchScreeningTab('depression')">
+                                    <i class="ri-history-line"></i> <span>ดูผลประเมิน</span>
                                 </button>
-                                <button class="btn btn-danger btn-sm student-allowed" onclick="app.openDepressionModal()">
-                                    <i class="ri-heart-3-line"></i> ทำแบบประเมิน
+                                <button class="btn-screening-primary depression-btn student-allowed" onclick="app.openDepressionModal()">
+                                    <i class="ri-heart-add-line"></i> <span>เริ่มทำแบบประเมิน</span>
                                 </button>
                             </div>
                         </div>
@@ -715,18 +794,20 @@
 
                 </div>
 
-                <!-- History Table Panel with Tab Switcher -->
-                <div class="glass-panel" id="screening-history-panel">
-                    <div class="panel-header" style="flex-wrap: wrap; gap: 14px;">
-                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                            <button type="button" class="role-pill-btn active" id="tab-scr-behavior" onclick="app.switchScreeningTab('behavior')">
-                                🛡️ ผลการคัดกรองพฤติกรรมเสี่ยง (4 ด้าน)
+                <!-- 3. Modern Glassmorphism Assessment Results Panel -->
+                <div class="glass-panel screening-results-panel" id="screening-history-panel">
+                    <div class="panel-header-custom">
+                        <div class="tab-pills-wrapper">
+                            <button type="button" class="screening-tab-btn active" id="tab-scr-behavior" onclick="app.switchScreeningTab('behavior')">
+                                <i class="ri-shield-user-line"></i>
+                                <span>ผลการคัดกรองพฤติกรรมเสี่ยง (4 ด้าน)</span>
                             </button>
-                            <button type="button" class="role-pill-btn" id="tab-scr-depression" onclick="app.switchScreeningTab('depression')">
-                                🧠 ผลการประเมินภาวะซึมเศร้า (PHQ-A)
+                            <button type="button" class="screening-tab-btn" id="tab-scr-depression" onclick="app.switchScreeningTab('depression')">
+                                <i class="ri-heart-pulse-line"></i>
+                                <span>ผลการประเมินภาวะซึมเศร้า (PHQ-A)</span>
                             </button>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="panel-actions-wrapper">
                             <button class="btn btn-danger btn-sm teacher-only" id="btn-open-delete-screening-modal" onclick="app.openDeleteScreeningModal()">
                                 <i class="ri-delete-bin-line"></i> ลบผลการประเมิน (รายห้อง/ทั้งหมด)
                             </button>
@@ -734,7 +815,7 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class="custom-table">
+                        <table class="custom-table screening-custom-table">
                             <thead id="table-screenings-head">
                                 <tr>
                                     <th>นักเรียน</th>
@@ -1755,12 +1836,12 @@
     </div>
 
     <!-- Load Application Scripts -->
-    <script src="js/config.js?v=4.1"></script>
-    <script src="js/firebase-service.js?v=4.1"></script>
-    <script src="js/cloudinary-service.js?v=4.1"></script>
-    <script src="js/pdf-generator.js?v=4.1"></script>
-    <script src="js/csv-importer.js?v=4.1"></script>
-    <script src="js/auth.js?v=4.1"></script>
-    <script src="js/app.js?v=4.1"></script>
+    <script src="js/config.js?v=4.2"></script>
+    <script src="js/firebase-service.js?v=4.2"></script>
+    <script src="js/cloudinary-service.js?v=4.2"></script>
+    <script src="js/pdf-generator.js?v=4.2"></script>
+    <script src="js/csv-importer.js?v=4.2"></script>
+    <script src="js/auth.js?v=4.2"></script>
+    <script src="js/app.js?v=4.2"></script>
 </body>
 </html>

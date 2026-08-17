@@ -1783,8 +1783,13 @@ class Application {
 
         const cntBehaviorEl = document.getElementById('cnt-behavior-num');
         const cntDepressionEl = document.getElementById('cnt-depression-num');
+        const heroCntBehaviorEl = document.getElementById('hero-cnt-behavior');
+        const heroCntDepressionEl = document.getElementById('hero-cnt-depression');
+
         if (cntBehaviorEl) cntBehaviorEl.textContent = behaviorScreenings.length;
         if (cntDepressionEl) cntDepressionEl.textContent = depressionScreenings.length;
+        if (heroCntBehaviorEl) heroCntBehaviorEl.textContent = `${behaviorScreenings.length} ราย`;
+        if (heroCntDepressionEl) heroCntDepressionEl.textContent = `${depressionScreenings.length} ราย`;
 
         const currentTab = this.currentScreeningTab || 'behavior';
         let targetScreenings = currentTab === 'depression' ? depressionScreenings : behaviorScreenings;
@@ -1837,8 +1842,8 @@ class Application {
         }
 
         const depLevelsMap = {
-            normal: { label: 'ไม่มีภาวะซึมเศร้า', bg: 'rgba(5,150,105,0.1)', color: '#059669', advice: 'ขณะนี้ยังไม่พบภาวะซึมเศร้าที่ชัดเจน' },
-            mild: { label: 'มีภาวะซึมเศร้าเล็กน้อย', bg: 'rgba(2,132,199,0.1)', color: '#0284c7', advice: 'ควรหากิจกรรมที่ช่วยผ่อนคลายอารมณ์ หรือปรึกษาบุคคลใกล้ชิดที่ไว้ใจ' },
+            normal: { label: 'ไม่มีภาวะซึมเศร้า', bg: 'rgba(2,132,199,0.1)', color: '#0284c7', advice: 'ขณะนี้ยังไม่พบภาวะซึมเศร้าที่ชัดเจน' },
+            mild: { label: 'มีภาวะซึมเศร้าเล็กน้อย', bg: 'rgba(5,150,105,0.1)', color: '#059669', advice: 'ควรหากิจกรรมที่ช่วยผ่อนคลายอารมณ์ หรือปรึกษาบุคคลใกล้ชิดที่ไว้ใจ' },
             moderate: { label: 'มีภาวะซึมเศร้าปานกลาง', bg: 'rgba(217,119,6,0.1)', color: '#d97706', advice: 'ควรปรึกษาแพทย์ เพื่อวินิจฉัยและบำบัดรักษา' },
             severe_high: { label: 'มีภาวะซึมเศร้ามาก', bg: 'rgba(234,88,12,0.1)', color: '#ea580c', advice: 'ควรปรึกษาแพทย์ เพื่อวินิจฉัยและบำบัดรักษา' },
             severe_extreme: { label: 'มีภาวะซึมเศร้ารุนแรง', bg: 'rgba(225,29,72,0.12)', color: '#e11d48', advice: 'ควรปรึกษาแพทย์ เพื่อวินิจฉัยและบำบัดรักษา' }
