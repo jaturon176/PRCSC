@@ -3989,3 +3989,407 @@ body[data-user-role="teacher"] .admin-only {
     .referral-tab-btn { width: 100%; justify-content: center; }
 }
 
+/* ============================================================
+   🛡️ REDESIGNED DISCIPLINARY & PREVENTION CENTER (v5.8)
+   ============================================================ */
+
+.prevention-hero-banner {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 28%, #581c87 55%, #831843 80%, #be123c 100%);
+    border-radius: 24px;
+    padding: 34px 36px 30px;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 16px 40px rgba(30, 27, 75, 0.28), 0 4px 12px rgba(225, 29, 72, 0.15);
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.prevention-hero-banner::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 480px;
+    height: 480px;
+    background: radial-gradient(circle, rgba(244, 63, 94, 0.28) 0%, rgba(168, 85, 247, 0.15) 50%, transparent 75%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.prevention-hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 820px;
+}
+
+.prevention-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    margin-bottom: 14px;
+}
+
+.prevention-hero-title {
+    font-size: 1.85rem;
+    font-weight: 800;
+    line-height: 1.25;
+    margin-bottom: 10px;
+    color: #ffffff;
+    font-family: var(--font-heading);
+}
+
+.gradient-text-prevention {
+    background: linear-gradient(135deg, #fb7185 0%, #fda4af 40%, #fde047 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: block;
+    margin-top: 4px;
+}
+
+.prevention-hero-desc {
+    font-size: 0.90rem;
+    color: rgba(254, 205, 211, 0.92);
+    line-height: 1.6;
+    max-width: 780px;
+    margin-bottom: 20px;
+}
+
+.prevention-hero-chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.prevention-stat-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border-radius: 12px;
+    font-size: 0.84rem;
+    font-weight: 500;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    transition: transform 0.2s ease;
+}
+.prevention-stat-chip:hover {
+    transform: translateY(-2px);
+}
+
+.prevention-stat-chip.chip-total {
+    background: rgba(99, 102, 241, 0.25);
+    color: #e0e7ff;
+}
+.prevention-stat-chip.chip-severe {
+    background: rgba(225, 29, 72, 0.35);
+    color: #ffe4e6;
+    border-color: rgba(244, 63, 94, 0.45);
+}
+.prevention-stat-chip.chip-moderate {
+    background: rgba(245, 158, 11, 0.30);
+    color: #fef3c7;
+    border-color: rgba(245, 158, 11, 0.45);
+}
+.prevention-stat-chip.chip-minor {
+    background: rgba(2, 132, 199, 0.25);
+    color: #e0f2fe;
+    border-color: rgba(2, 132, 199, 0.45);
+}
+.prevention-stat-chip.chip-proof {
+    background: rgba(16, 185, 129, 0.25);
+    color: #d1fae5;
+    border-color: rgba(16, 185, 129, 0.45);
+}
+
+.prevention-hero-actions {
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+}
+
+.btn-hero-offense {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #f43f5e 0%, #e11d48 50%, #be123c 100%);
+    color: #ffffff;
+    padding: 14px 24px;
+    border-radius: 16px;
+    font-family: var(--font-heading);
+    font-size: 1.0rem;
+    font-weight: 700;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(225, 29, 72, 0.45);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+}
+.btn-hero-offense:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(225, 29, 72, 0.60);
+    background: linear-gradient(135deg, #fb7185 0%, #f43f5e 50%, #e11d48 100%);
+}
+
+/* Prevention Filter Bar */
+.prevention-filter-bar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+    background: var(--bg-card);
+    padding: 14px 18px;
+    border-radius: 18px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.prevention-search-box {
+    flex: 1;
+    min-width: 260px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.prevention-search-box i {
+    position: absolute;
+    left: 14px;
+    color: var(--text-dim);
+    font-size: 1.1rem;
+    pointer-events: none;
+}
+
+.prevention-search-box input {
+    width: 100%;
+    padding: 10px 16px 10px 40px;
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+    background: var(--bg-subtle);
+    font-size: 0.90rem;
+    color: var(--text-heading);
+    transition: all 0.2s ease;
+}
+.prevention-search-box input:focus {
+    background: var(--bg-card);
+    border-color: var(--indigo-500);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.prevention-filter-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.prevention-select-filter {
+    min-width: 180px;
+    font-size: 0.88rem;
+    padding: 9px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+    background: var(--bg-subtle);
+    color: var(--text-heading);
+    font-weight: 500;
+}
+.prevention-select-filter:focus {
+    border-color: var(--indigo-500);
+    background: var(--bg-card);
+}
+
+/* Prevention Custom Table Styling */
+.prevention-table-panel {
+    padding: 0;
+    overflow: hidden;
+    border-radius: 20px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.prevention-custom-table thead {
+    background: linear-gradient(90deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+}
+
+.prevention-custom-table th {
+    padding: 14px 18px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: rgba(224, 231, 255, 0.95);
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.offense-table-row {
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+.offense-table-row:hover {
+    background: rgba(99, 102, 241, 0.04) !important;
+}
+
+/* Level Badges */
+.badge-offense-severe {
+    background: linear-gradient(135deg, rgba(244, 63, 94, 0.15) 0%, rgba(225, 29, 72, 0.25) 100%);
+    color: #e11d48;
+    border: 1px solid rgba(244, 63, 94, 0.4);
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.badge-dot-severe {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e11d48;
+    box-shadow: 0 0 8px #e11d48;
+    animation: pulseDot 1.5s infinite;
+}
+
+.badge-offense-moderate {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.25) 100%);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.badge-offense-minor {
+    background: linear-gradient(135deg, rgba(2, 132, 199, 0.15) 0%, rgba(3, 105, 161, 0.25) 100%);
+    color: #0284c7;
+    border: 1px solid rgba(2, 132, 199, 0.4);
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Image Thumbnail in Table */
+.offense-img-thumbnail-wrap {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1.5px solid var(--border-light);
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+    flex-shrink: 0;
+}
+.offense-thumbnail-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.25s ease;
+}
+.offense-img-thumbnail-wrap:hover .offense-thumbnail-img {
+    transform: scale(1.18);
+}
+.offense-thumb-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 1rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.offense-img-thumbnail-wrap:hover .offense-thumb-overlay {
+    opacity: 1;
+}
+
+/* Buttons Gradient */
+.btn-pdf-gradient {
+    background: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%);
+    color: #ffffff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 3px 8px rgba(2, 132, 199, 0.25);
+    transition: all 0.2s ease;
+}
+.btn-pdf-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(2, 132, 199, 0.35);
+}
+
+.btn-delete-gradient {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 3px 8px rgba(239, 68, 68, 0.25);
+    transition: all 0.2s ease;
+}
+.btn-delete-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(239, 68, 68, 0.35);
+}
+
+/* Responsive adjustments for Prevention page */
+@media (max-width: 768px) {
+    .prevention-hero-banner {
+        padding: 22px 20px;
+        flex-direction: column;
+        align-items: flex-start;
+        border-radius: 18px;
+    }
+    .prevention-hero-title { font-size: 1.35rem; }
+    .gradient-text-prevention { font-size: 1.15rem; }
+    .prevention-hero-chips { gap: 6px; }
+    .prevention-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .prevention-filter-group {
+        flex-direction: column;
+        width: 100%;
+    }
+    .prevention-select-filter {
+        width: 100%;
+    }
+}
+

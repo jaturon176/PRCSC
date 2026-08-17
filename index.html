@@ -19,8 +19,8 @@
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Custom Design System v5.7 -->
-    <link rel="stylesheet" href="css/style.css?v=5.7">
+    <!-- Custom Design System v5.8 -->
+    <link rel="stylesheet" href="css/style.css?v=5.8">
 </head>
 <body data-theme="indigo">
     <!-- DEDICATED FULLSCREEN LOGIN PAGE (Matching User Reference Image Design) -->
@@ -868,24 +868,95 @@
                 </div>
             </main>
 
-            <!-- Page 5: Prevention & Offenses (ป้องกันและแก้ปัญหา) -->
+            <!-- Page 5: Prevention & Offenses (ป้องกันและแก้ปัญหา - บันทึกการกระทำความผิด) -->
             <main class="content-page" id="page-prevention">
-                <div class="glass-panel">
-                    <div class="panel-header">
-                        <div>
-                            <h2 class="panel-title"><i class="ri-shield-flash-line"></i> ป้องกันและแก้ไขปัญหา - บันทึกการกระทำความผิด</h2>
-                            <p style="color: var(--text-muted); font-size: 0.9rem;">บันทึกพฤติกรรมความผิด อัปโหลดหลักฐาน Cloudinary และพิมพ์รายงาน PDF ภาษาไทยทางการ</p>
+                <!-- 1. VIBRANT HERO BANNER -->
+                <div class="prevention-hero-banner">
+                    <div class="prevention-hero-content">
+                        <div class="prevention-hero-badge">
+                            <span class="hero-pulse-dot" style="background:#f43f5e;"></span>
+                            <i class="ri-shield-flash-line" style="color: #f43f5e;"></i>
+                            <span>ระบบป้องกัน ปรับพฤติกรรม และวินัยเชิงบวก (Behavioral Care & Discipline)</span>
                         </div>
-                        <button class="btn btn-danger teacher-only" id="btn-open-offense"><i class="ri-alarm-warning-line"></i> บันทึกเหตุการณ์ความผิด</button>
+                        <h1 class="prevention-hero-title">
+                            ศูนย์ป้องกันและแก้ไขปัญหาพฤติกรรม 🛡️
+                            <span class="gradient-text-prevention">วินัยเชิงบวก & ช่วยเหลือ</span>
+                        </h1>
+                        <p class="prevention-hero-desc">
+                            บันทึกพฤติกรรมการกระทำผิด จัดเก็บหลักฐานภาพถ่ายความละเอียดสูงบน Cloudinary ออกเอกสารรายงานพฤติกรรมรายบุคคล (PDF ภาษาไทยทางการ) พร้อมประสานการดูแลและส่งต่อเคสอย่างเป็นระบบ
+                        </p>
+
+                        <!-- Live Stat Chips -->
+                        <div class="prevention-hero-chips">
+                            <div class="prevention-stat-chip chip-total">
+                                <i class="ri-file-shield-2-line"></i>
+                                <span class="chip-label">บันทึกทั้งหมด:</span>
+                                <strong id="offense-stat-total">0</strong> เคส
+                            </div>
+                            <div class="prevention-stat-chip chip-severe">
+                                <i class="ri-alarm-warning-fill"></i>
+                                <span class="chip-label">ร้ายแรง:</span>
+                                <strong id="offense-stat-severe">0</strong> เคส
+                            </div>
+                            <div class="prevention-stat-chip chip-moderate">
+                                <i class="ri-alert-fill"></i>
+                                <span class="chip-label">ปานกลาง:</span>
+                                <strong id="offense-stat-moderate">0</strong> เคส
+                            </div>
+                            <div class="prevention-stat-chip chip-minor">
+                                <i class="ri-information-fill"></i>
+                                <span class="chip-label">ระดับเบา:</span>
+                                <strong id="offense-stat-minor">0</strong> เคส
+                            </div>
+                            <div class="prevention-stat-chip chip-proof">
+                                <i class="ri-image-2-fill"></i>
+                                <span class="chip-label">มีรูปหลักฐาน:</span>
+                                <strong id="offense-stat-proof">0</strong> เคส
+                            </div>
+                        </div>
                     </div>
 
+                    <div class="prevention-hero-actions">
+                        <button class="btn btn-hero-offense teacher-only" id="btn-open-offense">
+                            <i class="ri-add-circle-fill"></i>
+                            <span>บันทึกเหตุการณ์ความผิด</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. FILTER & SEARCH CONTROL BAR -->
+                <div class="prevention-filter-bar">
+                    <div class="prevention-search-box">
+                        <i class="ri-search-line"></i>
+                        <input type="text" id="offense-filter-search" class="form-control" placeholder="ค้นหาชื่อนักเรียน, รหัสนักเรียน, ชั้น, หรือสถานที่เกิดเหตุ..." oninput="app.renderOffenses()">
+                    </div>
+                    <div class="prevention-filter-group">
+                        <select id="offense-filter-level" class="form-select prevention-select-filter" onchange="app.renderOffenses()">
+                            <option value="all">⚡ ทุกระดับความผิด</option>
+                            <option value="severe">🔴 ร้ายแรง</option>
+                            <option value="moderate">🟡 ปานกลาง</option>
+                            <option value="minor">🔵 เบา</option>
+                        </select>
+                        <select id="offense-filter-category" class="form-select prevention-select-filter" onchange="app.renderOffenses()">
+                            <option value="all">📁 ทุกหมวดหมู่ความผิด</option>
+                            <option value="บุหรี่/บุหรี่ไฟฟ้า/สารเสพติด">🚬 บุหรี่/บุหรี่ไฟฟ้า/สารเสพติด</option>
+                            <option value="เข้าเรียนสาย/หนีเรียน">⏰ เข้าเรียนสาย/หนีเรียน</option>
+                            <option value="พฤติกรรมความก้าวร้าว">🥊 พฤติกรรมความก้าวร้าว/วิวาท</option>
+                            <option value="แต่งกายผิดระเบียบ">👔 แต่งกายผิดระเบียบ</option>
+                            <option value="การลักทรัพย์/ทำลายทรัพย์สิน">💰 ลักทรัพย์/ทำลายทรัพย์สิน</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 3. VIBRANT TABLE DISPLAY -->
+                <div class="glass-panel prevention-table-panel">
                     <div class="table-responsive">
-                        <table class="custom-table">
+                        <table class="custom-table prevention-custom-table">
                             <thead>
                                 <tr>
                                     <th>นักเรียน / ชั้น</th>
                                     <th>ระดับความผิด</th>
-                                    <th>หมวดหมู่ความผิด</th>
+                                    <th>หมวดหมู่ & รายละเอียด</th>
                                     <th>วันที่เกิดเหตุ</th>
                                     <th>รูปหลักฐาน</th>
                                     <th>การจัดการ & รายงาน PDF</th>
@@ -2082,12 +2153,12 @@
     </div>
 
     <!-- Load Application Scripts -->
-    <script src="js/config.js?v=5.7"></script>
-    <script src="js/firebase-service.js?v=5.7"></script>
-    <script src="js/cloudinary-service.js?v=5.7"></script>
-    <script src="js/pdf-generator.js?v=5.7"></script>
-    <script src="js/csv-importer.js?v=5.7"></script>
-    <script src="js/auth.js?v=5.7"></script>
-    <script src="js/app.js?v=5.7"></script>
+    <script src="js/config.js?v=5.8"></script>
+    <script src="js/firebase-service.js?v=5.8"></script>
+    <script src="js/cloudinary-service.js?v=5.8"></script>
+    <script src="js/pdf-generator.js?v=5.8"></script>
+    <script src="js/csv-importer.js?v=5.8"></script>
+    <script src="js/auth.js?v=5.8"></script>
+    <script src="js/app.js?v=5.8"></script>
 </body>
 </html>

@@ -1968,6 +1968,15 @@ class Application {
         this.openModal('modal-depression-screening');
     }
 
+    openOffenseModal() {
+        const form = document.getElementById('form-offense');
+        if (form) form.reset();
+        const preview = document.getElementById('offense-image-preview');
+        if (preview) preview.style.display = 'none';
+        this.selectedOffenseProofFile = null;
+        this.openModal('modal-offense');
+    }
+
     switchScreeningTab(tabType) {
         this.currentScreeningTab = tabType;
         const btnBehavior = document.getElementById('tab-scr-behavior');
@@ -2274,41 +2283,164 @@ class Application {
         if (!tbody) return;
         const offenses = firebaseService.getOffenses();
 
+        // 1. Calculate and update Live Hero Stat KPI Chips
+        const total = offenses.length;
+        const severeCount = offenses.filter(o => o.level === 'severe').length;
+        const moderateCount = offenses.filter(o => o.level === 'moderate').length;
+        const minorCount = offenses.filter(o => o.level === 'minor').length;
+        const proofCount = offenses.filter(o => Boolean(o.imageUrl)).length;
+
+        const statTotal = document.getElementById('offense-stat-total');
+        if (statTotal) statTotal.textContent = total;
+        const statSevere = document.getElementById('offense-stat-severe');
+        if (statSevere) statSevere.textContent = severeCount;
+        const statModerate = document.getElementById('offense-stat-moderate');
+        if (statModerate) statModerate.textContent = moderateCount;
+        const statMinor = document.getElementById('offense-stat-minor');
+        if (statMinor) statMinor.textContent = minorCount;
+        const statProof = document.getElementById('offense-stat-proof');
+        if (statProof) statProof.textContent = proofCount;
+
+        // 2. Read search and filter values
+        const searchInput = document.getElementById('offense-filter-search');
+        const query = (searchInput?.value || '').trim().toLowerCase();
+        const levelFilter = document.getElementById('offense-filter-level')?.value || 'all';
+        const catFilter = document.getElementById('offense-filter-category')?.value || 'all';
+
+        // 3. Filter offenses
+        let filtered = offenses.filter(off => {
+            if (levelFilter !== 'all' && off.level !== levelFilter) return false;
+            if (catFilter !== 'all' && off.category !== catFilter) return false;
+            if (query) {
+                const sName = (off.studentName || '').toLowerCase();
+                const sGrade = (off.gradeRoom || '').toLowerCase();
+                const sCat = (off.category || '').toLowerCase();
+                const sLoc = (off.location || '').toLowerCase();
+                const sDesc = (off.description || '').toLowerCase();
+                const sAction = (off.actionTaken || '').toLowerCase();
+                if (!sName.includes(query) && !sGrade.includes(query) && !sCat.includes(query) && !sLoc.includes(query) && !sDesc.includes(query) && !sAction.includes(query)) {
+                    return false;
+                }
+            }
+            return true;
+        });
+
         tbody.innerHTML = '';
-        if (offenses.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding: 24px;">ไม่มีประวัติการกระทำความผิด</td></tr>';
+        if (filtered.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center; color:var(--text-muted); padding: 36px 20px;">
+                        <div style="font-size: 2.2rem; margin-bottom: 8px; color: var(--text-dim);"><i class="ri-shield-check-line"></i></div>
+                        <div style="font-weight: 600; font-size: 1rem; color: var(--text-heading); margin-bottom: 4px;">ไม่พบรายการบันทึกการกระทำความผิด</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">${query || levelFilter !== 'all' || catFilter !== 'all' ? 'ลองเปลี่ยนคำค้นหาหรือตัวเลือกการกรอง' : 'ยังไม่มีบันทึกข้อมูลในระบบ'}</div>
+                    </td>
+                </tr>
+            `;
             return;
         }
 
         // Sort latest offense date first (newest to oldest)
-        offenses.sort((a, b) => {
+        filtered.sort((a, b) => {
             const timeA = new Date(a.incidentDate || a.createdAt || 0).getTime();
             const timeB = new Date(b.incidentDate || b.createdAt || 0).getTime();
             return timeB - timeA;
         });
 
-        offenses.forEach(off => {
-            const levelBadgeClass = `badge-${off.level}`;
-            const levelLabel = off.level === 'severe' ? 'ร้ายแรง' : (off.level === 'moderate' ? 'ปานกลาง' : 'เบา');
+        // 4. Render Table Rows with Vibrant Design
+        filtered.forEach(off => {
+            // Level badge
+            let levelBadgeHtml = '';
+            if (off.level === 'severe') {
+                levelBadgeHtml = `<span class="badge badge-offense-severe"><span class="badge-dot-severe"></span> ร้ายแรง</span>`;
+            } else if (off.level === 'moderate') {
+                levelBadgeHtml = `<span class="badge badge-offense-moderate"><i class="ri-alert-fill"></i> ปานกลาง</span>`;
+            } else {
+                levelBadgeHtml = `<span class="badge badge-offense-minor"><i class="ri-information-fill"></i> เบา</span>`;
+            }
+
+            // Category badge & color
+            let catIcon = 'ri-bookmark-fill';
+            let catColor = '#6366f1';
+            let catBg = 'rgba(99, 102, 241, 0.12)';
+            if (off.category?.includes('บุหรี่') || off.category?.includes('สารเสพติด')) {
+                catIcon = 'ri-fire-fill';
+                catColor = '#e11d48';
+                catBg = 'rgba(225, 29, 72, 0.12)';
+            } else if (off.category?.includes('สาย') || off.category?.includes('หนีเรียน')) {
+                catIcon = 'ri-time-fill';
+                catColor = '#d97706';
+                catBg = 'rgba(245, 158, 11, 0.12)';
+            } else if (off.category?.includes('ก้าวร้าว') || off.category?.includes('วิวาท')) {
+                catIcon = 'ri-sword-fill';
+                catColor = '#b91c1c';
+                catBg = 'rgba(185, 28, 28, 0.12)';
+            } else if (off.category?.includes('แต่งกาย')) {
+                catIcon = 'ri-t-shirt-fill';
+                catColor = '#0284c7';
+                catBg = 'rgba(2, 132, 199, 0.12)';
+            } else if (off.category?.includes('ลักทรัพย์') || off.category?.includes('ทรัพย์สิน')) {
+                catIcon = 'ri-money-dollar-circle-fill';
+                catColor = '#0f766e';
+                catBg = 'rgba(15, 118, 110, 0.12)';
+            }
 
             const escapedName = (off.studentName || 'นักเรียน').replace(/'/g, "\\'");
             const imageTdHtml = off.imageUrl 
                 ? `<div style="display:flex; align-items:center; gap:8px;">
-                     <img src="${off.imageUrl}" alt="หลักฐาน" style="width:40px; height:40px; border-radius:8px; object-fit:cover; border:1px solid var(--border-light); cursor:pointer; box-shadow: var(--shadow-sm);" onclick="app.previewImage('${off.imageUrl}', '${escapedName}')" title="คลิกเพื่อขยายดูรูปภาพ">
-                     <button class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 0.78rem;" onclick="app.previewImage('${off.imageUrl}', '${escapedName}')"><i class="ri-search-eye-line"></i> ดูรูป</button>
+                     <div class="offense-img-thumbnail-wrap" onclick="app.previewImage('${off.imageUrl}', '${escapedName}')" title="คลิกเพื่อดูรูปภาพหลักฐาน">
+                         <img src="${off.imageUrl}" alt="หลักฐาน" class="offense-thumbnail-img">
+                         <div class="offense-thumb-overlay"><i class="ri-zoom-in-line"></i></div>
+                     </div>
+                     <button class="btn btn-secondary btn-sm" style="padding: 4px 9px; font-size: 0.78rem; border-radius: 8px;" onclick="app.previewImage('${off.imageUrl}', '${escapedName}')"><i class="ri-search-eye-line"></i> ดูรูป</button>
                    </div>`
-                : `<span class="text-dim text-sm"><i class="ri-image-off-line"></i> ไม่มีรูป</span>`;
+                : `<span class="badge" style="background: var(--bg-subtle); color: var(--text-dim); border: 1px solid var(--border-light); font-size: 0.76rem; padding: 4px 8px;"><i class="ri-image-off-line"></i> ไม่มีรูป</span>`;
+
+            // Date formatting
+            const dateStr = off.incidentDate ? new Date(off.incidentDate).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '-';
+            const locationHtml = off.location ? `<div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 3px;"><i class="ri-map-pin-2-line" style="color: #f43f5e;"></i> ${off.location}</div>` : '';
+
+            // Referral badge if linked to referral
+            const refBadge = (off.referralType && off.referralType !== 'none') ? `
+                <div style="margin-top: 4px;">
+                    <span class="badge" style="font-size: 0.72rem; padding: 2px 6px; background: rgba(56,189,248,0.15); color: #0284c7; border: 1px solid rgba(56,189,248,0.3);"><i class="ri-share-forward-line"></i> ส่งต่อ: ${off.targetAgency || (off.referralType === 'internal' ? 'ภายใน' : 'ภายนอก')}</span>
+                </div>
+            ` : '';
 
             const tr = document.createElement('tr');
+            tr.className = 'offense-table-row';
             tr.innerHTML = `
-                <td><strong>${off.studentName}</strong> <br><small style="color:var(--text-muted);">${off.gradeRoom || ''}</small></td>
-                <td><span class="badge ${levelBadgeClass}">${levelLabel}</span></td>
-                <td>${off.category}</td>
-                <td>${off.incidentDate || '-'}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="student-avatar-circle" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #fff; width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; font-weight: 700; flex-shrink: 0; box-shadow: 0 3px 8px rgba(79,70,229,0.25);">
+                            ${(off.studentName || 'น').charAt(0)}
+                        </div>
+                        <div>
+                            <div style="font-weight: 700; color: var(--text-heading); font-size: 0.94rem;">${off.studentName}</div>
+                            <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                                <span class="badge" style="background: rgba(99,102,241,0.12); color: #4f46e5; font-size: 0.74rem; font-weight: 600; padding: 2px 6px; border-radius: 6px;">${off.gradeRoom || 'ม.ต้น/ปลาย'}</span>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td>${levelBadgeHtml}</td>
+                <td>
+                    <span class="badge" style="background: ${catBg}; color: ${catColor}; font-size: 0.78rem; font-weight: 700; border-radius: 8px; padding: 4px 10px; display: inline-flex; align-items: center; gap: 4px;">
+                        <i class="${catIcon}"></i> ${off.category}
+                    </span>
+                    ${locationHtml}
+                    ${refBadge}
+                </td>
+                <td>
+                    <div style="font-size: 0.88rem; font-weight: 600; color: var(--text-heading); display: flex; align-items: center; gap: 5px;">
+                        <i class="ri-calendar-event-line" style="color: #6366f1;"></i> ${dateStr}
+                    </div>
+                </td>
                 <td>${imageTdHtml}</td>
                 <td>
-                    <button class="btn btn-primary btn-sm" onclick="app.downloadOffensePDF('${off.id}')"><i class="ri-printer-line"></i> พิมพ์รายงาน / PDF</button>
-                    <button class="btn btn-danger btn-sm teacher-only" onclick="app.deleteOffense('${off.id}')"><i class="ri-delete-bin-line"></i> ลบ</button>
+                    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                        <button class="btn btn-pdf-gradient btn-sm" onclick="app.downloadOffensePDF('${off.id}')" title="พิมพ์เอกสารรายงานพฤติกรรม PDF"><i class="ri-printer-line"></i> พิมพ์รายงาน / PDF</button>
+                        <button class="btn btn-delete-gradient btn-sm teacher-only" onclick="app.deleteOffense('${off.id}')" title="ลบรายการบันทึกนี้"><i class="ri-delete-bin-line"></i> ลบ</button>
+                    </div>
                 </td>
             `;
             tbody.appendChild(tr);
