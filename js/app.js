@@ -889,6 +889,8 @@ class Application {
 
         // Referral Form Submit
         document.getElementById('btn-open-referral')?.addEventListener('click', () => {
+            const screeningIdInput = document.getElementById('ref-screening-id');
+            if (screeningIdInput) screeningIdInput.value = '';
             const currentType = document.getElementById('ref-type')?.value || 'internal';
             this.updateReferralAgencyOptions(currentType);
             this.openModal('modal-referral');
@@ -898,8 +900,10 @@ class Application {
             const studentId = document.getElementById('ref-student-select').value;
             const students = firebaseService.getStudents();
             const student = students.find(s => s.studentId === studentId || s.id === studentId);
+            const screeningId = document.getElementById('ref-screening-id')?.value;
 
             const referral = {
+                screeningId: screeningId || undefined,
                 studentId: student ? student.studentId : studentId,
                 studentName: student ? student.fullName : 'นักเรียน',
                 type: document.getElementById('ref-type').value,
@@ -908,9 +912,23 @@ class Application {
                 status: 'pending',
                 createdAt: new Date().toISOString()
             };
-            await firebaseService.saveReferral(referral);
+            const savedRef = await firebaseService.saveReferral(referral);
+
+            // If referral was created from a screening, also mark screening as referred
+            if (screeningId) {
+                const allScreenings = firebaseService.getScreenings();
+                const matchedScr = allScreenings.find(s => s.id === screeningId);
+                if (matchedScr) {
+                    matchedScr.referred = true;
+                    matchedScr.referralId = savedRef?.id || referral.id;
+                    await firebaseService.saveScreening(matchedScr);
+                }
+            }
+
             this.closeModal('modal-referral');
             this.showToast('บันทึกการส่งต่อนักเรียนเรียบร้อยแล้ว 🕊️', 'success');
+            this.renderScreenings();
+            this.renderReferrals();
         });
 
         // Search & Filter Triggers
@@ -1805,6 +1823,7 @@ class Application {
         if (!tbody) return;
         const allScreenings = firebaseService.getScreenings();
         const students = firebaseService.getStudents();
+        const allReferrals = firebaseService.getReferrals();
         const user = authManager.getCurrentUser();
 
         // Calculate card counts for both 2 assessments
@@ -1888,15 +1907,24 @@ class Application {
                 const isRisk = scr.extRisk?.isSuicideRisk || (scr.qScores && scr.qScores[8] > 0);
                 const needsReferral = scr.resultLevel === 'severe_high' || scr.resultLevel === 'severe_extreme' || isRisk;
 
+                const isReferred = scr.referred === true || allReferrals.some(r => r.screeningId === scr.id || (r.studentId === scr.studentId && new Date(r.createdAt) >= new Date(scr.assessedAt || 0)));
+
                 const riskBadge = isRisk 
                     ? `<br><span class="badge" style="background:rgba(225,29,72,0.15); color:#be123c; border:1px solid #e11d48; font-size:0.75rem; margin-top:4px; font-weight:700;">🚨 เสี่ยงฆ่าตัวตาย/ทำร้ายตนเอง (เฝ้าระวังด่วน)</span>`
                     : '';
 
-                const referralBtn = needsReferral
-                    ? `<button class="btn btn-warning btn-sm" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; font-weight: 700; border: none; box-shadow: 0 2px 8px rgba(245,158,11,0.35); margin-right: 6px; display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 8px; transition: all 0.2s ease;" onclick="app.openReferralForScreening('${scr.id}')" title="คลิกเพื่อส่งต่อนักเรียนไปยังโรงพยาบาล/พม./ผู้เชี่ยวชาญ">
-                        <i class="ri-git-pull-request-line"></i> ส่งต่อ
-                       </button>`
-                    : '';
+                let referralBtn = '';
+                if (needsReferral) {
+                    if (isReferred) {
+                        referralBtn = `<button class="btn btn-success btn-sm" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; font-weight: 700; border: none; box-shadow: 0 2px 8px rgba(16,185,129,0.35); margin-right: 6px; display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 8px; transition: all 0.2s ease;" onclick="app.openReferralForScreening('${scr.id}')" title="ส่งต่อนักเรียนเรียบร้อยแล้ว (คลิกเพื่อแก้ไข/ดูข้อมูล)">
+                            <i class="ri-checkbox-circle-fill"></i> ส่งต่อแล้ว
+                        </button>`;
+                    } else {
+                        referralBtn = `<button class="btn btn-warning btn-sm" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; font-weight: 700; border: none; box-shadow: 0 2px 8px rgba(245,158,11,0.35); margin-right: 6px; display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 8px; transition: all 0.2s ease;" onclick="app.openReferralForScreening('${scr.id}')" title="คลิกเพื่อส่งต่อนักเรียนไปยังโรงพยาบาล/พม./ผู้เชี่ยวชาญ">
+                            <i class="ri-git-pull-request-line"></i> ส่งต่อ
+                        </button>`;
+                    }
+                }
 
                 tr.innerHTML = `
                     <td><strong>${student ? `${student.prefix || ''}${student.fullName} (${student.grade}/${student.room})` : (user && user.role === 'student' ? user.name : scr.studentId)}</strong></td>
@@ -1947,6 +1975,11 @@ class Application {
         const student = students.find(s => s.studentId === scr.studentId || s.id === scr.studentId);
 
         this.updateStudentDropdowns();
+
+        const screeningIdInput = document.getElementById('ref-screening-id');
+        if (screeningIdInput) {
+            screeningIdInput.value = screeningId;
+        }
 
         const studentSelect = document.getElementById('ref-student-select');
         if (studentSelect) {
