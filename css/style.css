@@ -1930,7 +1930,7 @@ a { text-decoration: none; color: inherit; }
     .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
     #sidebar {
         transform: translateX(-100%);
         z-index: 200;
@@ -3257,8 +3257,8 @@ body[data-user-role="teacher"] .admin-only {
 #tab-scr-behavior.active i { color: #0284c7; }
 #tab-scr-depression.active i { color: #e11d48; }
 
-/* Responsive adjustments for Screening page (Phones) */
-@media (max-width: 767px) {
+/* Responsive adjustments for Screening page */
+@media (max-width: 768px) {
     .screening-hero-banner {
         padding: 22px 20px;
         flex-direction: column;
@@ -3774,8 +3774,8 @@ body[data-user-role="teacher"] .admin-only {
     color: #ffffff;
 }
 
-/* Responsive adjustments for Referrals page (Phones) */
-@media (max-width: 767px) {
+/* Responsive adjustments for Referrals page */
+@media (max-width: 768px) {
     .referral-hero-banner {
         padding: 22px 20px;
         flex-direction: column;
@@ -3790,183 +3790,5 @@ body[data-user-role="teacher"] .admin-only {
     .referral-search-box input { width: 100%; }
     .referral-tabs-wrapper { flex-direction: column; width: 100%; }
     .referral-tab-btn { width: 100%; justify-content: center; }
-}
-
-/* ============================================================
-   📱✨ DEDICATED IPAD & TABLET OPTIMIZATION (768px - 1194px)
-   Enhances iPad Pro, iPad Air, and iPad Mini to match desktop beauty!
-   ============================================================ */
-@media (min-width: 768px) and (max-width: 1194px) {
-    :root {
-        --sidebar-width: 220px;
-    }
-
-    /* Smooth iPad touch & rendering */
-    html, body {
-        -webkit-tap-highlight-color: transparent;
-        -webkit-touch-callout: none;
-    }
-
-    /* Top Header on iPad */
-    #top-header {
-        padding: 0 18px !important;
-    }
-    .status-indicator {
-        display: inline-flex !important;
-        padding: 6px 12px !important;
-    }
-    .status-indicator .status-text {
-        display: inline-block !important;
-    }
-    .user-info {
-        display: flex !important;
-    }
-    .user-profile-card {
-        padding: 6px 12px 6px 8px !important;
-        max-width: none !important;
-    }
-
-    /* Content Page Layout on iPad */
-    .content-page {
-        padding: 20px 22px;
-    }
-
-    /* Dashboard on iPad */
-    .hero-welcome-banner {
-        padding: 24px 28px;
-        border-radius: 20px;
-    }
-    .hero-welcome-banner .banner-title {
-        font-size: 1.6rem;
-    }
-    .stats-grid {
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 14px;
-    }
-    .stat-card {
-        padding: 16px 18px;
-    }
-    .analytics-flex-layout {
-        grid-template-columns: 1fr !important;
-        gap: 18px;
-    }
-    .charts-grid {
-        grid-template-columns: 1fr 1fr !important;
-        gap: 16px;
-    }
-
-    /* Screening Page on iPad */
-    .screening-hero-banner {
-        padding: 28px 28px;
-        border-radius: 22px;
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-    }
-    .screening-hero-art {
-        display: flex !important;
-    }
-    .screening-hero-title {
-        font-size: 1.65rem !important;
-    }
-    .screening-cards-container {
-        grid-template-columns: 1fr 1fr !important;
-        gap: 18px !important;
-    }
-    .vibrant-assessment-card {
-        padding: 24px 20px 20px !important;
-    }
-    .tab-pills-wrapper {
-        flex-direction: row !important;
-        width: auto !important;
-    }
-    .screening-tab-btn {
-        width: auto !important;
-    }
-
-    /* Referral Page on iPad */
-    .referral-hero-banner {
-        padding: 28px 28px;
-        border-radius: 22px;
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-    }
-    .referral-hero-art {
-        display: flex !important;
-    }
-    .referral-hero-title {
-        font-size: 1.65rem !important;
-    }
-    .gradient-text-referral {
-        font-size: 1.35rem !important;
-    }
-    .referral-cards-grid {
-        grid-template-columns: 1fr 1fr !important;
-        gap: 18px !important;
-    }
-    .vibrant-referral-card {
-        padding: 24px 22px !important;
-    }
-    .referral-tabs-wrapper {
-        flex-direction: row !important;
-        width: auto !important;
-    }
-    .referral-tab-btn {
-        width: auto !important;
-    }
-
-    /* Standalone Login Screen on iPad */
-    .login-card {
-        flex-direction: row !important;
-        max-width: 780px !important;
-        min-height: 520px !important;
-        width: 90% !important;
-        border-radius: 28px !important;
-        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25) !important;
-    }
-    .login-left-banner {
-        width: 44% !important;
-        padding: 34px 28px !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: space-between !important;
-    }
-    .login-left-banner .login-features-header,
-    .login-left-banner .login-feature-item,
-    .login-left-banner .login-divider,
-    .login-left-banner .login-banner-copyright {
-        display: block !important;
-    }
-    .login-left-banner .login-feature-item {
-        display: flex !important;
-    }
-    .login-right-form {
-        width: 56% !important;
-        padding: 34px 30px !important;
-    }
-
-    /* Table Responsiveness on iPad */
-    .table-responsive {
-        -webkit-overflow-scrolling: touch;
-        border-radius: 14px;
-    }
-    .custom-table th, .custom-table td {
-        padding: 12px 14px;
-        font-size: 0.88rem;
-    }
-
-    /* Modals on iPad */
-    .modal-content {
-        max-width: 660px;
-        width: 92%;
-        border-radius: 24px;
-    }
-    .form-grid-2 {
-        grid-template-columns: 1fr 1fr !important;
-        gap: 14px !important;
-    }
 }
 
