@@ -1032,10 +1032,21 @@ class Application {
 
     // Modal Helpers
     openModal(id) {
-        document.getElementById(id)?.classList.add('active');
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.classList.add('active');
+            document.body.classList.add('modal-open');
+        }
     }
     closeModal(id) {
-        document.getElementById(id)?.classList.remove('active');
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.classList.remove('active');
+            const activeModals = document.querySelectorAll('.modal-overlay.active');
+            if (activeModals.length === 0) {
+                document.body.classList.remove('modal-open');
+            }
+        }
     }
 
     updateStudentDropdowns() {
