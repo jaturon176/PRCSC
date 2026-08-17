@@ -2186,26 +2186,172 @@ class Application {
     renderReferrals() {
         const tbody = document.getElementById('table-referrals-body');
         if (!tbody) return;
-        const referrals = firebaseService.getReferrals();
+        const allReferrals = firebaseService.getReferrals();
+        const students = firebaseService.getStudents();
+        const user = authManager.getCurrentUser();
+
+        // 1. Calculate and update Stat Chips & Tab Counters
+        const totalCount = allReferrals.length;
+        const internalCount = allReferrals.filter(r => r.type === 'internal').length;
+        const externalCount = allReferrals.filter(r => r.type !== 'internal').length;
+        const pendingCount = allReferrals.filter(r => (r.status || 'pending') === 'pending').length;
+        const completedCount = allReferrals.filter(r => r.status === 'completed').length;
+
+        const updateText = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val;
+        };
+
+        updateText('ref-stat-total', totalCount);
+        updateText('ref-stat-internal', internalCount);
+        updateText('ref-stat-external', externalCount);
+        updateText('ref-stat-pending', pendingCount);
+        updateText('ref-stat-completed', completedCount);
+
+        updateText('tab-cnt-all', totalCount);
+        updateText('tab-cnt-internal', internalCount);
+        updateText('tab-cnt-external', externalCount);
+        updateText('tab-cnt-pending', pendingCount);
+        updateText('tab-cnt-completed', completedCount);
+
+        // 2. Filter referrals based on active tab and search query
+        const activeTab = this.currentRefTab || 'all';
+        const searchInput = document.getElementById('ref-search-input');
+        const query = (searchInput?.value || '').trim().toLowerCase();
+
+        let filtered = [...allReferrals];
+
+        if (activeTab === 'internal') {
+            filtered = filtered.filter(r => r.type === 'internal');
+        } else if (activeTab === 'external') {
+            filtered = filtered.filter(r => r.type !== 'internal');
+        } else if (activeTab === 'pending') {
+            filtered = filtered.filter(r => (r.status || 'pending') === 'pending');
+        } else if (activeTab === 'completed') {
+            filtered = filtered.filter(r => r.status === 'completed');
+        }
+
+        if (query) {
+            filtered = filtered.filter(r => {
+                const sName = (r.studentName || '').toLowerCase();
+                const sId = (r.studentId || '').toLowerCase();
+                const agency = (r.targetAgency || '').toLowerCase();
+                const reason = (r.reason || '').toLowerCase();
+                return sName.includes(query) || sId.includes(query) || agency.includes(query) || reason.includes(query);
+            });
+        }
 
         tbody.innerHTML = '';
-        if (referrals.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#64748b;">ไม่มีรายการส่งต่อ</td></tr>';
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#64748b; padding: 28px;">ไม่พบรายการส่งต่อนักเรียนในหมวดหมู่นี้</td></tr>';
             return;
         }
 
-        referrals.forEach(ref => {
-            const typeLabel = ref.type === 'internal' ? 'ส่งต่อภายใน' : 'ส่งต่อภายนอก';
+        filtered.forEach(ref => {
+            const student = students.find(s => s.studentId === ref.studentId || s.id === ref.studentId);
             const tr = document.createElement('tr');
+
+            // Format Type Pill
+            const isInternal = ref.type === 'internal';
+            const typeBadge = isInternal
+                ? `<span class="badge badge-internal-pill"><i class="ri-community-line"></i> ส่งต่อภายใน</span>`
+                : `<span class="badge badge-external-pill"><i class="ri-hospital-line"></i> ส่งต่อภายนอก</span>`;
+
+            // Format Agency Pill / Icon
+            let agencyIcon = isInternal ? '👩‍🏫' : '🏥';
+            if (ref.targetAgency?.includes('นางฟ้า')) agencyIcon = '🧚‍♀️';
+            else if (ref.targetAgency?.includes('โรงพยาบาล')) agencyIcon = '🏥';
+            else if (ref.targetAgency?.includes('สาธารณสุข')) agencyIcon = '🩺';
+            else if (ref.targetAgency?.includes('พม')) agencyIcon = '🏛️';
+            else if (ref.targetAgency?.includes('ตำรวจ')) agencyIcon = '👮';
+
+            const agencyDisplay = `<span style="display:inline-flex; align-items:center; gap:6px; font-weight:600; color:var(--text-heading);">
+                <span style="font-size:1.1rem;">${agencyIcon}</span> ${ref.targetAgency || '-'}
+            </span>`;
+
+            // Format Reason Box
+            const hasUrgentAlert = ref.reason?.includes('🚨') || ref.reason?.includes('เฝ้าระวัง') || ref.reason?.includes('ฆ่าตัวตาย');
+            const reasonDisplay = hasUrgentAlert
+                ? `<div class="ref-reason-box-alert">${ref.reason}</div>`
+                : `<div class="ref-reason-box-normal">${ref.reason}</div>`;
+
+            // Format Status Toggle
+            const isCompleted = ref.status === 'completed';
+            const statusDisplay = isCompleted
+                ? `<button class="status-toggle-btn status-completed teacher-only" onclick="app.toggleReferralStatus('${ref.id}', 'pending')" title="คลิกเพื่อสลับเป็น รอการดำเนินการ"><i class="ri-checkbox-circle-fill"></i> ประสานสำเร็จ</button>`
+                : `<button class="status-toggle-btn status-pending teacher-only" onclick="app.toggleReferralStatus('${ref.id}', 'completed')" title="คลิกเพื่อสลับเป็น ดำเนินการแล้วเสร็จ"><i class="ri-time-line"></i> รอการดำเนินการ</button>`;
+
+            // Format Student Cell
+            const studentInfo = student
+                ? `<strong>${student.prefix || ''}${student.fullName}</strong><br><small style="color:var(--text-muted); font-size:0.8rem;">${student.grade}/${student.room} • รหัส ${student.studentId || ref.studentId}</small>`
+                : `<strong>${ref.studentName || 'นักเรียน'}</strong><br><small style="color:var(--text-muted); font-size:0.8rem;">รหัส ${ref.studentId}</small>`;
+
+            const dateStr = ref.createdAt ? new Date(ref.createdAt).toLocaleDateString('th-TH') : '-';
+
             tr.innerHTML = `
-                <td><strong>${ref.studentName}</strong></td>
-                <td><span class="badge badge-minor">${typeLabel}</span></td>
-                <td>${ref.targetAgency || '-'}</td>
-                <td>${ref.reason}</td>
-                <td><span class="badge badge-risk">${ref.status === 'pending' ? 'รอการดำเนินการ' : 'เสร็จสิ้น'}</span></td>
+                <td>${studentInfo}</td>
+                <td>${typeBadge}</td>
+                <td>${agencyDisplay}</td>
+                <td style="max-width: 320px;">${reasonDisplay}</td>
+                <td>${statusDisplay}</td>
+                <td style="color:var(--text-muted); font-size:0.85rem;">${dateStr}</td>
+                <td class="teacher-only" style="white-space: nowrap;">
+                    <button class="btn btn-danger btn-sm" onclick="app.deleteSingleReferral('${ref.id}')" title="ลบรายการส่งต่อ"><i class="ri-delete-bin-line"></i> ลบ</button>
+                </td>
             `;
+
             tbody.appendChild(tr);
         });
+
+        authManager.applyUIPermissions();
+    }
+
+    switchReferralFilterTab(tabName = 'all') {
+        this.currentRefTab = tabName;
+        document.querySelectorAll('.referral-tab-btn').forEach(btn => {
+            if (btn.getAttribute('data-ref-tab') === tabName) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        this.renderReferrals();
+    }
+
+    openDirectReferralModal(type = 'internal') {
+        const refTypeEl = document.getElementById('ref-type');
+        if (refTypeEl) refTypeEl.value = type;
+        this.updateReferralAgencyOptions(type);
+        const screeningIdInput = document.getElementById('ref-screening-id');
+        if (screeningIdInput) screeningIdInput.value = '';
+        this.openModal('modal-referral');
+    }
+
+    async toggleReferralStatus(refId, newStatus) {
+        const referrals = firebaseService.getReferrals();
+        const ref = referrals.find(r => r.id === refId);
+        if (!ref) return;
+
+        ref.status = newStatus;
+        await firebaseService.saveReferral(ref);
+        this.showToast(newStatus === 'completed' ? 'อัปเดตสถานะเป็น "ประสานงานสำเร็จ" ✅' : 'อัปเดตสถานะเป็น "รอการดำเนินการ" ⏳', 'info');
+        this.renderReferrals();
+    }
+
+    async deleteSingleReferral(refId) {
+        const confirmed = await this.confirmDialog({
+            title: 'ยืนยันการลบรายการส่งต่อ',
+            message: 'คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลการส่งต่อนักเรียนรายการนี้? การกระทำนี้ไม่สามารถย้อนกลับได้',
+            type: 'danger',
+            confirmText: 'ลบข้อมูล',
+            cancelText: 'ยกเลิก'
+        });
+        if (!confirmed) return;
+
+        await firebaseService.deleteReferral(refId);
+        this.showToast('ลบรายการส่งต่อนักเรียนเรียบร้อยแล้ว', 'success');
+        this.renderReferrals();
+        this.renderScreenings();
     }
 
     renderActivitiesList() {

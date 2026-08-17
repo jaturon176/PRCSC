@@ -19,8 +19,8 @@
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Custom Design System v4.5 -->
-    <link rel="stylesheet" href="css/style.css?v=4.5">
+    <!-- Custom Design System v4.7 -->
+    <link rel="stylesheet" href="css/style.css?v=4.7">
 </head>
 <body data-theme="indigo">
     <!-- DEDICATED FULLSCREEN LOGIN PAGE (Matching User Reference Image Design) -->
@@ -901,26 +901,173 @@
                 </div>
             </main>
 
-            <!-- Page 6: Referrals (การส่งต่อ) -->
+            <!-- Page 6: Referrals (การส่งต่อนักเรียน - ส่งต่อภายใน & ส่งต่อภายนอก) -->
             <main class="content-page" id="page-referrals">
-                <div class="glass-panel">
-                    <div class="panel-header">
-                        <div>
-                            <h2 class="panel-title"><i class="ri-git-pull-request-line"></i> การส่งต่อนักเรียน (ส่งต่อภายใน & ส่งต่อภายนอก)</h2>
-                            <p style="color: var(--text-muted); font-size: 0.9rem;">ติดตามสถานะการส่งต่อเคสนักเรียนไปยัง ครูแนะแนว, ฝ่ายปกครอง, โรงพยาบาล หรือหน่วยงานภายนอก</p>
+                <!-- 1. VIBRANT HERO BANNER -->
+                <div class="referral-hero-banner">
+                    <div class="referral-hero-content">
+                        <div class="referral-hero-badge">
+                            <span class="hero-pulse-dot" style="background:#38bdf8;"></span>
+                            <i class="ri-git-pull-request-line" style="color: #38bdf8;"></i>
+                            <span>ระบบส่งต่อและประสานการดูแลช่วยเหลือนักเรียน (Student Referral Network)</span>
                         </div>
-                        <button class="btn btn-primary teacher-only" id="btn-open-referral"><i class="ri-send-plane-line"></i> ส่งต่อเคสนักเรียน</button>
+                        <h1 class="referral-hero-title">
+                            ศูนย์ประสานส่งต่อนักเรียน 🕊️
+                            <span class="gradient-text-referral">ส่งต่อภายใน & ภายนอก</span>
+                        </h1>
+                        <p class="referral-hero-desc">
+                            เชื่อมโยงเครือข่ายการดูแลรอบด้าน ทั้งภายในโรงเรียน (ครูแนะแนว / ครูนางฟ้า / ฝ่ายปกครอง) และภายนอกสถานศึกษา (โรงพยาบาลพนมดงรัก / สาธารณสุข / พม. / สถานีตำรวจ) เพื่อช่วยเหลือนักเรียนอย่างทันท่วงทีและมีประสิทธิภาพสูงสุด
+                        </p>
+
+                        <!-- Live Stat Chips -->
+                        <div class="referral-hero-chips">
+                            <div class="referral-stat-chip chip-total">
+                                <i class="ri-folder-shared-line"></i>
+                                <span class="chip-label">ส่งต่อทั้งหมด:</span>
+                                <strong id="ref-stat-total">0</strong> เคส
+                            </div>
+                            <div class="referral-stat-chip chip-internal">
+                                <i class="ri-community-line"></i>
+                                <span class="chip-label">ส่งต่อภายใน:</span>
+                                <strong id="ref-stat-internal">0</strong> เคส
+                            </div>
+                            <div class="referral-stat-chip chip-external">
+                                <i class="ri-hospital-line"></i>
+                                <span class="chip-label">ส่งต่อภายนอก:</span>
+                                <strong id="ref-stat-external">0</strong> เคส
+                            </div>
+                            <div class="referral-stat-chip chip-pending">
+                                <i class="ri-time-line"></i>
+                                <span class="chip-label">รอประสานงาน:</span>
+                                <strong id="ref-stat-pending">0</strong> เคส
+                            </div>
+                            <div class="referral-stat-chip chip-completed">
+                                <i class="ri-checkbox-circle-line"></i>
+                                <span class="chip-label">ประสานสำเร็จ:</span>
+                                <strong id="ref-stat-completed">0</strong> เคส
+                            </div>
+                        </div>
+                    </div>
+                    <div class="referral-hero-art">
+                        <div class="art-bubble bubble-ref-1"><i class="ri-heart-pulse-fill"></i></div>
+                        <div class="art-bubble bubble-ref-2"><i class="ri-shield-user-fill"></i></div>
+                        <div class="art-bubble bubble-ref-3"><i class="ri-hand-heart-fill"></i></div>
+                    </div>
+                </div>
+
+                <!-- 2. DUAL ACTION CARDS (Internal & External Networks) -->
+                <div class="referral-cards-grid">
+                    <!-- Card 1: Internal Referral -->
+                    <div class="vibrant-referral-card card-ref-internal">
+                        <div class="ref-card-glow-bar bar-internal"></div>
+                        <div class="ref-card-top">
+                            <div class="ref-card-icon icon-internal">
+                                <i class="ri-team-fill"></i>
+                            </div>
+                            <div class="ref-card-title-group">
+                                <span class="ref-badge-pill badge-internal">เครือข่ายภายในสถานศึกษา</span>
+                                <h3>ส่งต่อภายใน (Internal Referral)</h3>
+                                <p>ดูแลสุขภาวะทางจิต ให้คำปรึกษา พัฒนาพฤติกรรม และปรับการเรียน</p>
+                            </div>
+                        </div>
+                        
+                        <div class="ref-network-tags">
+                            <div class="ref-tag-item"><i class="ri-user-star-line"></i> <strong>👩‍🏫 ครูแนะแนว:</strong> ให้คำปรึกษาเชิงลึกด้านจิตวิทยา การปรับตัว และการศึกษาต่อ</div>
+                            <div class="ref-tag-item"><i class="ri-magic-line"></i> <strong>🧚‍♀️ ครูนางฟ้า:</strong> ดูแลใกล้ชิดรายบุคคล เติมพลังบวก และเฝ้าระวังพฤติกรรม</div>
+                            <div class="ref-tag-item"><i class="ri-shield-check-line"></i> <strong>🛡️ ฝ่ายกิจการนักเรียน:</strong> ปรับพฤติกรรม และดูแลความประพฤติร่วมกับผู้ปกครอง</div>
+                        </div>
+
+                        <div class="ref-card-footer">
+                            <button class="btn btn-internal-action teacher-only" onclick="app.openDirectReferralModal('internal')">
+                                <i class="ri-send-plane-2-line"></i> บันทึกส่งต่อภายใน
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="table-responsive">
-                        <table class="custom-table">
+                    <!-- Card 2: External Referral -->
+                    <div class="vibrant-referral-card card-ref-external">
+                        <div class="ref-card-glow-bar bar-external"></div>
+                        <div class="ref-card-top">
+                            <div class="ref-card-icon icon-external">
+                                <i class="ri-hospital-fill"></i>
+                            </div>
+                            <div class="ref-card-title-group">
+                                <span class="ref-badge-pill badge-external">เครือข่ายหน่วยงานภายนอก</span>
+                                <h3>ส่งต่อภายนอก (External Referral)</h3>
+                                <p>ตรวจรักษาทางการแพทย์ คุ้มครองสวัสดิภาพ และช่วยเหลือทางกฎหมาย</p>
+                            </div>
+                        </div>
+                        
+                        <div class="ref-network-tags">
+                            <div class="ref-tag-item"><i class="ri-hospital-line"></i> <strong>🏥 รพ.พนมดงรัก / สธ.:</strong> ตรวจวินิจฉัย บำบัดรักษาทางการแพทย์ และจิตเวชวัยรุ่น</div>
+                            <div class="ref-tag-item"><i class="ri-government-line"></i> <strong>🏛️ พม. (พัฒนาสังคมฯ):</strong> คุ้มครองสวัสดิภาพ สงเคราะห์ครอบครัว และทุนช่วยเหลือ</div>
+                            <div class="ref-tag-item"><i class="ri-shield-flash-line"></i> <strong>👮 สถานีตำรวจ:</strong> คุ้มครองความปลอดภัย แก้ไขปัญหาสารเสพติด และการกระทำผิด</div>
+                        </div>
+
+                        <div class="ref-card-footer">
+                            <button class="btn btn-external-action teacher-only" onclick="app.openDirectReferralModal('external')">
+                                <i class="ri-hospital-line"></i> บันทึกส่งต่อภายนอก
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. REFERRALS DATA TABLE & FILTER PANEL -->
+                <div class="glass-panel" style="margin-top: 24px; padding: 24px;">
+                    <div class="panel-header-custom" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--text-heading); display: flex; align-items: center; gap: 8px;">
+                                <i class="ri-file-list-3-line" style="color: #0284c7;"></i> ทะเบียนรายการส่งต่อนักเรียน
+                            </h3>
+                            <p style="margin: 4px 0 0; font-size: 0.88rem; color: var(--text-muted);">
+                                แสดงประวัติและติดตามสถานะความคืบหน้าการส่งต่อเคสของนักเรียนทั้งหมด
+                            </p>
+                        </div>
+
+                        <!-- Right Actions -->
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <!-- Search box -->
+                            <div class="referral-search-box">
+                                <i class="ri-search-line"></i>
+                                <input type="text" id="ref-search-input" placeholder="ค้นหาชื่อนักเรียน, รหัส, หน่วยงาน..." oninput="app.renderReferrals()">
+                            </div>
+                            <button class="btn btn-primary teacher-only" id="btn-open-referral">
+                                <i class="ri-add-circle-line"></i> ส่งต่อเคสใหม่
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filter Tabs -->
+                    <div class="referral-tabs-wrapper">
+                        <button class="referral-tab-btn active" data-ref-tab="all" onclick="app.switchReferralFilterTab('all')">
+                            <i class="ri-apps-2-line"></i> ทั้งหมด (<span id="tab-cnt-all">0</span>)
+                        </button>
+                        <button class="referral-tab-btn" data-ref-tab="internal" onclick="app.switchReferralFilterTab('internal')">
+                            <i class="ri-community-line"></i> 🏫 ส่งต่อภายใน (<span id="tab-cnt-internal">0</span>)
+                        </button>
+                        <button class="referral-tab-btn" data-ref-tab="external" onclick="app.switchReferralFilterTab('external')">
+                            <i class="ri-hospital-line"></i> 🏥 ส่งต่อภายนอก (<span id="tab-cnt-external">0</span>)
+                        </button>
+                        <button class="referral-tab-btn" data-ref-tab="pending" onclick="app.switchReferralFilterTab('pending')">
+                            <i class="ri-time-line"></i> ⏳ รอการดำเนินการ (<span id="tab-cnt-pending">0</span>)
+                        </button>
+                        <button class="referral-tab-btn" data-ref-tab="completed" onclick="app.switchReferralFilterTab('completed')">
+                            <i class="ri-checkbox-circle-line"></i> ✅ ดำเนินการแล้วเสร็จ (<span id="tab-cnt-completed">0</span>)
+                        </button>
+                    </div>
+
+                    <!-- Table Responsive -->
+                    <div class="table-responsive" style="margin-top: 18px;">
+                        <table class="custom-table" id="table-referrals">
                             <thead>
                                 <tr>
-                                    <th>ชื่อนักเรียน</th>
-                                    <th>ประเภทการส่งต่อ</th>
-                                    <th>หน่วยงาน/ผู้รับส่งต่อ</th>
-                                    <th>สาเหตุการส่งต่อ</th>
-                                    <th>สถานะ</th>
+                                    <th style="min-width: 180px;">นักเรียน</th>
+                                    <th style="min-width: 130px;">ประเภทการส่งต่อ</th>
+                                    <th style="min-width: 180px;">หน่วยงาน / ผู้รับส่งต่อ</th>
+                                    <th style="min-width: 260px;">สาเหตุ & รายละเอียดการส่งต่อ</th>
+                                    <th style="min-width: 140px;">สถานะการดำเนินงาน</th>
+                                    <th style="min-width: 110px;">วันที่บันทึก</th>
+                                    <th class="teacher-only" style="min-width: 120px;">จัดการ</th>
                                 </tr>
                             </thead>
                             <tbody id="table-referrals-body">
@@ -1844,12 +1991,12 @@
     </div>
 
     <!-- Load Application Scripts -->
-    <script src="js/config.js?v=4.6"></script>
-    <script src="js/firebase-service.js?v=4.6"></script>
-    <script src="js/cloudinary-service.js?v=4.6"></script>
-    <script src="js/pdf-generator.js?v=4.6"></script>
-    <script src="js/csv-importer.js?v=4.6"></script>
-    <script src="js/auth.js?v=4.6"></script>
-    <script src="js/app.js?v=4.6"></script>
+    <script src="js/config.js?v=4.7"></script>
+    <script src="js/firebase-service.js?v=4.7"></script>
+    <script src="js/cloudinary-service.js?v=4.7"></script>
+    <script src="js/pdf-generator.js?v=4.7"></script>
+    <script src="js/csv-importer.js?v=4.7"></script>
+    <script src="js/auth.js?v=4.7"></script>
+    <script src="js/app.js?v=4.7"></script>
 </body>
 </html>

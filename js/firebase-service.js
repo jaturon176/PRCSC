@@ -816,6 +816,18 @@ class FirebaseService {
         return referral;
     }
 
+    async deleteReferral(id) {
+        let referrals = this.getReferrals();
+        referrals = referrals.filter(r => r.id !== id);
+        this.setCache(CONFIG.STORAGE_KEYS.REFERRALS, referrals);
+        window.dispatchEvent(new CustomEvent('referralsUpdated', { detail: referrals }));
+
+        if (this.isOnline) {
+            await this.cloudDelete(`${CONFIG.FIREBASE.ENDPOINTS.REFERRALS}/${id}`);
+        }
+        return true;
+    }
+
     // 6. Activities Catalogue
     getActivities() {
         return this.getCache(CONFIG.STORAGE_KEYS.ACTIVITIES) || [
