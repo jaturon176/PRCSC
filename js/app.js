@@ -733,6 +733,26 @@ class Application {
                 isSuicideRisk ? 'warning' : alertType
             );
             this.switchScreeningTab('depression');
+
+            // Prompt to open Referral modal immediately for severe depression or suicide risk
+            if (totalScore >= 15 || isSuicideRisk) {
+                const activeUser = authManager.getCurrentUser();
+                if (activeUser && activeUser.role !== 'student') {
+                    setTimeout(() => {
+                        this.confirmDialog({
+                            title: '🚨 ตรวจพบความเสี่ยงสุขภาพจิตระดับสูง',
+                            message: `ผลการประเมินพบ: <strong>${levelLabel}</strong> (${totalScore}/27)${isSuicideRisk ? '<br><span style="color:#e11d48; font-weight:700;">🚨 มีความเสี่ยงต่อการทำร้ายตนเอง/ฆ่าตัวตาย (เฝ้าระวังด่วน)</span>' : ''}<br><br>ต้องการเปิดแบบฟอร์ม <strong>ส่งต่อนักเรียน (Referral)</strong> ไปยังโรงพยาบาล/พม. ทันทีหรือไม่?`,
+                            type: 'warning',
+                            confirmText: 'เปิดฟอร์มส่งต่อทันที 🕊️',
+                            cancelText: 'ไว้ภายหลัง'
+                        }).then(confirmed => {
+                            if (confirmed) {
+                                this.openReferralForScreening(screening.id);
+                            }
+                        });
+                    }, 800);
+                }
+            }
         });
 
         document.getElementById('btn-open-screening')?.addEventListener('click', () => {
@@ -1856,9 +1876,16 @@ class Application {
             if (scr.type === 'depression') {
                 const depInfo = depLevelsMap[scr.resultLevel] || depLevelsMap.normal;
                 const isRisk = scr.extRisk?.isSuicideRisk || (scr.qScores && scr.qScores[8] > 0);
+                const needsReferral = scr.resultLevel === 'severe_high' || scr.resultLevel === 'severe_extreme' || isRisk;
 
                 const riskBadge = isRisk 
                     ? `<br><span class="badge" style="background:rgba(225,29,72,0.15); color:#be123c; border:1px solid #e11d48; font-size:0.75rem; margin-top:4px; font-weight:700;">🚨 เสี่ยงฆ่าตัวตาย/ทำร้ายตนเอง (เฝ้าระวังด่วน)</span>`
+                    : '';
+
+                const referralBtn = needsReferral
+                    ? `<button class="btn btn-warning btn-sm" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #ffffff; font-weight: 700; border: none; box-shadow: 0 2px 8px rgba(245,158,11,0.35); margin-right: 6px; display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 8px; transition: all 0.2s ease;" onclick="app.openReferralForScreening('${scr.id}')" title="คลิกเพื่อส่งต่อนักเรียนไปยังโรงพยาบาล/พม./ผู้เชี่ยวชาญ">
+                        <i class="ri-git-pull-request-line"></i> ส่งต่อ
+                       </button>`
                     : '';
 
                 tr.innerHTML = `
@@ -1873,7 +1900,8 @@ class Application {
                     <td style="max-width:280px; font-size:0.85rem; color:var(--text-muted); line-height:1.4;">${scr.advice || depInfo.advice}</td>
                     <td>${scr.assessor || '-'}</td>
                     <td>${scr.assessedAt ? new Date(scr.assessedAt).toLocaleDateString('th-TH') : '-'}</td>
-                    <td class="teacher-only">
+                    <td class="teacher-only" style="white-space: nowrap;">
+                        ${referralBtn}
                         <button class="btn btn-danger btn-sm" onclick="app.deleteSingleScreening('${scr.id}')"><i class="ri-delete-bin-line"></i> ลบ</button>
                     </td>
                 `;
@@ -1895,6 +1923,51 @@ class Application {
         });
 
         authManager.applyUIPermissions();
+    }
+
+    /**
+     * Open Referral Modal prefilled with student depression / high risk assessment data
+     */
+    openReferralForScreening(screeningId) {
+        const screenings = firebaseService.getScreenings();
+        const scr = screenings.find(s => s.id === screeningId);
+        if (!scr) return;
+
+        const students = firebaseService.getStudents();
+        const student = students.find(s => s.studentId === scr.studentId || s.id === scr.studentId);
+
+        this.updateStudentDropdowns();
+
+        const studentSelect = document.getElementById('ref-student-select');
+        if (studentSelect) {
+            studentSelect.value = scr.studentId;
+            if (!studentSelect.value && student) {
+                studentSelect.value = student.studentId || student.id;
+            }
+        }
+
+        const refTypeEl = document.getElementById('ref-type');
+        if (refTypeEl) {
+            refTypeEl.value = 'external'; // Default to external hospital / msdhs referral
+        }
+
+        const refAgencyEl = document.getElementById('ref-agency');
+        if (refAgencyEl) {
+            refAgencyEl.value = 'โรงพยาบาลพนมดงรัก / สาธารณสุข / พม.';
+        }
+
+        const isRisk = scr.extRisk?.isSuicideRisk || (scr.qScores && scr.qScores[8] > 0);
+        let riskText = '';
+        if (isRisk) {
+            riskText = ' 🚨 [เฝ้าระวังด่วน: มีความเสี่ยงต่อการทำร้ายตนเอง/ฆ่าตัวตาย]';
+        }
+
+        const reasonEl = document.getElementById('ref-reason');
+        if (reasonEl) {
+            reasonEl.value = `ผลการคัดกรองภาวะซึมเศร้า (PHQ-A): ${scr.levelLabel || 'มีความเสี่ยงสูง'} (คะแนนรวม ${scr.totalScore || 0}/27)${riskText}\nคำแนะนำ: ${scr.advice || 'ส่งต่อเพื่อรับการประเมิน วินิจฉัย และบำบัดรักษาทางการแพทย์'}`;
+        }
+
+        this.openModal('modal-referral');
     }
 
     renderMerits() {
@@ -2391,7 +2464,7 @@ class Application {
             }
 
             if (titleEl) titleEl.textContent = title || 'ยืนยันการทำรายการ';
-            if (msgEl) msgEl.textContent = message || 'คุณต้องการดำเนินการนี้ใช่หรือไม่?';
+            if (msgEl) msgEl.innerHTML = message || 'คุณต้องการดำเนินการนี้ใช่หรือไม่?';
 
             if (iconWrapper) iconWrapper.className = `confirm-icon-wrapper ${type}`;
             if (iconI) {
