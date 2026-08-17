@@ -868,7 +868,8 @@
                             <strong>📌 รูปแบบการเข้าใช้งานระบบ (Login Standard Guidelines):</strong><br>
                             • <strong>👨‍🏫 ครู / บุคลากร:</strong> ลงชื่อเข้าใช้โดยใช้ <u>เบอร์โทรศัพท์</u> เป็นทั้งชื่อผู้ใช้และรหัสผ่าน (เช่น <code>0812345678</code>)<br>
                             • <strong>🎓 นักเรียน:</strong> ลงชื่อเข้าใช้โดยใช้ <u>รหัสประจำตัวนักเรียน</u> เป็นทั้งชื่อผู้ใช้และรหัสผ่าน (เช่น <code>67001</code>)<br>
-                            • <strong>🛡️ ผู้ดูแลระบบ:</strong> ลงชื่อเข้าใช้ด้วยบัญชี Admin (เช่น <code>admin</code> / <code>admin123</code>)
+                            • <strong>🛡️ ผู้ดูแลระบบ:</strong> ลงชื่อเข้าใช้ด้วยบัญชี Admin (เช่น <code>admin</code> / <code>admin123</code>)<br>
+                            • <strong>🏥 ภายนอก (รพ. / ตำรวจ / พม.):</strong> ลงชื่อเข้าใช้ด้วยชื่อผู้ใช้และรหัสผ่านที่ได้รับมอบหมาย
                         </div>
                     </div>
 
@@ -968,6 +969,9 @@
                             <option value="teacher">👨‍🏫 ครู / ครูกิจการนักเรียน / ครูประจำชั้น</option>
                             <option value="student">🎓 นักเรียน (ดูโปรไฟล์และกิจกรรมทำความดี)</option>
                             <option value="admin">🛡️ ผู้ดูแลระบบ (Administrator)</option>
+                            <option value="hospital">🏥 โรงพยาบาล / บุคลากรทางการแพทย์</option>
+                            <option value="police">👮 สถานีตำรวจ / เจ้าหน้าที่ตำรวจ</option>
+                            <option value="msdhs">🏛️ พม. (พัฒนาสังคมและความมั่นคงของมนุษย์)</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -1697,6 +1701,9 @@
                                 <option value="teacher">👨‍🏫 ครู / ครูกิจการนักเรียน</option>
                                 <option value="student">🎓 นักเรียน</option>
                                 <option value="admin">🛡️ ผู้ดูแลระบบ (Admin)</option>
+                                <option value="hospital">🏥 โรงพยาบาล / สาธารณสุข</option>
+                                <option value="police">👮 สถานีตำรวจ</option>
+                                <option value="msdhs">🏛️ พม. (พัฒนาสังคมฯ)</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -1748,12 +1755,12 @@
     </div>
 
     <!-- Load Application Scripts -->
-    <script src="js/config.js?v=3.9"></script>
-    <script src="js/firebase-service.js?v=3.9"></script>
-    <script src="js/cloudinary-service.js?v=3.9"></script>
-    <script src="js/pdf-generator.js?v=3.9"></script>
-    <script src="js/csv-importer.js?v=3.9"></script>
-    <script src="js/auth.js?v=3.9"></script>
-    <script src="js/app.js?v=3.9"></script>
+    <script src="js/config.js?v=4.0"></script>
+    <script src="js/firebase-service.js?v=4.0"></script>
+    <script src="js/cloudinary-service.js?v=4.0"></script>
+    <script src="js/pdf-generator.js?v=4.0"></script>
+    <script src="js/csv-importer.js?v=4.0"></script>
+    <script src="js/auth.js?v=4.0"></script>
+    <script src="js/app.js?v=4.0"></script>
 </body>
 </html>

@@ -56,13 +56,19 @@ const CONFIG = {
     ROLES: {
         STUDENT: "student",
         TEACHER: "teacher",
-        ADMIN: "admin"
+        ADMIN: "admin",
+        HOSPITAL: "hospital",
+        POLICE: "police",
+        MSDHS: "msdhs"
     },
 
     ROLE_NAMES_TH: {
         student: "🎓 นักเรียน",
         teacher: "👨‍🏫 ครู / ครูกิจการนักเรียน",
-        admin: "🛡️ ผู้ดูแลระบบ (Administrator)"
+        admin: "🛡️ ผู้ดูแลระบบ (Administrator)",
+        hospital: "🏥 โรงพยาบาล / สาธารณสุข",
+        police: "👮 สถานีตำรวจ",
+        msdhs: "🏛️ พม. (พัฒนาสังคมฯ)"
     },
 
     SCREENING_LEVELS: {

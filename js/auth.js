@@ -233,7 +233,7 @@ class AuthManager {
 
     canEditData() {
         if (!this.currentUser) return false;
-        return this.currentUser.role === CONFIG.ROLES.TEACHER || this.currentUser.role === CONFIG.ROLES.ADMIN;
+        return ['teacher', 'admin', 'hospital', 'police', 'msdhs'].includes(this.currentUser.role);
     }
 
     canManageAdmin() {
@@ -297,6 +297,18 @@ class AuthManager {
                     } else {
                         item.style.display = 'none';
                     }
+                } else if (role === 'hospital') {
+                    // Hospital can see dashboard, students, screening, prevention, referrals
+                    const allowed = ['dashboard', 'students', 'screening', 'prevention', 'referrals'];
+                    item.style.display = allowed.includes(page) ? '' : 'none';
+                } else if (role === 'police') {
+                    // Police can see dashboard, students, prevention, referrals
+                    const allowed = ['dashboard', 'students', 'prevention', 'referrals'];
+                    item.style.display = allowed.includes(page) ? '' : 'none';
+                } else if (role === 'msdhs') {
+                    // MSDHS (พม.) can see dashboard, students, screening, promotion, prevention, referrals
+                    const allowed = ['dashboard', 'students', 'screening', 'promotion', 'prevention', 'referrals'];
+                    item.style.display = allowed.includes(page) ? '' : 'none';
                 } else {
                     item.style.display = '';
                 }
@@ -342,7 +354,7 @@ class AuthManager {
         });
 
         document.querySelectorAll('.teacher-only').forEach(el => {
-            if (role === 'admin' || role === 'teacher') {
+            if (['admin', 'teacher', 'hospital', 'police', 'msdhs'].includes(role)) {
                 el.style.display = '';
             } else {
                 el.style.display = 'none';

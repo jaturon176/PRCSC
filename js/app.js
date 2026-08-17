@@ -268,8 +268,8 @@ class Application {
         if (user && user.role === 'student') {
             // Student is ONLY allowed to access 'screening'
             pageId = 'screening';
-        } else if (user && user.role === 'teacher') {
-            // Teacher cannot access 'admin' (ตั้งค่าและจัดการผู้ใช้)
+        } else if (user && ['teacher', 'hospital', 'police', 'msdhs'].includes(user.role)) {
+            // Non-admin roles cannot access 'admin' (ตั้งค่าและจัดการผู้ใช้)
             if (pageId === 'admin') {
                 pageId = 'dashboard';
             }
@@ -2141,7 +2141,7 @@ class Application {
         users.forEach(u => {
             const tr = document.createElement('tr');
             let roleBadge = 'badge-normal';
-            let roleTitle = 'ครู / บุคลากร';
+            let roleTitle = '👨‍🏫 ครู / บุคลากร';
 
             if (u.role === 'admin') {
                 roleBadge = 'badge-risk';
@@ -2149,6 +2149,15 @@ class Application {
             } else if (u.role === 'student') {
                 roleBadge = 'badge-minor';
                 roleTitle = '🎓 นักเรียน';
+            } else if (u.role === 'hospital') {
+                roleBadge = 'badge-normal';
+                roleTitle = '🏥 โรงพยาบาล';
+            } else if (u.role === 'police') {
+                roleBadge = 'badge-risk';
+                roleTitle = '👮 สถานีตำรวจ';
+            } else if (u.role === 'msdhs') {
+                roleBadge = 'badge-moderate';
+                roleTitle = '🏛️ พม. (พัฒนาสังคมฯ)';
             } else {
                 roleBadge = 'badge-normal';
                 roleTitle = '👨‍🏫 ครู / บุคลากร';
