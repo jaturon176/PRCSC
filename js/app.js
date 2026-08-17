@@ -966,7 +966,7 @@ class Application {
 
             await firebaseService.saveReferral(ref);
             this.closeModal('modal-referral-action');
-            this.showToast(status === 'completed' ? 'บันทึกผลการดำเนินการ (ประสานสำเร็จ) เรียบร้อยแล้ว 🎉' : 'บันทึกผลการดำเนินการช่วยเหลือเรียบร้อยแล้ว ✅', 'success');
+            this.showToast(status === 'completed' ? 'บันทึกผลการดำเนินการ (ดำเนินการแล้วเสร็จ) เรียบร้อยแล้ว 🎉' : 'บันทึกผลการดำเนินการช่วยเหลือเรียบร้อยแล้ว ✅', 'success');
             this.renderReferrals();
         });
 
@@ -2329,7 +2329,7 @@ class Application {
 
             if (canProcess) {
                 statusDisplay = isCompleted
-                    ? `<button class="status-toggle-btn status-completed" onclick="app.openReferralActionModal('${ref.id}')" title="คลิกเพื่อบันทึกหรือดูผลการดำเนินการ"><i class="ri-checkbox-circle-fill"></i> ประสานสำเร็จ <span style="font-size:0.75rem; opacity:0.85;">(คลิก)</span></button>`
+                    ? `<button class="status-toggle-btn status-completed" onclick="app.openReferralActionModal('${ref.id}')" title="คลิกเพื่อบันทึกหรือดูผลการดำเนินการ"><i class="ri-checkbox-circle-fill"></i> ดำเนินการแล้วเสร็จ <span style="font-size:0.75rem; opacity:0.85;">(คลิก)</span></button>`
                     : `<button class="status-toggle-btn status-pending" onclick="app.openReferralActionModal('${ref.id}')" title="คลิกเพื่อบันทึกวิธีดำเนินการกับเคสนี้"><i class="ri-time-line"></i> รอการดำเนินการ <span style="font-size:0.75rem; opacity:0.85;">(คลิก)</span></button>`;
             } else {
                 statusDisplay = isCompleted
@@ -2544,7 +2544,7 @@ class Application {
 
         ref.status = newStatus;
         await firebaseService.saveReferral(ref);
-        this.showToast(newStatus === 'completed' ? 'อัปเดตสถานะเป็น "ประสานงานสำเร็จ" ✅' : 'อัปเดตสถานะเป็น "รอการดำเนินการ" ⏳', 'info');
+        this.showToast(newStatus === 'completed' ? 'อัปเดตสถานะเป็น "ดำเนินการแล้วเสร็จ" ✅' : 'อัปเดตสถานะเป็น "รอการดำเนินการ" ⏳', 'info');
         this.renderReferrals();
     }
 
