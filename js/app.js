@@ -1887,6 +1887,13 @@ class Application {
             targetScreenings = targetScreenings.filter(s => s.studentId === user.studentId || s.studentId === user.id);
         }
 
+        // Sort latest assessment date first (newest to oldest)
+        targetScreenings.sort((a, b) => {
+            const timeA = new Date(a.assessedAt || a.createdAt || 0).getTime();
+            const timeB = new Date(b.assessedAt || b.createdAt || 0).getTime();
+            return timeB - timeA;
+        });
+
         const tableTitleEl = document.getElementById('screening-table-title');
         if (tableTitleEl) {
             tableTitleEl.textContent = currentTab === 'depression' 
@@ -2106,6 +2113,13 @@ class Application {
             merits = merits.filter(m => m.studentId === user.studentId || m.studentId === user.id);
         }
 
+        // Sort latest merit date first (newest to oldest)
+        merits.sort((a, b) => {
+            const timeA = new Date(a.recordedDate || a.createdAt || 0).getTime();
+            const timeB = new Date(b.recordedDate || b.createdAt || 0).getTime();
+            return timeB - timeA;
+        });
+
         tbody.innerHTML = '';
         if (merits.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#64748b;">ยังไม่มีรายการทำความดี</td></tr>';
@@ -2136,6 +2150,13 @@ class Application {
             tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding: 24px;">ไม่มีประวัติการกระทำความผิด</td></tr>';
             return;
         }
+
+        // Sort latest offense date first (newest to oldest)
+        offenses.sort((a, b) => {
+            const timeA = new Date(a.incidentDate || a.createdAt || 0).getTime();
+            const timeB = new Date(b.incidentDate || b.createdAt || 0).getTime();
+            return timeB - timeA;
+        });
 
         offenses.forEach(off => {
             const levelBadgeClass = `badge-${off.level}`;
@@ -2279,6 +2300,13 @@ class Application {
                 return sName.includes(query) || sId.includes(query) || agency.includes(query) || reason.includes(query);
             });
         }
+
+        // Sort latest referral first (newest to oldest)
+        filtered.sort((a, b) => {
+            const timeA = new Date(a.createdAt || 0).getTime();
+            const timeB = new Date(b.createdAt || 0).getTime();
+            return timeB - timeA;
+        });
 
         tbody.innerHTML = '';
         if (filtered.length === 0) {
