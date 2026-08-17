@@ -19,8 +19,8 @@
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Custom Design System v4.7 -->
-    <link rel="stylesheet" href="css/style.css?v=4.7">
+    <!-- Custom Design System v4.8 -->
+    <link rel="stylesheet" href="css/style.css?v=4.8">
 </head>
 <body data-theme="indigo">
     <!-- DEDICATED FULLSCREEN LOGIN PAGE (Matching User Reference Image Design) -->
@@ -1753,6 +1753,67 @@
         </div>
     </div>
 
+    <!-- Modal 7.1: Referral Action & History (บันทึกผลการดำเนินการและดูประวัติการช่วยเหลือ) -->
+    <div class="modal-overlay" id="modal-referral-action">
+        <div class="modal-content" style="max-width: 650px;">
+            <div class="modal-header">
+                <h3><i class="ri-heart-pulse-line" style="color: #0284c7;"></i> ดำเนินการช่วยเหลือ & ประวัติการส่งต่อ</h3>
+                <button class="btn-close" onclick="app.closeModal('modal-referral-action')">&times;</button>
+            </div>
+            <form id="form-referral-action">
+                <input type="hidden" id="action-ref-id">
+                <div class="modal-body" style="max-height: 75vh; overflow-y: auto;">
+                    <!-- Case Summary Header -->
+                    <div id="action-ref-summary-box" style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: 14px; padding: 14px 16px; margin-bottom: 18px;">
+                        <!-- Dynamically filled with student name, agency, referral reason -->
+                    </div>
+
+                    <!-- History Timeline Feed -->
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="font-size: 0.98rem; font-weight: 700; color: var(--text-heading); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                            <i class="ri-history-line" style="color: #6366f1;"></i> ประวัติบันทึกการดำเนินการช่วยเหลือที่ผ่านมา
+                        </h4>
+                        <div id="action-ref-history-list" style="display: flex; flex-direction: column; gap: 10px;">
+                            <!-- Dynamically filled with previous action logs -->
+                        </div>
+                    </div>
+
+                    <!-- Permission Notice if read-only -->
+                    <div id="action-ref-readonly-notice" style="display: none; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 12px 14px; font-size: 0.88rem; color: #b45309; align-items: center; gap: 8px;">
+                        <i class="ri-lock-line" style="font-size: 1.2rem; flex-shrink: 0;"></i>
+                        <span id="action-ref-readonly-text">เฉพาะผู้รับส่งต่อเท่านั้นที่สามารถบันทึกผลการดำเนินการได้</span>
+                    </div>
+
+                    <!-- New Action Form (Shown only if user has permission to edit) -->
+                    <div id="action-ref-input-section" style="background: rgba(2, 132, 199, 0.04); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 14px; padding: 16px;">
+                        <h4 style="font-size: 0.98rem; font-weight: 700; color: #0284c7; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                            <i class="ri-edit-2-line"></i> บันทึกผลการดำเนินการครั้งใหม่
+                        </h4>
+                        <div class="form-group">
+                            <label class="form-label">ปรับสถานะเคส *</label>
+                            <select class="form-select" id="action-ref-status" required>
+                                <option value="pending">⏳ อยู่ระหว่างดำเนินการช่วยเหลือ / ติดตามผล</option>
+                                <option value="completed">✅ ดำเนินการแล้วเสร็จ (ประสานงานสำเร็จ)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">วิธี / รายละเอียดที่ดำเนินการกับเคสนี้ *</label>
+                            <textarea class="form-control" id="action-ref-notes" rows="3" required placeholder="ระบุวิธีการช่วยเหลือ เช่น ให้คำปรึกษาเชิงจิตวิทยา 2 ครั้ง, ส่งตรวจพบจิตแพทย์เด็ก รพ.พนมดงรัก, เยี่ยมบ้านประสานผู้ปกครองร่วมวางแผนดูแล..."></textarea>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label">ผู้บันทึกผลการดำเนินการ</label>
+                            <input type="text" class="form-control" id="action-ref-by" readonly style="background: var(--bg-card);">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="app.closeModal('modal-referral-action')">ปิดหน้าต่าง</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-referral-action"><i class="ri-save-line"></i> บันทึกผลการดำเนินการ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Modal: Add/Edit Teacher -->
     <div class="modal-overlay" id="modal-teacher">
         <div class="modal-content">
@@ -1991,12 +2052,12 @@
     </div>
 
     <!-- Load Application Scripts -->
-    <script src="js/config.js?v=4.7"></script>
-    <script src="js/firebase-service.js?v=4.7"></script>
-    <script src="js/cloudinary-service.js?v=4.7"></script>
-    <script src="js/pdf-generator.js?v=4.7"></script>
-    <script src="js/csv-importer.js?v=4.7"></script>
-    <script src="js/auth.js?v=4.7"></script>
-    <script src="js/app.js?v=4.7"></script>
+    <script src="js/config.js?v=4.8"></script>
+    <script src="js/firebase-service.js?v=4.8"></script>
+    <script src="js/cloudinary-service.js?v=4.8"></script>
+    <script src="js/pdf-generator.js?v=4.8"></script>
+    <script src="js/csv-importer.js?v=4.8"></script>
+    <script src="js/auth.js?v=4.8"></script>
+    <script src="js/app.js?v=4.8"></script>
 </body>
 </html>

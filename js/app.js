@@ -931,6 +931,45 @@ class Application {
             this.renderReferrals();
         });
 
+        // Referral Action & History Form Submit
+        document.getElementById('form-referral-action')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const refId = document.getElementById('action-ref-id').value;
+            const status = document.getElementById('action-ref-status').value;
+            const notes = document.getElementById('action-ref-notes').value.trim();
+
+            if (!notes) {
+                this.showToast('กรุณาระบุวิธีหรือผลการดำเนินการช่วยเหลือ', 'warning');
+                return;
+            }
+
+            const referrals = firebaseService.getReferrals();
+            const ref = referrals.find(r => r.id === refId);
+            if (!ref) return;
+
+            const currentUser = authManager.getCurrentUser();
+            if (!ref.actionLogs) ref.actionLogs = [];
+
+            const newLog = {
+                actionDate: new Date().toISOString(),
+                actionBy: currentUser?.name || 'บุคลากรผู้รับส่งต่อ',
+                actionRole: currentUser?.roleTitle || currentUser?.role || 'ผู้รับส่งต่อ',
+                status: status,
+                notes: notes
+            };
+
+            ref.actionLogs.unshift(newLog);
+            ref.status = status;
+            ref.lastActionNotes = notes;
+            ref.lastActionBy = newLog.actionBy;
+            ref.lastActionDate = newLog.actionDate;
+
+            await firebaseService.saveReferral(ref);
+            this.closeModal('modal-referral-action');
+            this.showToast(status === 'completed' ? 'บันทึกผลการดำเนินการ (ประสานสำเร็จ) เรียบร้อยแล้ว 🎉' : 'บันทึกผลการดำเนินการช่วยเหลือเรียบร้อยแล้ว ✅', 'success');
+            this.renderReferrals();
+        });
+
         // Search & Filter Triggers
         document.getElementById('student-search-input')?.addEventListener('input', () => this.renderStudentList());
         document.getElementById('student-grade-filter')?.addEventListener('change', () => this.renderStudentList());
@@ -2275,11 +2314,28 @@ class Application {
                 ? `<div class="ref-reason-box-alert">${ref.reason}</div>`
                 : `<div class="ref-reason-box-normal">${ref.reason}</div>`;
 
-            // Format Status Toggle
+            // History badge if logs exist
+            const logsCount = (ref.actionLogs || []).length;
+            const historyBadge = logsCount > 0
+                ? `<div style="margin-top: 6px;"><button type="button" class="btn btn-sm" style="background: rgba(2,132,199,0.08); border: 1px solid rgba(2,132,199,0.25); color: #0284c7; font-size: 0.76rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;" onclick="app.openReferralActionModal('${ref.id}')" title="ดูประวัติการดำเนินการทั้งหมด"><i class="ri-history-line"></i> ประวัติการช่วยเหลือ (${logsCount})</button></div>`
+                : '';
+
+            // Check permission to process
+            const canProcess = this.canUserProcessReferral(user, ref);
+
+            // Format Status Toggle / Action Button
             const isCompleted = ref.status === 'completed';
-            const statusDisplay = isCompleted
-                ? `<button class="status-toggle-btn status-completed teacher-only" onclick="app.toggleReferralStatus('${ref.id}', 'pending')" title="คลิกเพื่อสลับเป็น รอการดำเนินการ"><i class="ri-checkbox-circle-fill"></i> ประสานสำเร็จ</button>`
-                : `<button class="status-toggle-btn status-pending teacher-only" onclick="app.toggleReferralStatus('${ref.id}', 'completed')" title="คลิกเพื่อสลับเป็น ดำเนินการแล้วเสร็จ"><i class="ri-time-line"></i> รอการดำเนินการ</button>`;
+            let statusDisplay = '';
+
+            if (canProcess) {
+                statusDisplay = isCompleted
+                    ? `<button class="status-toggle-btn status-completed" onclick="app.openReferralActionModal('${ref.id}')" title="คลิกเพื่อบันทึกหรือดูผลการดำเนินการ"><i class="ri-checkbox-circle-fill"></i> ประสานสำเร็จ <span style="font-size:0.75rem; opacity:0.85;">(คลิก)</span></button>`
+                    : `<button class="status-toggle-btn status-pending" onclick="app.openReferralActionModal('${ref.id}')" title="คลิกเพื่อบันทึกวิธีดำเนินการกับเคสนี้"><i class="ri-time-line"></i> รอการดำเนินการ <span style="font-size:0.75rem; opacity:0.85;">(คลิก)</span></button>`;
+            } else {
+                statusDisplay = isCompleted
+                    ? `<button class="status-toggle-btn status-completed" onclick="app.openReferralActionModal('${ref.id}')" style="cursor:pointer;" title="คลิกเพื่อดูประวัติการดำเนินการ"><i class="ri-checkbox-circle-fill"></i> ดำเนินการแล้วเสร็จ</button>`
+                    : `<button class="status-toggle-btn" onclick="app.openReferralActionModal('${ref.id}')" style="background:rgba(245,158,11,0.1); color:#b45309; border:1px dashed rgba(245,158,11,0.4); cursor:pointer;" title="เฉพาะ ${ref.targetAgency || 'ผู้รับส่งต่อ'} เท่านั้นที่สามารถกดดำเนินการได้ (คลิกเพื่อดูประวัติ)"><i class="ri-lock-line"></i> รอ ${ref.targetAgency || 'ผู้รับส่งต่อ'} ดำเนินการ</button>`;
+            }
 
             // Format Student Cell
             const studentInfo = student
@@ -2292,7 +2348,7 @@ class Application {
                 <td>${studentInfo}</td>
                 <td>${typeBadge}</td>
                 <td>${agencyDisplay}</td>
-                <td style="max-width: 320px;">${reasonDisplay}</td>
+                <td style="max-width: 320px;">${reasonDisplay}${historyBadge}</td>
                 <td>${statusDisplay}</td>
                 <td style="color:var(--text-muted); font-size:0.85rem;">${dateStr}</td>
                 <td class="teacher-only" style="white-space: nowrap;">
@@ -2304,6 +2360,160 @@ class Application {
         });
 
         authManager.applyUIPermissions();
+    }
+
+    /**
+     * Check if the current user has permission to process / update status of a referral case
+     */
+    canUserProcessReferral(user, ref) {
+        if (!user || !ref) return false;
+        if (user.role === 'admin') return true;
+
+        const target = (ref.targetAgency || '').toLowerCase();
+        const role = user.role;
+        const uName = (user.name || '').toLowerCase();
+        const uUsername = (user.username || '').toLowerCase();
+
+        // 1. Angel role / name matches
+        if (role === 'angel' || uName.includes('นางฟ้า') || uUsername.includes('angel')) {
+            if (target.includes('นางฟ้า')) return true;
+        }
+
+        // 2. Guidance role / name matches
+        if (role === 'guidance' || uName.includes('แนะแนว') || uUsername.includes('guidance')) {
+            if (target.includes('แนะแนว')) return true;
+        }
+
+        // 3. Hospital role
+        if (role === 'hospital') {
+            if (target.includes('โรงพยาบาล') || target.includes('สาธารณสุข') || target.includes('รพ')) return true;
+        }
+
+        // 4. Police role
+        if (role === 'police') {
+            if (target.includes('ตำรวจ')) return true;
+        }
+
+        // 5. MSDHS (พม.) role
+        if (role === 'msdhs') {
+            if (target.includes('พม') || target.includes('พัฒนาสังคม')) return true;
+        }
+
+        // 6. Teacher / Personnel role if target is general school staff / student affairs
+        if (role === 'teacher') {
+            if (target.includes('ฝ่ายปกครอง') || target.includes('กิจการนักเรียน') || target.includes('ครูประจำชั้น')) return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Open Referral Action Modal (for processing action & viewing history)
+     */
+    openReferralActionModal(refId) {
+        const referrals = firebaseService.getReferrals();
+        const ref = referrals.find(r => r.id === refId);
+        if (!ref) return;
+
+        const students = firebaseService.getStudents();
+        const student = students.find(s => s.studentId === ref.studentId || s.id === ref.studentId);
+        const user = authManager.getCurrentUser();
+        const canProcess = this.canUserProcessReferral(user, ref);
+
+        // Fill hidden ID
+        const idInput = document.getElementById('action-ref-id');
+        if (idInput) idInput.value = refId;
+
+        // Fill Summary Box
+        const summaryBox = document.getElementById('action-ref-summary-box');
+        if (summaryBox) {
+            const isInternal = ref.type === 'internal';
+            summaryBox.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+                    <div>
+                        <strong style="font-size: 1.05rem; color: #0284c7;">${student ? `${student.prefix || ''}${student.fullName}` : ref.studentName}</strong>
+                        <span style="font-size: 0.85rem; color: var(--text-muted); margin-left: 6px;">(${student ? `${student.grade}/${student.room}` : ''} รหัส ${student ? (student.studentId || ref.studentId) : ref.studentId})</span>
+                    </div>
+                    <span class="badge ${isInternal ? 'badge-internal-pill' : 'badge-external-pill'}">${isInternal ? '🏫 ส่งต่อภายใน' : '🏥 ส่งต่อภายนอก'}</span>
+                </div>
+                <div style="font-size: 0.88rem; color: var(--text-body); margin-bottom: 6px;">
+                    <strong>หน่วยงาน / ผู้รับส่งต่อที่มอบหมาย:</strong> <span style="color: #4f46e5; font-weight: 700;">${ref.targetAgency || '-'}</span>
+                </div>
+                <div style="font-size: 0.86rem; color: var(--text-muted); background: var(--bg-card); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-light); line-height: 1.4;">
+                    <strong>เหตุผลการส่งต่อ:</strong> ${ref.reason}
+                </div>
+            `;
+        }
+
+        // Fill History List
+        const historyList = document.getElementById('action-ref-history-list');
+        if (historyList) {
+            const logs = ref.actionLogs || [];
+            if (logs.length === 0) {
+                historyList.innerHTML = `
+                    <div style="text-align: center; color: var(--text-muted); padding: 18px; background: var(--bg-card); border-radius: 12px; border: 1px dashed var(--border-light); font-size: 0.88rem;">
+                        <i class="ri-history-line" style="font-size: 1.6rem; display: block; margin-bottom: 4px; color: var(--text-dim);"></i>
+                        ยังไม่มีบันทึกประวัติการดำเนินการช่วยเหลือสำหรับเคสนี้
+                    </div>
+                `;
+            } else {
+                historyList.innerHTML = logs.map(log => {
+                    const isComp = log.status === 'completed';
+                    const statusBadge = isComp
+                        ? `<span class="badge" style="background: rgba(16,185,129,0.15); color: #047857; font-size: 0.76rem; font-weight: 700; border-radius: 6px; padding: 2px 8px;"><i class="ri-checkbox-circle-fill"></i> ดำเนินการแล้วเสร็จ</span>`
+                        : `<span class="badge" style="background: rgba(245,158,11,0.15); color: #b45309; font-size: 0.76rem; font-weight: 700; border-radius: 6px; padding: 2px 8px;"><i class="ri-time-line"></i> กำลังดำเนินการ</span>`;
+                    const dateStr = log.actionDate ? new Date(log.actionDate).toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+
+                    return `
+                        <div style="background: var(--bg-card); border: 1px solid var(--border-light); border-left: 4px solid ${isComp ? '#10b981' : '#f59e0b'}; border-radius: 10px; padding: 12px 14px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+                                <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-heading); display: flex; align-items: center; gap: 6px;">
+                                    <span>👤 ${log.actionBy}</span>
+                                    <span style="font-weight: 400; color: var(--text-muted); font-size: 0.8rem;">(${log.actionRole || 'ผู้ดำเนินการ'})</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    ${statusBadge}
+                                    <span style="font-size: 0.78rem; color: var(--text-muted);"><i class="ri-calendar-line"></i> ${dateStr}</span>
+                                </div>
+                            </div>
+                            <div style="font-size: 0.88rem; color: var(--text-body); line-height: 1.45; white-space: pre-wrap;">${log.notes}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // Toggle New Action Form vs Readonly notice based on permission
+        const inputSection = document.getElementById('action-ref-input-section');
+        const readonlyNotice = document.getElementById('action-ref-readonly-notice');
+        const readonlyText = document.getElementById('action-ref-readonly-text');
+        const btnSave = document.getElementById('btn-save-referral-action');
+
+        if (canProcess) {
+            if (inputSection) inputSection.style.display = 'block';
+            if (readonlyNotice) readonlyNotice.style.display = 'none';
+            if (btnSave) btnSave.style.display = '';
+
+            const statusSelect = document.getElementById('action-ref-status');
+            if (statusSelect) statusSelect.value = ref.status || 'pending';
+
+            const notesInput = document.getElementById('action-ref-notes');
+            if (notesInput) notesInput.value = '';
+
+            const byInput = document.getElementById('action-ref-by');
+            if (byInput) byInput.value = `${user?.name || 'ผู้รับส่งต่อ'} (${user?.roleTitle || user?.role || 'เจ้าหน้าที่'})`;
+        } else {
+            if (inputSection) inputSection.style.display = 'none';
+            if (readonlyNotice) {
+                readonlyNotice.style.display = 'flex';
+                if (readonlyText) {
+                    readonlyText.innerHTML = `🔒 คุณกำลังเปิดดูข้อมูลเคสนี้ใน<strong>โหมดดูข้อมูล</strong> (เฉพาะ <strong>${ref.targetAgency || 'ผู้รับส่งต่อ'}</strong> เท่านั้นที่สามารถกดดำเนินการและเปลี่ยนสถานะเคสนี้ได้)`;
+                }
+            }
+            if (btnSave) btnSave.style.display = 'none';
+        }
+
+        this.openModal('modal-referral-action');
     }
 
     switchReferralFilterTab(tabName = 'all') {
