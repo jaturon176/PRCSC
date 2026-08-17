@@ -2503,18 +2503,18 @@ class Application {
         if (summaryBox) {
             const isInternal = ref.type === 'internal';
             summaryBox.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 5px;">
                     <div>
-                        <strong style="font-size: 1.05rem; color: #0284c7;">${student ? `${student.prefix || ''}${student.fullName}` : ref.studentName}</strong>
-                        <span style="font-size: 0.85rem; color: var(--text-muted); margin-left: 6px;">(${student ? `${student.grade}/${student.room}` : ''} รหัส ${student ? (student.studentId || ref.studentId) : ref.studentId})</span>
+                        <strong style="font-size: 0.98rem; color: #0284c7;">${student ? `${student.prefix || ''}${student.fullName}` : ref.studentName}</strong>
+                        <span style="font-size: 0.82rem; color: var(--text-muted); margin-left: 4px;">(${student ? `${student.grade}/${student.room}` : ''} รหัส ${student ? (student.studentId || ref.studentId) : ref.studentId})</span>
                     </div>
-                    <span class="badge ${isInternal ? 'badge-internal-pill' : 'badge-external-pill'}">${isInternal ? '🏫 ส่งต่อภายใน' : '🏥 ส่งต่อภายนอก'}</span>
+                    <span class="badge ${isInternal ? 'badge-internal-pill' : 'badge-external-pill'}" style="font-size: 0.74rem; padding: 2px 8px;">${isInternal ? '🏫 ส่งต่อภายใน' : '🏥 ส่งต่อภายนอก'}</span>
                 </div>
-                <div style="font-size: 0.88rem; color: var(--text-body); margin-bottom: 6px;">
-                    <strong>หน่วยงาน / ผู้รับส่งต่อที่มอบหมาย:</strong> <span style="color: #4f46e5; font-weight: 700;">${ref.targetAgency || '-'}</span>
+                <div style="font-size: 0.82rem; color: var(--text-body); margin-bottom: 4px;">
+                    <strong>ผู้รับส่งต่อ:</strong> <span style="color: #4f46e5; font-weight: 700;">${ref.targetAgency || '-'}</span>
                 </div>
-                <div style="font-size: 0.86rem; color: var(--text-muted); background: var(--bg-card); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-light); line-height: 1.4;">
-                    <strong>เหตุผลการส่งต่อ:</strong> ${ref.reason}
+                <div style="font-size: 0.80rem; color: var(--text-muted); background: var(--bg-card); padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border-light); line-height: 1.35;">
+                    <strong>สาเหตุ:</strong> ${ref.reason}
                 </div>
             `;
         }
@@ -2525,8 +2525,8 @@ class Application {
             const logs = ref.actionLogs || [];
             if (logs.length === 0) {
                 historyList.innerHTML = `
-                    <div style="text-align: center; color: var(--text-muted); padding: 18px; background: var(--bg-card); border-radius: 12px; border: 1px dashed var(--border-light); font-size: 0.88rem;">
-                        <i class="ri-history-line" style="font-size: 1.6rem; display: block; margin-bottom: 4px; color: var(--text-dim);"></i>
+                    <div style="text-align: center; color: var(--text-muted); padding: 10px 14px; background: var(--bg-card); border-radius: 10px; border: 1px dashed var(--border-light); font-size: 0.82rem;">
+                        <i class="ri-history-line" style="font-size: 1.1rem; vertical-align: middle; margin-right: 4px; color: var(--text-dim);"></i>
                         ยังไม่มีบันทึกประวัติการดำเนินการช่วยเหลือสำหรับเคสนี้
                     </div>
                 `;
@@ -2534,23 +2534,23 @@ class Application {
                 historyList.innerHTML = logs.map(log => {
                     const isComp = log.status === 'completed';
                     const statusBadge = isComp
-                        ? `<span class="badge" style="background: rgba(16,185,129,0.15); color: #047857; font-size: 0.76rem; font-weight: 700; border-radius: 6px; padding: 2px 8px;"><i class="ri-checkbox-circle-fill"></i> ดำเนินการแล้วเสร็จ</span>`
-                        : `<span class="badge" style="background: rgba(245,158,11,0.15); color: #b45309; font-size: 0.76rem; font-weight: 700; border-radius: 6px; padding: 2px 8px;"><i class="ri-time-line"></i> กำลังดำเนินการ</span>`;
-                    const dateStr = log.actionDate ? new Date(log.actionDate).toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' }) : '-';
+                        ? `<span class="badge" style="background: rgba(16,185,129,0.15); color: #047857; font-size: 0.74rem; font-weight: 700; border-radius: 6px; padding: 2px 6px;"><i class="ri-checkbox-circle-fill"></i> ดำเนินการแล้วเสร็จ</span>`
+                        : `<span class="badge" style="background: rgba(245,158,11,0.15); color: #b45309; font-size: 0.74rem; font-weight: 700; border-radius: 6px; padding: 2px 6px;"><i class="ri-time-line"></i> กำลังดำเนินการ</span>`;
+                    const dateStr = log.actionDate ? new Date(log.actionDate).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }) : '-';
 
                     return `
-                        <div style="background: var(--bg-card); border: 1px solid var(--border-light); border-left: 4px solid ${isComp ? '#10b981' : '#f59e0b'}; border-radius: 10px; padding: 12px 14px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
-                                <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-heading); display: flex; align-items: center; gap: 6px;">
+                        <div style="background: var(--bg-card); border: 1px solid var(--border-light); border-left: 3px solid ${isComp ? '#10b981' : '#f59e0b'}; border-radius: 8px; padding: 8px 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; flex-wrap: wrap; gap: 4px;">
+                                <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-heading); display: flex; align-items: center; gap: 4px;">
                                     <span>👤 ${log.actionBy}</span>
-                                    <span style="font-weight: 400; color: var(--text-muted); font-size: 0.8rem;">(${log.actionRole || 'ผู้ดำเนินการ'})</span>
+                                    <span style="font-weight: 400; color: var(--text-muted); font-size: 0.76rem;">(${log.actionRole || 'ผู้ดำเนินการ'})</span>
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="display: flex; align-items: center; gap: 6px;">
                                     ${statusBadge}
-                                    <span style="font-size: 0.78rem; color: var(--text-muted);"><i class="ri-calendar-line"></i> ${dateStr}</span>
+                                    <span style="font-size: 0.74rem; color: var(--text-muted);"><i class="ri-calendar-line"></i> ${dateStr}</span>
                                 </div>
                             </div>
-                            <div style="font-size: 0.88rem; color: var(--text-body); line-height: 1.45; white-space: pre-wrap;">${log.notes}</div>
+                            <div style="font-size: 0.84rem; color: var(--text-body); line-height: 1.4; white-space: pre-wrap;">${log.notes}</div>
                         </div>
                     `;
                 }).join('');

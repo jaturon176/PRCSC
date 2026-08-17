@@ -19,8 +19,8 @@
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Custom Design System v5.3 -->
-    <link rel="stylesheet" href="css/style.css?v=5.3">
+    <!-- Custom Design System v5.4 -->
+    <link rel="stylesheet" href="css/style.css?v=5.4">
 </head>
 <body data-theme="indigo">
     <!-- DEDICATED FULLSCREEN LOGIN PAGE (Matching User Reference Image Design) -->
@@ -1764,60 +1764,60 @@
 
     <!-- Modal 7.1: Referral Action & History (บันทึกผลการดำเนินการและดูประวัติการช่วยเหลือ) -->
     <div class="modal-overlay" id="modal-referral-action">
-        <div class="modal-content" style="max-width: 650px;">
-            <div class="modal-header">
+        <div class="modal-content" style="max-width: 620px;">
+            <div class="modal-header" style="padding: 16px 22px 14px;">
                 <h3><i class="ri-heart-pulse-line" style="color: #0284c7;"></i> ดำเนินการช่วยเหลือ & ประวัติการส่งต่อ</h3>
                 <button class="btn-close" onclick="app.closeModal('modal-referral-action')">&times;</button>
             </div>
             <form id="form-referral-action">
                 <input type="hidden" id="action-ref-id">
-                <div class="modal-body" style="max-height: 75vh; overflow-y: auto;">
+                <div class="modal-body" style="padding: 16px 20px;">
                     <!-- Case Summary Header -->
-                    <div id="action-ref-summary-box" style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: 14px; padding: 14px 16px; margin-bottom: 18px;">
+                    <div id="action-ref-summary-box" style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: 12px; padding: 10px 14px; margin-bottom: 12px;">
                         <!-- Dynamically filled with student name, agency, referral reason -->
                     </div>
 
                     <!-- History Timeline Feed -->
-                    <div style="margin-bottom: 20px;">
-                        <h4 style="font-size: 0.98rem; font-weight: 700; color: var(--text-heading); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                    <div style="margin-bottom: 14px;">
+                        <h4 style="font-size: 0.90rem; font-weight: 700; color: var(--text-heading); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
                             <i class="ri-history-line" style="color: #6366f1;"></i> ประวัติบันทึกการดำเนินการช่วยเหลือที่ผ่านมา
                         </h4>
-                        <div id="action-ref-history-list" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div id="action-ref-history-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; padding-right: 2px;">
                             <!-- Dynamically filled with previous action logs -->
                         </div>
                     </div>
 
                     <!-- Permission Notice if read-only -->
-                    <div id="action-ref-readonly-notice" style="display: none; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 12px; padding: 12px 14px; font-size: 0.88rem; color: #b45309; align-items: center; gap: 8px;">
-                        <i class="ri-lock-line" style="font-size: 1.2rem; flex-shrink: 0;"></i>
+                    <div id="action-ref-readonly-notice" style="display: none; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 10px 12px; font-size: 0.84rem; color: #b45309; align-items: center; gap: 8px; margin-bottom: 8px;">
+                        <i class="ri-lock-line" style="font-size: 1.1rem; flex-shrink: 0;"></i>
                         <span id="action-ref-readonly-text">เฉพาะผู้รับส่งต่อเท่านั้นที่สามารถบันทึกผลการดำเนินการได้</span>
                     </div>
 
                     <!-- New Action Form (Shown only if user has permission to edit) -->
-                    <div id="action-ref-input-section" style="background: rgba(2, 132, 199, 0.04); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 14px; padding: 16px;">
-                        <h4 style="font-size: 0.98rem; font-weight: 700; color: #0284c7; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                    <div id="action-ref-input-section" style="background: rgba(2, 132, 199, 0.04); border: 1px solid rgba(2, 132, 199, 0.2); border-radius: 12px; padding: 12px 14px;">
+                        <h4 style="font-size: 0.90rem; font-weight: 700; color: #0284c7; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
                             <i class="ri-edit-2-line"></i> บันทึกผลการดำเนินการครั้งใหม่
                         </h4>
-                        <div class="form-group">
-                            <label class="form-label">ปรับสถานะเคส *</label>
-                            <select class="form-select" id="action-ref-status" required>
+                        <div class="form-group" style="margin-bottom: 10px;">
+                            <label class="form-label" style="font-size: 0.82rem; margin-bottom: 3px; font-weight: 700;">ปรับสถานะเคส *</label>
+                            <select class="form-select" id="action-ref-status" required style="padding: 7px 10px; font-size: 0.88rem; border-radius: 8px;">
                                 <option value="pending">⏳ อยู่ระหว่างดำเนินการช่วยเหลือ / ติดตามผล</option>
                                 <option value="completed">✅ ดำเนินการแล้วเสร็จ</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">วิธี / รายละเอียดที่ดำเนินการกับเคสนี้ *</label>
-                            <textarea class="form-control" id="action-ref-notes" rows="3" required placeholder="ระบุวิธีการช่วยเหลือ เช่น ให้คำปรึกษาเชิงจิตวิทยา 2 ครั้ง, ส่งตรวจพบจิตแพทย์เด็ก รพ.พนมดงรัก, เยี่ยมบ้านประสานผู้ปกครองร่วมวางแผนดูแล..."></textarea>
+                        <div class="form-group" style="margin-bottom: 10px;">
+                            <label class="form-label" style="font-size: 0.82rem; margin-bottom: 3px; font-weight: 700;">วิธี / รายละเอียดที่ดำเนินการกับเคสนี้ *</label>
+                            <textarea class="form-control" id="action-ref-notes" rows="2" required placeholder="ระบุวิธีการช่วยเหลือ เช่น ให้คำปรึกษาเชิงจิตวิทยา 2 ครั้ง, ส่งต่อแพทย์ตรวจวินิจฉัย..." style="padding: 8px 10px; font-size: 0.88rem; border-radius: 8px; line-height: 1.4;"></textarea>
                         </div>
                         <div class="form-group" style="margin-bottom: 0;">
-                            <label class="form-label">ผู้บันทึกผลการดำเนินการ</label>
-                            <input type="text" class="form-control" id="action-ref-by" readonly style="background: var(--bg-card);">
+                            <label class="form-label" style="font-size: 0.82rem; margin-bottom: 3px; font-weight: 700;">ผู้บันทึกผลการดำเนินการ</label>
+                            <input type="text" class="form-control" id="action-ref-by" readonly style="background: var(--bg-card); padding: 6px 10px; font-size: 0.84rem; border-radius: 8px;">
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="app.closeModal('modal-referral-action')">ปิดหน้าต่าง</button>
-                    <button type="submit" class="btn btn-primary" id="btn-save-referral-action"><i class="ri-save-line"></i> บันทึกผลการดำเนินการ</button>
+                <div class="modal-footer" style="padding: 12px 20px 16px;">
+                    <button type="button" class="btn btn-secondary" onclick="app.closeModal('modal-referral-action')" style="padding: 8px 16px; font-size: 0.90rem;">ปิดหน้าต่าง</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-referral-action" style="padding: 8px 18px; font-size: 0.90rem;"><i class="ri-save-line"></i> บันทึกผลการดำเนินการ</button>
                 </div>
             </form>
         </div>
@@ -2061,12 +2061,12 @@
     </div>
 
     <!-- Load Application Scripts -->
-    <script src="js/config.js?v=5.3"></script>
-    <script src="js/firebase-service.js?v=5.3"></script>
-    <script src="js/cloudinary-service.js?v=5.3"></script>
-    <script src="js/pdf-generator.js?v=5.3"></script>
-    <script src="js/csv-importer.js?v=5.3"></script>
-    <script src="js/auth.js?v=5.3"></script>
-    <script src="js/app.js?v=5.3"></script>
+    <script src="js/config.js?v=5.4"></script>
+    <script src="js/firebase-service.js?v=5.4"></script>
+    <script src="js/cloudinary-service.js?v=5.4"></script>
+    <script src="js/pdf-generator.js?v=5.4"></script>
+    <script src="js/csv-importer.js?v=5.4"></script>
+    <script src="js/auth.js?v=5.4"></script>
+    <script src="js/app.js?v=5.4"></script>
 </body>
 </html>
