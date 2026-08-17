@@ -19,56 +19,100 @@
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Custom Design System v4.3 -->
-    <link rel="stylesheet" href="css/style.css?v=4.3">
+    <!-- Custom Design System v4.4 -->
+    <link rel="stylesheet" href="css/style.css?v=4.4">
 </head>
 <body data-theme="indigo">
-    <!-- DEDICATED FULLSCREEN LOGIN PAGE (Matching User Reference Image Design) -->
+    <!-- DEDICATED FULLSCREEN LOGIN PAGE WITH DYNAMIC ANIMATIONS -->
     <div id="login-screen-view">
+        <!-- Animated Background Gradient Orbs -->
+        <div class="login-bg-orb orb-1"></div>
+        <div class="login-bg-orb orb-2"></div>
+        <div class="login-bg-orb orb-3"></div>
+        <div class="login-bg-orb orb-4"></div>
+        <div class="login-bg-grid-overlay"></div>
+
         <div class="login-card">
+            <!-- Flowing Neon Border Light Stream -->
+            <div class="login-card-border-glow"></div>
+
             <!-- Left Branding & Feature Highlights Side -->
             <div class="login-left-banner">
+                <div class="login-live-chip">
+                    <span class="live-dot-pulse"></span>
+                    <span>ONLINE REALTIME CLOUD SYSTEM</span>
+                </div>
+
                 <div class="login-logo-wrapper">
+                    <div class="login-logo-halo"></div>
                     <img src="assets/logo_prcare.png" alt="PR Care+ Logo" class="login-logo-img">
                 </div>
+
                 <h1 class="login-title-main">PR Care+</h1>
                 <div class="login-title-sub">ระบบดูแลช่วยเหลือนักเรียน<br>โรงเรียนพนมดงรักวิทยา</div>
 
                 <div class="login-divider"></div>
 
-                <div class="login-features-header">✨ คุณสมบัติเด่นของระบบ</div>
+                <div class="login-features-header">
+                    <span class="sparkle-icon">✨</span>
+                    <span>คุณสมบัติเด่นของระบบ</span>
+                </div>
 
-                <div class="login-feature-item">
-                    <i class="ri-heart-pulse-line" style="color: #38bdf8; font-size: 1.2rem;"></i>
-                    <span>ระบบคัดกรองและประเมินพฤติกรรมเสี่ยง 4 ด้าน</span>
-                </div>
-                <div class="login-feature-item">
-                    <i class="ri-award-line" style="color: #34d399; font-size: 1.2rem;"></i>
-                    <span>บันทึกส่งเสริมความดีและกิจกรรมสาธารณประโยชน์</span>
-                </div>
-                <div class="login-feature-item">
-                    <i class="ri-shield-flash-line" style="color: #f87171; font-size: 1.2rem;"></i>
-                    <span>ป้องกัน แก้ปัญหาพฤติกรรม พร้อมอัปโหลดหลักฐาน</span>
-                </div>
-                <div class="login-feature-item">
-                    <i class="ri-file-pdf-line" style="color: #fbbf24; font-size: 1.2rem;"></i>
-                    <span>ออกรายงาน PDF ภาษาไทยทางการ & ส่งต่อ (ภายใน/ภายนอก)</span>
+                <div class="login-features-list">
+                    <div class="login-feature-item feat-screening">
+                        <div class="feat-icon-box"><i class="ri-heart-pulse-fill"></i></div>
+                        <div class="feat-content">
+                            <strong>ระบบคัดกรอง 4 ด้าน & PHQ-A</strong>
+                            <span>ประเมินพฤติกรรมเสี่ยงและสุขภาพจิต</span>
+                        </div>
+                        <div class="feat-light-glimmer"></div>
+                    </div>
+
+                    <div class="login-feature-item feat-promotion">
+                        <div class="feat-icon-box"><i class="ri-award-fill"></i></div>
+                        <div class="feat-content">
+                            <strong>ส่งเสริมความดีและจิตอาสา</strong>
+                            <span>บันทึกชั่วโมงและสะสมคะแนนกิจกรรม</span>
+                        </div>
+                        <div class="feat-light-glimmer"></div>
+                    </div>
+
+                    <div class="login-feature-item feat-prevention">
+                        <div class="feat-icon-box"><i class="ri-shield-flash-fill"></i></div>
+                        <div class="feat-content">
+                            <strong>ป้องกันและแก้ไขปัญหา</strong>
+                            <span>บันทึกพฤติกรรมพร้อมหลักฐานภาพถ่าย</span>
+                        </div>
+                        <div class="feat-light-glimmer"></div>
+                    </div>
+
+                    <div class="login-feature-item feat-reports">
+                        <div class="feat-icon-box"><i class="ri-file-pdf-2-fill"></i></div>
+                        <div class="feat-content">
+                            <strong>รายงาน PDF & ส่งต่อสหวิชาชีพ</strong>
+                            <span>เอกสารทางการและส่งต่อ รพ./ตำรวจ/พม.</span>
+                        </div>
+                        <div class="feat-light-glimmer"></div>
+                    </div>
                 </div>
 
                 <div class="login-banner-copyright">
-                    © 2026 PR-Care+ Developed by Krunoii <span id="app-login-banner-version" class="version-pill-badge">(v3.3)</span>
+                    © 2026 PR-Care+ Developed by Krunoii <span id="app-login-banner-version" class="version-pill-badge">(v4.4)</span>
                 </div>
             </div>
 
             <!-- Right Form Side -->
             <div class="login-right-form">
                 <!-- Login Icon & Header (centered) -->
-                <div style="text-align: center; margin-bottom: 24px;">
-                    <div style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border-radius: 20px; background: linear-gradient(135deg, #0284c7 0%, #6366f1 100%); box-shadow: 0 8px 24px rgba(99,102,241,0.25); margin-bottom: 14px;">
-                        <i class="ri-login-circle-line" style="font-size: 2rem; color: #fff;"></i>
+                <div class="login-header-group">
+                    <div class="login-avatar-ring">
+                        <div class="login-avatar-conic"></div>
+                        <div class="login-avatar-inner">
+                            <i class="ri-login-circle-fill"></i>
+                        </div>
                     </div>
-                    <h2 class="login-form-heading" style="text-align: center; margin: 0 0 6px 0;">เข้าสู่ระบบ</h2>
-                    <div class="login-form-subheading" style="text-align: center; font-size: 0.88rem;">กรอกชื่อผู้ใช้และรหัสผ่านเพื่อเข้าใช้งานระบบ PR Care+</div>
+                    <h2 class="login-form-heading">เข้าสู่ระบบ</h2>
+                    <div class="login-form-subheading">กรอกชื่อผู้ใช้และรหัสผ่านเพื่อเข้าใช้งานระบบ PR Care+</div>
                 </div>
 
                 <form id="standalone-login-form">
@@ -76,39 +120,60 @@
 
                     <div class="light-field-group">
                         <label class="light-field-label" id="page-login-user-label">
-                            <i class="ri-user-3-line" style="color: #0284c7;"></i> ชื่อผู้ใช้งาน (Username)
+                            <i class="ri-user-3-fill" style="color: #0284c7;"></i> ชื่อผู้ใช้งาน (Username)
                         </label>
                         <div class="light-field-input-wrap">
-                            <input type="text" class="light-field-input" id="page-login-user" placeholder="เบอร์โทรศัพท์ (ครู) / รหัสนักเรียน / Admin" required>
+                            <input type="text" class="light-field-input" id="page-login-user" placeholder="เบอร์โทรศัพท์ (ครู) / รหัสนักเรียน / Admin" required autocomplete="username">
+                            <div class="field-focus-line"></div>
                         </div>
                     </div>
 
                     <div class="light-field-group">
                         <label class="light-field-label" id="page-login-pass-label">
-                            <i class="ri-lock-2-line" style="color: #0284c7;"></i> รหัสผ่าน (Password)
+                            <i class="ri-lock-2-fill" style="color: #0284c7;"></i> รหัสผ่าน (Password)
                         </label>
                         <div class="light-field-input-wrap">
-                            <input type="password" class="light-field-input" id="page-login-pass" placeholder="เบอร์โทรศัพท์ (ครู) / รหัสนักเรียน / Admin" required>
-                            <button type="button" class="password-toggle-btn" onclick="app.togglePasswordVisibility('page-login-pass', this)"><i class="ri-eye-line"></i></button>
+                            <input type="password" class="light-field-input" id="page-login-pass" placeholder="เบอร์โทรศัพท์ (ครู) / รหัสนักเรียน / Admin" required autocomplete="current-password">
+                            <button type="button" class="password-toggle-btn" onclick="app.togglePasswordVisibility('page-login-pass', this)" title="แสดง/ซ่อนรหัสผ่าน">
+                                <i class="ri-eye-line"></i>
+                            </button>
+                            <div class="field-focus-line"></div>
                         </div>
                     </div>
 
-                    <div id="login-role-hint-badge" style="background: rgba(2, 132, 199, 0.07); border: 1px solid rgba(2, 132, 199, 0.18); border-radius: 10px; padding: 10px 14px; font-size: 0.82rem; color: #0369a1; margin-bottom: 18px; line-height: 1.6;">
-                        <div style="font-weight: 700; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                            <i class="ri-information-fill" style="color: #0284c7; font-size: 1rem;"></i> รูปแบบการลงชื่อเข้าใช้งาน:
+                    <!-- Guidelines Banner -->
+                    <div class="login-guidelines-box" id="login-role-hint-badge">
+                        <div class="guide-header">
+                            <i class="ri-information-fill"></i>
+                            <span>คำแนะนำการลงชื่อเข้าใช้งาน:</span>
                         </div>
-                        • <strong>ครู / บุคลากร:</strong> ใช้ <u>เบอร์โทรศัพท์</u> เป็นชื่อผู้ใช้และรหัสผ่าน<br>
-                        • <strong>นักเรียน:</strong> ใช้ <u>รหัสประจำตัวนักเรียน</u> เป็นชื่อผู้ใช้และรหัสผ่าน
+                        <div class="guide-grid">
+                            <div class="guide-item">
+                                <span class="guide-role-badge badge-teacher">👨‍🏫 ครู / บุคลากร</span>
+                                <span class="guide-desc">ใช้ <u>เบอร์โทรศัพท์</u></span>
+                            </div>
+                            <div class="guide-item">
+                                <span class="guide-role-badge badge-student">🎓 นักเรียน</span>
+                                <span class="guide-desc">ใช้ <u>รหัสประจำตัว</u></span>
+                            </div>
+                            <div class="guide-item">
+                                <span class="guide-role-badge badge-partner">🏥 ภายนอก / Admin</span>
+                                <span class="guide-desc">ใช้ <u>Username ที่ได้รับ</u></span>
+                            </div>
+                        </div>
                     </div>
 
                     <button type="submit" class="btn-signin-submit">
-                        <i class="ri-login-circle-line"></i> เข้าสู่ระบบ (Sign In)
+                        <span class="btn-sheen-stream"></span>
+                        <i class="ri-login-circle-line"></i>
+                        <span>เข้าสู่ระบบ (Sign In)</span>
                     </button>
                 </form>
 
-                <div class="login-security-badge" style="justify-content: center; margin-top: 20px;">
-                    <i class="ri-shield-check-line" style="color: #0284c7;"></i>
-                    <span style="font-size: 0.78rem; color: var(--text-muted);">256-Bit Encrypted Realtime Cloud Security System (Firebase DB)</span>
+                <div class="login-security-badge">
+                    <div class="security-dot-pulse"></div>
+                    <i class="ri-shield-check-fill" style="color: #10b981;"></i>
+                    <span>256-Bit Encrypted Realtime Cloud Security System (Firebase DB)</span>
                 </div>
             </div>
         </div>
@@ -1836,12 +1901,12 @@
     </div>
 
     <!-- Load Application Scripts -->
-    <script src="js/config.js?v=4.3"></script>
-    <script src="js/firebase-service.js?v=4.3"></script>
-    <script src="js/cloudinary-service.js?v=4.3"></script>
-    <script src="js/pdf-generator.js?v=4.3"></script>
-    <script src="js/csv-importer.js?v=4.3"></script>
-    <script src="js/auth.js?v=4.3"></script>
-    <script src="js/app.js?v=4.3"></script>
+    <script src="js/config.js?v=4.4"></script>
+    <script src="js/firebase-service.js?v=4.4"></script>
+    <script src="js/cloudinary-service.js?v=4.4"></script>
+    <script src="js/pdf-generator.js?v=4.4"></script>
+    <script src="js/csv-importer.js?v=4.4"></script>
+    <script src="js/auth.js?v=4.4"></script>
+    <script src="js/app.js?v=4.4"></script>
 </body>
 </html>
