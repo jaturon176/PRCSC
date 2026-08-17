@@ -827,6 +827,9 @@ class Application {
                 }
             }
 
+            const refType = document.getElementById('offense-referral').value;
+            const refAgency = refType !== 'none' ? document.getElementById('offense-agency')?.value : '';
+
             const offense = {
                 studentId: student ? student.studentId : studentId,
                 studentName: student ? `${student.prefix || ''}${student.fullName}` : 'ไม่ระบุชื่อ',
@@ -838,7 +841,8 @@ class Application {
                 incidentDate: document.getElementById('offense-date').value || new Date().toISOString().slice(0, 10),
                 description: document.getElementById('offense-desc').value.trim(),
                 actionTaken: document.getElementById('offense-action').value.trim(),
-                referralType: document.getElementById('offense-referral').value,
+                referralType: refType,
+                referralAgency: refAgency,
                 imageUrl: imageUrl,
                 recordedBy: authManager.getCurrentUser()?.name || 'ครูกิจการนักเรียน'
             };
@@ -847,18 +851,56 @@ class Application {
 
             // If referral selected, create referral record automatically
             if (offense.referralType !== 'none') {
+                const targetAgencyName = offense.referralAgency || (offense.referralType === 'internal' ? 'ครูกิจการนักเรียน' : 'โรงพยาบาลพนมดงรัก');
                 await firebaseService.saveReferral({
                     studentId: offense.studentId,
                     studentName: offense.studentName,
                     type: offense.referralType,
-                    reason: `กระทำความผิดระดับ ${offense.level}: ${offense.category}`,
+                    reason: `กระทำความผิดระดับ ${offense.level}: ${offense.category}${offense.description ? ` (${offense.description})` : ''}`,
                     status: 'pending',
-                    targetAgency: offense.referralType === 'internal' ? 'ครูแนะแนว/ฝ่ายปกครอง' : 'สถานีตำรวจ/สาธารณสุข'
+                    targetAgency: targetAgencyName,
+                    createdAt: new Date().toISOString()
                 });
+                this.renderReferrals();
             }
 
             this.closeModal('modal-offense');
             this.showToast('บันทึกข้อมูลการกระทำผิดเรียบร้อยแล้ว 🚨', 'success');
+        });
+
+        // Offense Referral Type Change -> Dynamic Agency Dropdown
+        document.getElementById('offense-referral')?.addEventListener('change', (e) => {
+            const val = e.target.value;
+            const groupEl = document.getElementById('offense-agency-group');
+            const agencySelect = document.getElementById('offense-agency');
+            if (!groupEl || !agencySelect) return;
+
+            if (val === 'none') {
+                groupEl.style.display = 'none';
+                agencySelect.innerHTML = '';
+            } else {
+                groupEl.style.display = 'block';
+                agencySelect.innerHTML = '';
+                const options = val === 'internal'
+                    ? [
+                        { value: 'ครูกิจการนักเรียน', label: '👮 1. ครูกิจการนักเรียน' },
+                        { value: 'ครูแนะแนว', label: '👩‍🏫 2. ครูแนะแนว' },
+                        { value: 'ครูนางฟ้า', label: '🧚‍♀️ 3. ครูนางฟ้า' }
+                    ]
+                    : [
+                        { value: 'โรงพยาบาลพนมดงรัก', label: '🏥 1. โรงพยาบาลพนมดงรัก' },
+                        { value: 'สาธารณสุข', label: '🩺 2. สาธารณสุข' },
+                        { value: 'พม.', label: '🏛️ 3. พม. (พัฒนาสังคมและความมั่นคงของมนุษย์)' },
+                        { value: 'สถานีตำรวจ', label: '👮 4. สถานีตำรวจ' }
+                    ];
+
+                options.forEach(opt => {
+                    const optEl = document.createElement('option');
+                    optEl.value = opt.value;
+                    optEl.textContent = opt.label;
+                    agencySelect.appendChild(optEl);
+                });
+            }
         });
 
         // Merit Activity Submit
@@ -2068,14 +2110,16 @@ class Application {
 
         if (type === 'internal') {
             options = [
-                { value: 'ครูแนะแนว', label: '👩‍🏫 1. ครูแนะแนว' },
-                { value: 'ครูนางฟ้า', label: '🧚‍♀️ 2. ครูนางฟ้า' }
+                { value: 'ครูกิจการนักเรียน', label: '👮 1. ครูกิจการนักเรียน' },
+                { value: 'ครูแนะแนว', label: '👩‍🏫 2. ครูแนะแนว' },
+                { value: 'ครูนางฟ้า', label: '🧚‍♀️ 3. ครูนางฟ้า' }
             ];
         } else {
             options = [
                 { value: 'โรงพยาบาลพนมดงรัก', label: '🏥 1. โรงพยาบาลพนมดงรัก' },
                 { value: 'สาธารณสุข', label: '🩺 2. สาธารณสุข' },
-                { value: 'พม.', label: '🏛️ 3. พม. (พัฒนาสังคมและความมั่นคงของมนุษย์)' }
+                { value: 'พม.', label: '🏛️ 3. พม. (พัฒนาสังคมและความมั่นคงของมนุษย์)' },
+                { value: 'สถานีตำรวจ', label: '👮 4. สถานีตำรวจ' }
             ];
         }
 
@@ -2326,8 +2370,10 @@ class Application {
 
             // Format Agency Pill / Icon
             let agencyIcon = isInternal ? '👩‍🏫' : '🏥';
-            if (ref.targetAgency?.includes('นางฟ้า')) agencyIcon = '🧚‍♀️';
-            else if (ref.targetAgency?.includes('โรงพยาบาล')) agencyIcon = '🏥';
+            if (ref.targetAgency?.includes('กิจการนักเรียน') || ref.targetAgency?.includes('ปกครอง')) agencyIcon = '👮';
+            else if (ref.targetAgency?.includes('นางฟ้า')) agencyIcon = '🧚‍♀️';
+            else if (ref.targetAgency?.includes('แนะแนว')) agencyIcon = '👩‍🏫';
+            else if (ref.targetAgency?.includes('โรงพยาบาล') || ref.targetAgency?.includes('รพ')) agencyIcon = '🏥';
             else if (ref.targetAgency?.includes('สาธารณสุข')) agencyIcon = '🩺';
             else if (ref.targetAgency?.includes('พม')) agencyIcon = '🏛️';
             else if (ref.targetAgency?.includes('ตำรวจ')) agencyIcon = '👮';
