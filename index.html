@@ -19,8 +19,8 @@
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Custom Design System v5.5 -->
-    <link rel="stylesheet" href="css/style.css?v=5.5">
+    <!-- Custom Design System v5.6 -->
+    <link rel="stylesheet" href="css/style.css?v=5.6">
 </head>
 <body data-theme="indigo">
     <!-- DEDICATED FULLSCREEN LOGIN PAGE (Matching User Reference Image Design) -->
@@ -1387,7 +1387,12 @@
             <form id="form-screening">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">เลือนักเรียนผู้รับการคัดกรอง *</label>
+                        <label class="form-label">เลือกนักเรียนผู้รับการคัดกรอง *</label>
+                        <div class="student-search-box-wrap" style="position: relative; margin-bottom: 6px;">
+                            <i class="ri-search-line" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 1rem; pointer-events: none;"></i>
+                            <input type="text" class="form-control student-search-input" id="screening-student-search" placeholder="🔍 พิมพ์ค้นหา ชื่อ, รหัสนักเรียน, หรือ ชั้น ม./ห้อง..." oninput="app.filterStudentSelect('screening-student-select', this.value)" style="padding-left: 32px; padding-right: 28px; font-size: 0.88rem; border-radius: 8px;">
+                            <button type="button" class="btn-clear-student-search" onclick="app.clearStudentSearch('screening-student-search', 'screening-student-select')" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-dim); cursor: pointer; display: none; font-size: 1rem;"><i class="ri-close-circle-fill"></i></button>
+                        </div>
                         <select class="form-select" id="screening-student-select" required></select>
                     </div>
 
@@ -1450,7 +1455,12 @@
                     </div>
 
                     <div class="form-group" style="margin-bottom: 20px;">
-                        <label class="form-label" style="font-weight: 700;">เลือนักเรียนผู้รับการประเมิน *</label>
+                        <label class="form-label" style="font-weight: 700;">เลือกนักเรียนผู้รับการประเมิน *</label>
+                        <div class="student-search-box-wrap" style="position: relative; margin-bottom: 6px;">
+                            <i class="ri-search-line" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 1rem; pointer-events: none;"></i>
+                            <input type="text" class="form-control student-search-input" id="dep-student-search" placeholder="🔍 พิมพ์ค้นหา ชื่อ, รหัสนักเรียน, หรือ ชั้น ม./ห้อง..." oninput="app.filterStudentSelect('dep-student-select', this.value)" style="padding-left: 32px; padding-right: 28px; font-size: 0.88rem; border-radius: 8px;">
+                            <button type="button" class="btn-clear-student-search" onclick="app.clearStudentSearch('dep-student-search', 'dep-student-select')" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-dim); cursor: pointer; display: none; font-size: 1rem;"><i class="ri-close-circle-fill"></i></button>
+                        </div>
                         <select class="form-select" id="dep-student-select" required></select>
                     </div>
 
@@ -1604,7 +1614,12 @@
             <form id="form-offense">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">เลือนักเรียนผู้กระทำความผิด *</label>
+                        <label class="form-label">เลือกนักเรียนผู้กระทำความผิด *</label>
+                        <div class="student-search-box-wrap" style="position: relative; margin-bottom: 6px;">
+                            <i class="ri-search-line" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 1rem; pointer-events: none;"></i>
+                            <input type="text" class="form-control student-search-input" id="offense-student-search" placeholder="🔍 พิมพ์ค้นหา ชื่อ, รหัสนักเรียน, หรือ ชั้น ม./ห้อง..." oninput="app.filterStudentSelect('offense-student-select', this.value)" style="padding-left: 32px; padding-right: 28px; font-size: 0.88rem; border-radius: 8px;">
+                            <button type="button" class="btn-clear-student-search" onclick="app.clearStudentSearch('offense-student-search', 'offense-student-select')" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-dim); cursor: pointer; display: none; font-size: 1rem;"><i class="ri-close-circle-fill"></i></button>
+                        </div>
                         <select class="form-select" id="offense-student-select" required></select>
                     </div>
 
@@ -1695,7 +1710,12 @@
             <form id="form-merit">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">นักเรียนผู้ทำความดี *</label>
+                        <label class="form-label">เลือกนักเรียนผู้ทำความดี *</label>
+                        <div class="student-search-box-wrap" style="position: relative; margin-bottom: 6px;">
+                            <i class="ri-search-line" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 1rem; pointer-events: none;"></i>
+                            <input type="text" class="form-control student-search-input" id="merit-student-search" placeholder="🔍 พิมพ์ค้นหา ชื่อ, รหัสนักเรียน, หรือ ชั้น ม./ห้อง..." oninput="app.filterStudentSelect('merit-student-select', this.value)" style="padding-left: 32px; padding-right: 28px; font-size: 0.88rem; border-radius: 8px;">
+                            <button type="button" class="btn-clear-student-search" onclick="app.clearStudentSearch('merit-student-search', 'merit-student-select')" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-dim); cursor: pointer; display: none; font-size: 1rem;"><i class="ri-close-circle-fill"></i></button>
+                        </div>
                         <select class="form-select" id="merit-student-select" required></select>
                     </div>
                     <div class="form-group">
@@ -1731,7 +1751,12 @@
                 <input type="hidden" id="ref-screening-id">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label class="form-label">นักเรียน *</label>
+                        <label class="form-label">เลือกนักเรียนที่ต้องการส่งต่อ *</label>
+                        <div class="student-search-box-wrap" style="position: relative; margin-bottom: 6px;">
+                            <i class="ri-search-line" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 1rem; pointer-events: none;"></i>
+                            <input type="text" class="form-control student-search-input" id="ref-student-search" placeholder="🔍 พิมพ์ค้นหา ชื่อ, รหัสนักเรียน, หรือ ชั้น ม./ห้อง..." oninput="app.filterStudentSelect('ref-student-select', this.value)" style="padding-left: 32px; padding-right: 28px; font-size: 0.88rem; border-radius: 8px;">
+                            <button type="button" class="btn-clear-student-search" onclick="app.clearStudentSearch('ref-student-search', 'ref-student-select')" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-dim); cursor: pointer; display: none; font-size: 1rem;"><i class="ri-close-circle-fill"></i></button>
+                        </div>
                         <select class="form-select" id="ref-student-select" required></select>
                     </div>
                     <div class="form-group">
@@ -2061,12 +2086,12 @@
     </div>
 
     <!-- Load Application Scripts -->
-    <script src="js/config.js?v=5.5"></script>
-    <script src="js/firebase-service.js?v=5.5"></script>
-    <script src="js/cloudinary-service.js?v=5.5"></script>
-    <script src="js/pdf-generator.js?v=5.5"></script>
-    <script src="js/csv-importer.js?v=5.5"></script>
-    <script src="js/auth.js?v=5.5"></script>
-    <script src="js/app.js?v=5.5"></script>
+    <script src="js/config.js?v=5.6"></script>
+    <script src="js/firebase-service.js?v=5.6"></script>
+    <script src="js/cloudinary-service.js?v=5.6"></script>
+    <script src="js/pdf-generator.js?v=5.6"></script>
+    <script src="js/csv-importer.js?v=5.6"></script>
+    <script src="js/auth.js?v=5.6"></script>
+    <script src="js/app.js?v=5.6"></script>
 </body>
 </html>

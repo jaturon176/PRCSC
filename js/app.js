@@ -1036,6 +1036,17 @@ class Application {
         if (modal) {
             modal.classList.add('active');
             document.body.classList.add('modal-open');
+
+            // Reset student search inputs inside this modal
+            const searchInputs = modal.querySelectorAll('.student-search-input');
+            searchInputs.forEach(input => {
+                input.value = '';
+            });
+            const clearBtns = modal.querySelectorAll('.btn-clear-student-search');
+            clearBtns.forEach(btn => {
+                btn.style.display = 'none';
+            });
+            this.updateStudentDropdowns();
         }
     }
     closeModal(id) {
@@ -1051,20 +1062,77 @@ class Application {
 
     updateStudentDropdowns() {
         const students = firebaseService.getStudents();
-        const dropdowns = ['screening-student-select', 'offense-student-select', 'merit-student-select', 'ref-student-select'];
+        const dropdowns = ['screening-student-select', 'offense-student-select', 'merit-student-select', 'ref-student-select', 'dep-student-select'];
 
         dropdowns.forEach(id => {
             const el = document.getElementById(id);
             if (el) {
-                el.innerHTML = '<option value="">-- เลือนักเรียน --</option>';
+                const currentVal = el.value;
+                el.innerHTML = '<option value="">-- เลือกนักเรียน --</option>';
                 students.forEach(s => {
                     const opt = document.createElement('option');
                     opt.value = s.studentId || s.id;
-                    opt.textContent = `[${s.grade}/${s.room}] ${s.prefix || ''}${s.fullName} (รหัส ${s.studentId})`;
+                    opt.textContent = `[${s.grade}/${s.room}] ${s.prefix || ''}${s.fullName || s.name} (รหัส ${s.studentId})`;
                     el.appendChild(opt);
                 });
+                if (currentVal) el.value = currentVal;
             }
         });
+    }
+
+    /**
+     * Filter Student Select Dropdown by typing in search input
+     */
+    filterStudentSelect(selectId, query) {
+        const el = document.getElementById(selectId);
+        if (!el) return;
+
+        // Toggle clear button
+        const parentWrap = el.closest('.form-group') || el.parentElement;
+        const clearBtn = parentWrap?.querySelector('.btn-clear-student-search');
+        if (clearBtn) {
+            clearBtn.style.display = query && query.trim() ? 'block' : 'none';
+        }
+
+        const students = firebaseService.getStudents();
+        const currentVal = el.value;
+        const q = (query || '').trim().toLowerCase();
+
+        el.innerHTML = '<option value="">-- เลือกนักเรียน --</option>';
+
+        let matchCount = 0;
+        let firstMatchId = null;
+
+        students.forEach(s => {
+            const sName = `${s.prefix || ''}${s.fullName || s.name || ''}`.toLowerCase();
+            const sId = `${s.studentId || s.id || ''}`.toLowerCase();
+            const sGrade = `${s.grade || ''}/${s.room || ''}`.toLowerCase();
+            const sFull = `[${s.grade}/${s.room}] ${s.prefix || ''}${s.fullName || s.name} (รหัส ${s.studentId})`.toLowerCase();
+
+            if (!q || sFull.includes(q) || sName.includes(q) || sId.includes(q) || sGrade.includes(q)) {
+                const opt = document.createElement('option');
+                opt.value = s.studentId || s.id;
+                opt.textContent = `[${s.grade}/${s.room}] ${s.prefix || ''}${s.fullName || s.name} (รหัส ${s.studentId})`;
+                el.appendChild(opt);
+                matchCount++;
+                if (!firstMatchId) firstMatchId = opt.value;
+            }
+        });
+
+        if (currentVal && Array.from(el.options).some(o => o.value === currentVal)) {
+            el.value = currentVal;
+        } else if (q && matchCount === 1 && firstMatchId) {
+            el.value = firstMatchId;
+        }
+    }
+
+    /**
+     * Clear Student Search Input and reset options
+     */
+    clearStudentSearch(inputId, selectId) {
+        const input = document.getElementById(inputId);
+        if (input) input.value = '';
+        this.filterStudentSelect(selectId, '');
     }
 
     // --- Render Dashboard Analytics & Futuristic Charts ---
@@ -1850,19 +1918,22 @@ class Application {
         const user = authManager.getCurrentUser();
         const students = firebaseService.getStudents();
         const select = document.getElementById('screening-student-select');
+        const searchWrap = document.getElementById('screening-student-search')?.closest('.student-search-box-wrap');
         if (select) {
             select.innerHTML = '<option value="">-- เลือกนักเรียน --</option>';
             students.forEach(s => {
                 const opt = document.createElement('option');
                 opt.value = s.studentId || s.id;
-                opt.textContent = `[${s.grade}/${s.room}] ${s.prefix || ''}${s.fullName || s.name} (${s.studentId || ''})`;
+                opt.textContent = `[${s.grade}/${s.room}] ${s.prefix || ''}${s.fullName || s.name} (รหัส ${s.studentId || ''})`;
                 select.appendChild(opt);
             });
             if (user && user.role === 'student') {
                 select.value = user.studentId || user.id;
                 select.disabled = true;
+                if (searchWrap) searchWrap.style.display = 'none';
             } else {
                 select.disabled = false;
+                if (searchWrap) searchWrap.style.display = 'block';
             }
         }
         this.openModal('modal-screening');
@@ -1872,19 +1943,22 @@ class Application {
         const user = authManager.getCurrentUser();
         const students = firebaseService.getStudents();
         const select = document.getElementById('dep-student-select');
+        const searchWrap = document.getElementById('dep-student-search')?.closest('.student-search-box-wrap');
         if (select) {
             select.innerHTML = '<option value="">-- เลือกนักเรียน --</option>';
             students.forEach(s => {
                 const opt = document.createElement('option');
                 opt.value = s.studentId || s.id;
-                opt.textContent = `[${s.grade}/${s.room}] ${s.prefix || ''}${s.fullName || s.name} (${s.studentId || ''})`;
+                opt.textContent = `[${s.grade}/${s.room}] ${s.prefix || ''}${s.fullName || s.name} (รหัส ${s.studentId || ''})`;
                 select.appendChild(opt);
             });
             if (user && user.role === 'student') {
                 select.value = user.studentId || user.id;
                 select.disabled = true;
+                if (searchWrap) searchWrap.style.display = 'none';
             } else {
                 select.disabled = false;
+                if (searchWrap) searchWrap.style.display = 'block';
             }
         }
         for (let i = 1; i <= 9; i++) {
