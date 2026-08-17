@@ -46,6 +46,7 @@ class Application {
         this.renderMerits();
         this.renderOffenses();
         this.renderReferrals();
+        this.updateReferralAgencyOptions('internal');
 
         // 6. Realtime Listeners for Data Updates
         window.addEventListener('studentsUpdated', () => {
@@ -881,8 +882,17 @@ class Application {
             this.showToast('บันทึกการทำความดีสำเร็จ! ⭐', 'success');
         });
 
+        // Referral Type Change -> Dynamic Agency Dropdown Options
+        document.getElementById('ref-type')?.addEventListener('change', (e) => {
+            this.updateReferralAgencyOptions(e.target.value);
+        });
+
         // Referral Form Submit
-        document.getElementById('btn-open-referral')?.addEventListener('click', () => this.openModal('modal-referral'));
+        document.getElementById('btn-open-referral')?.addEventListener('click', () => {
+            const currentType = document.getElementById('ref-type')?.value || 'internal';
+            this.updateReferralAgencyOptions(currentType);
+            this.openModal('modal-referral');
+        });
         document.getElementById('form-referral')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const studentId = document.getElementById('ref-student-select').value;
@@ -1951,10 +1961,7 @@ class Application {
             refTypeEl.value = 'external'; // Default to external hospital / msdhs referral
         }
 
-        const refAgencyEl = document.getElementById('ref-agency');
-        if (refAgencyEl) {
-            refAgencyEl.value = 'โรงพยาบาลพนมดงรัก / สาธารณสุข / พม.';
-        }
+        this.updateReferralAgencyOptions('external', 'โรงพยาบาลพนมดงรัก');
 
         const isRisk = scr.extRisk?.isSuicideRisk || (scr.qScores && scr.qScores[8] > 0);
         let riskText = '';
@@ -1968,6 +1975,51 @@ class Application {
         }
 
         this.openModal('modal-referral');
+    }
+
+    /**
+     * Update Agency / Recipient dropdown options based on referral type (internal vs external)
+     */
+    updateReferralAgencyOptions(type = 'internal', defaultVal = '') {
+        const agencySelect = document.getElementById('ref-agency');
+        if (!agencySelect) return;
+
+        agencySelect.innerHTML = '';
+        let options = [];
+
+        if (type === 'internal') {
+            options = [
+                { value: 'ครูแนะแนว', label: '👩‍🏫 1. ครูแนะแนว' },
+                { value: 'ครูนางฟ้า', label: '🧚‍♀️ 2. ครูนางฟ้า' }
+            ];
+        } else {
+            options = [
+                { value: 'โรงพยาบาลพนมดงรัก', label: '🏥 1. โรงพยาบาลพนมดงรัก' },
+                { value: 'สาธารณสุข', label: '🩺 2. สาธารณสุข' },
+                { value: 'พม.', label: '🏛️ 3. พม. (พัฒนาสังคมและความมั่นคงของมนุษย์)' }
+            ];
+        }
+
+        options.forEach((opt, idx) => {
+            const optionEl = document.createElement('option');
+            optionEl.value = opt.value;
+            optionEl.textContent = opt.label;
+            if (defaultVal && (defaultVal === opt.value || defaultVal.includes(opt.value))) {
+                optionEl.selected = true;
+            } else if (!defaultVal && idx === 0) {
+                optionEl.selected = true;
+            }
+            agencySelect.appendChild(optionEl);
+        });
+
+        // If custom defaultVal was provided and not matched, add it
+        if (defaultVal && !options.some(o => o.value === defaultVal || defaultVal.includes(o.value))) {
+            const customOpt = document.createElement('option');
+            customOpt.value = defaultVal;
+            customOpt.textContent = defaultVal;
+            customOpt.selected = true;
+            agencySelect.appendChild(customOpt);
+        }
     }
 
     renderMerits() {
