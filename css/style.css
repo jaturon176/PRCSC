@@ -1980,16 +1980,143 @@ a { text-decoration: none; color: inherit; }
         flex: 1 !important;
     }
 
-    .login-card { flex-direction: column; max-width: 440px; min-height: auto; width: 100%; border-radius: 20px; }
-    .login-left-banner { width: 100%; padding: 18px 20px; }
+    /* Responsive Login Screen for Mobile / Tablets */
+    #login-screen-view {
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding: 12px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .login-card {
+        flex-direction: column;
+        max-width: 410px;
+        min-height: auto;
+        width: 100%;
+        border-radius: 18px;
+        box-shadow: 0 12px 36px rgba(30, 27, 75, 0.16);
+        border: 1px solid rgba(99, 102, 241, 0.15);
+        margin: auto;
+        overflow: hidden;
+    }
+
+    .login-left-banner {
+        width: 100%;
+        padding: 14px 18px;
+        flex-direction: row;
+        gap: 12px;
+        justify-content: center;
+        align-items: center;
+        text-align: left;
+    }
+
+    .login-left-banner .login-logo-wrapper {
+        margin-bottom: 0;
+        flex-shrink: 0;
+    }
+
+    .login-left-banner .login-logo-img {
+        width: 42px;
+        height: 42px;
+        max-height: 42px;
+        filter: drop-shadow(0 3px 8px rgba(0,0,0,0.3));
+    }
+
+    .login-left-banner .login-title-main {
+        font-size: 1.25rem;
+        margin: 0;
+        text-align: left;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+    }
+
+    .login-left-banner .login-title-sub {
+        font-size: 0.78rem;
+        margin: 0;
+        text-align: left;
+        line-height: 1.25;
+        color: rgba(224, 231, 255, 0.88);
+    }
+
     .login-left-banner .login-features-header,
     .login-left-banner .login-feature-item,
     .login-left-banner .login-divider,
-    .login-left-banner .login-banner-copyright { display: none !important; }
-    .login-left-banner .login-logo-img { width: 48px; height: 48px; }
-    .login-left-banner .login-title-main { font-size: 1.3rem; margin-top: 4px; }
-    .login-left-banner .login-title-sub { font-size: 0.8rem; margin-top: 2px; }
-    .login-right-form { padding: 22px 20px 26px; }
+    .login-left-banner .login-banner-copyright {
+        display: none !important;
+    }
+
+    /* Right Form Area on Mobile */
+    .login-right-form {
+        padding: 18px 18px 20px 18px;
+    }
+
+    .login-form-icon-wrapper {
+        display: none !important;
+    }
+
+    .login-form-top-group {
+        margin-bottom: 14px !important;
+    }
+
+    .login-form-heading {
+        font-size: 1.35rem !important;
+        font-weight: 800 !important;
+        margin: 0 0 3px 0 !important;
+    }
+
+    .login-form-subheading {
+        font-size: 0.80rem !important;
+        margin: 0 !important;
+    }
+
+    .light-field-group {
+        margin-bottom: 12px !important;
+    }
+
+    .light-field-label {
+        font-size: 0.82rem !important;
+        margin-bottom: 4px !important;
+        font-weight: 700 !important;
+    }
+
+    .light-field-input {
+        padding: 10px 42px 10px 13px !important;
+        font-size: 0.92rem !important;
+        border-radius: 10px !important;
+    }
+
+    .password-toggle-btn {
+        right: 12px;
+        font-size: 1.15rem;
+        padding: 4px;
+    }
+
+    #login-role-hint-badge {
+        padding: 8px 10px !important;
+        font-size: 0.75rem !important;
+        line-height: 1.45 !important;
+        margin-bottom: 14px !important;
+        border-radius: 8px !important;
+    }
+
+    .btn-signin-submit {
+        padding: 11px 16px !important;
+        font-size: 0.96rem !important;
+        border-radius: 10px !important;
+        min-height: 44px !important;
+        margin-top: 2px !important;
+    }
+
+    .login-security-badge {
+        margin-top: 12px !important;
+        font-size: 0.72rem !important;
+    }
+
+    .desktop-only {
+        display: none !important;
+    }
 }
 
 @media (max-width: 480px) {

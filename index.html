@@ -19,8 +19,8 @@
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Custom Design System v5.2 -->
-    <link rel="stylesheet" href="css/style.css?v=5.2">
+    <!-- Custom Design System v5.3 -->
+    <link rel="stylesheet" href="css/style.css?v=5.3">
 </head>
 <body data-theme="indigo">
     <!-- DEDICATED FULLSCREEN LOGIN PAGE (Matching User Reference Image Design) -->
@@ -31,8 +31,10 @@
                 <div class="login-logo-wrapper">
                     <img src="assets/logo_prcare.png" alt="PR Care+ Logo" class="login-logo-img">
                 </div>
-                <h1 class="login-title-main">PR Care+</h1>
-                <div class="login-title-sub">ระบบดูแลช่วยเหลือนักเรียน<br>โรงเรียนพนมดงรักวิทยา</div>
+                <div class="login-brand-text-group">
+                    <h1 class="login-title-main">PR Care+</h1>
+                    <div class="login-title-sub">ระบบดูแลช่วยเหลือนักเรียน<br class="desktop-only"> โรงเรียนพนมดงรักวิทยา</div>
+                </div>
 
                 <div class="login-divider"></div>
 
@@ -63,12 +65,12 @@
             <!-- Right Form Side -->
             <div class="login-right-form">
                 <!-- Login Icon & Header (centered) -->
-                <div style="text-align: center; margin-bottom: 24px;">
-                    <div style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border-radius: 20px; background: linear-gradient(135deg, #0284c7 0%, #6366f1 100%); box-shadow: 0 8px 24px rgba(99,102,241,0.25); margin-bottom: 14px;">
-                        <i class="ri-login-circle-line" style="font-size: 2rem; color: #fff;"></i>
+                <div class="login-form-top-group" style="text-align: center; margin-bottom: 22px;">
+                    <div class="login-form-icon-wrapper" style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 18px; background: linear-gradient(135deg, #0284c7 0%, #6366f1 100%); box-shadow: 0 8px 24px rgba(99,102,241,0.25); margin-bottom: 12px;">
+                        <i class="ri-login-circle-line" style="font-size: 1.9rem; color: #fff;"></i>
                     </div>
-                    <h2 class="login-form-heading" style="text-align: center; margin: 0 0 6px 0;">เข้าสู่ระบบ</h2>
-                    <div class="login-form-subheading" style="text-align: center; font-size: 0.88rem;">กรอกชื่อผู้ใช้และรหัสผ่านเพื่อเข้าใช้งานระบบ PR Care+</div>
+                    <h2 class="login-form-heading" style="text-align: center; margin: 0 0 4px 0;">เข้าสู่ระบบ</h2>
+                    <div class="login-form-subheading" style="text-align: center; font-size: 0.86rem; color: var(--text-muted);">กรอกชื่อผู้ใช้และรหัสผ่านเพื่อเข้าใช้งานระบบ PR Care+</div>
                 </div>
 
                 <form id="standalone-login-form">
@@ -79,7 +81,7 @@
                             <i class="ri-user-3-line" style="color: #0284c7;"></i> ชื่อผู้ใช้งาน (Username)
                         </label>
                         <div class="light-field-input-wrap">
-                            <input type="text" class="light-field-input" id="page-login-user" placeholder="เบอร์โทรศัพท์ (ครู) / รหัสนักเรียน / Admin" required>
+                            <input type="text" class="light-field-input" id="page-login-user" placeholder="เบอร์โทรศัพท์ (ครู) / รหัสนักเรียน" required autocomplete="username">
                         </div>
                     </div>
 
@@ -88,14 +90,14 @@
                             <i class="ri-lock-2-line" style="color: #0284c7;"></i> รหัสผ่าน (Password)
                         </label>
                         <div class="light-field-input-wrap">
-                            <input type="password" class="light-field-input" id="page-login-pass" placeholder="เบอร์โทรศัพท์ (ครู) / รหัสนักเรียน / Admin" required>
-                            <button type="button" class="password-toggle-btn" onclick="app.togglePasswordVisibility('page-login-pass', this)"><i class="ri-eye-line"></i></button>
+                            <input type="password" class="light-field-input" id="page-login-pass" placeholder="รหัสผ่านเข้าใช้งาน" required autocomplete="current-password">
+                            <button type="button" class="password-toggle-btn" onclick="app.togglePasswordVisibility('page-login-pass', this)" aria-label="Toggle Password Visibility"><i class="ri-eye-line"></i></button>
                         </div>
                     </div>
 
-                    <div id="login-role-hint-badge" style="background: rgba(2, 132, 199, 0.07); border: 1px solid rgba(2, 132, 199, 0.18); border-radius: 10px; padding: 10px 14px; font-size: 0.82rem; color: #0369a1; margin-bottom: 18px; line-height: 1.6;">
+                    <div id="login-role-hint-badge" style="background: rgba(2, 132, 199, 0.07); border: 1px solid rgba(2, 132, 199, 0.18); border-radius: 10px; padding: 10px 14px; font-size: 0.82rem; color: #0369a1; margin-bottom: 18px; line-height: 1.55;">
                         <div style="font-weight: 700; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-                            <i class="ri-information-fill" style="color: #0284c7; font-size: 1rem;"></i> รูปแบบการลงชื่อเข้าใช้งาน:
+                            <i class="ri-information-fill" style="color: #0284c7; font-size: 0.95rem;"></i> รูปแบบการลงชื่อเข้าใช้งาน:
                         </div>
                         • <strong>ครู / บุคลากร:</strong> ใช้ <u>เบอร์โทรศัพท์</u> เป็นชื่อผู้ใช้และรหัสผ่าน<br>
                         • <strong>นักเรียน:</strong> ใช้ <u>รหัสประจำตัวนักเรียน</u> เป็นชื่อผู้ใช้และรหัสผ่าน
@@ -106,9 +108,9 @@
                     </button>
                 </form>
 
-                <div class="login-security-badge" style="justify-content: center; margin-top: 20px;">
+                <div class="login-security-badge" style="justify-content: center; margin-top: 18px;">
                     <i class="ri-shield-check-line" style="color: #0284c7;"></i>
-                    <span style="font-size: 0.78rem; color: var(--text-muted);">256-Bit Encrypted Realtime Cloud Security System (Firebase DB)</span>
+                    <span style="font-size: 0.76rem; color: var(--text-muted);">256-Bit Encrypted Realtime Cloud Security</span>
                 </div>
             </div>
         </div>
@@ -2059,12 +2061,12 @@
     </div>
 
     <!-- Load Application Scripts -->
-    <script src="js/config.js?v=5.2"></script>
-    <script src="js/firebase-service.js?v=5.2"></script>
-    <script src="js/cloudinary-service.js?v=5.2"></script>
-    <script src="js/pdf-generator.js?v=5.2"></script>
-    <script src="js/csv-importer.js?v=5.2"></script>
-    <script src="js/auth.js?v=5.2"></script>
-    <script src="js/app.js?v=5.2"></script>
+    <script src="js/config.js?v=5.3"></script>
+    <script src="js/firebase-service.js?v=5.3"></script>
+    <script src="js/cloudinary-service.js?v=5.3"></script>
+    <script src="js/pdf-generator.js?v=5.3"></script>
+    <script src="js/csv-importer.js?v=5.3"></script>
+    <script src="js/auth.js?v=5.3"></script>
+    <script src="js/app.js?v=5.3"></script>
 </body>
 </html>
