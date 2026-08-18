@@ -19,8 +19,8 @@
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Custom Design System v5.8 -->
-    <link rel="stylesheet" href="css/style.css?v=5.8">
+    <!-- Custom Design System v5.9 -->
+    <link rel="stylesheet" href="css/style.css?v=5.9">
 </head>
 <body data-theme="indigo">
     <!-- DEDICATED FULLSCREEN LOGIN PAGE (Matching User Reference Image Design) -->
@@ -153,10 +153,10 @@
 
                 <div class="header-right">
                     <div class="user-profile-card">
-                        <div class="user-avatar-upload-wrapper" onclick="document.getElementById('user-avatar-file-input').click()" title="คลิกเพื่อเปลี่ยนรูปโปรไฟล์">
+                        <div class="user-avatar-upload-wrapper" title="แตะหรือคลิกเพื่อเปลี่ยนรูปโปรไฟล์">
+                            <input type="file" id="user-avatar-file-input" accept="image/*,.heic,.heif,.jpg,.jpeg,.png,.webp" title="เปลี่ยนรูปโปรไฟล์">
                             <img src="https://api.dicebear.com/7.x/bottts/svg?seed=teacher" class="user-avatar" id="user-avatar" alt="Avatar">
                             <div class="user-avatar-edit-overlay" title="อัปโหลดรูปโปรไฟล์"><i class="ri-camera-fill"></i></div>
-                            <input type="file" id="user-avatar-file-input" accept="image/*" style="display: none;">
                         </div>
                         <div class="user-info">
                             <div class="user-name" id="user-profile-name">ครูผู้ใช้งานระบบ</div>
@@ -1371,12 +1371,12 @@
                         <i class="ri-information-line"></i> หัวคอลัมน์ที่รองรับ:
                         <code style="background: white; padding: 3px 8px; border-radius: 6px; font-weight: 700; margin-left: 4px;">เลขที่, รหัสประจำตัว, ชื่อ-สกุล, ระดับชั้น, ครูที่ปรึกษา</code>
                     </div>
-                    <div class="drop-zone" id="student-csv-drop-zone" onclick="document.getElementById('csv-file-input').click()">
+                    <div class="drop-zone" id="student-csv-drop-zone">
+                        <input type="file" id="csv-file-input" accept=".csv" multiple required title="แตะหรือคลิกเพื่อเลือกไฟล์ CSV">
                         <div class="drop-zone-icon"><i class="ri-file-excel-2-line"></i></div>
                         <div class="drop-zone-title">ลากไฟล์ CSV มาวางที่นี่ (เลือกหลายไฟล์ได้)</div>
-                        <div class="drop-zone-sub">หรือ <span>คลิกเพื่อเลือกไฟล์</span> (สามารถเลือกได้หลายไฟล์พร้อมกัน)</div>
+                        <div class="drop-zone-sub">หรือ <span style="text-decoration: underline; color: var(--indigo-600); font-weight: 600;">แตะ/คลิกเพื่อเลือกไฟล์</span> (สามารถเลือกได้หลายไฟล์พร้อมกัน)</div>
                         <div class="drop-zone-formats"><i class="ri-file-list-3-line"></i> รองรับไฟล์ .CSV ทั้งแบบไฟล์เดียวและหลายไฟล์พร้อมกัน</div>
-                        <input type="file" id="csv-file-input" accept=".csv" multiple required style="display: none;">
                     </div>
                     <div id="student-csv-selected-file" style="display:none; margin-top:12px; padding:10px 14px; background:var(--indigo-50); border:1px solid var(--indigo-100); border-radius:10px; font-size:0.88rem; color:var(--indigo-700);">
                         <i class="ri-file-check-line"></i> <span id="student-csv-filename">ไม่มีไฟล์ที่เลือก</span>
@@ -1749,12 +1749,12 @@
 
                     <div class="form-group">
                         <label class="form-label">อัปโหลดรูปภาพหลักฐาน (Cloudinary CDN / Base64)</label>
-                        <div class="drop-zone image-drop-zone" id="offense-drop-zone" onclick="document.getElementById('offense-file-input').click()">
+                        <div class="drop-zone image-drop-zone" id="offense-drop-zone">
+                            <input type="file" id="offense-file-input" accept="image/*,.heic,.heif,.jpg,.jpeg,.png,.webp" title="แตะหรือคลิกเพื่อเลือกรูปภาพหลักฐาน">
                             <div class="drop-zone-icon"><i class="ri-camera-line"></i></div>
                             <div class="drop-zone-title">ลากรูปภาพมาวางที่นี่</div>
-                            <div class="drop-zone-sub">หรือ <span>คลิกเพื่อเลือกไฟล์รูปภาพหลักฐาน</span></div>
-                            <div class="drop-zone-formats"><i class="ri-image-line"></i> JPG, PNG, WEBP</div>
-                            <input type="file" id="offense-file-input" accept="image/*" style="display: none;">
+                            <div class="drop-zone-sub">หรือ <span style="text-decoration: underline; color: var(--indigo-600); font-weight: 600;">แตะ/คลิกเพื่อเลือกไฟล์รูปภาพ</span></div>
+                            <div class="drop-zone-formats"><i class="ri-image-line"></i> JPG, PNG, WEBP, HEIC (คลังรูปภาพ iPad/iPhone/กล้อง)</div>
                         </div>
                         <img id="offense-image-preview" class="preview-img" style="display: none;" alt="Preview">
                     </div>
@@ -1979,12 +1979,12 @@
             </div>
             <form id="form-teacher-csv-import">
                 <div class="modal-body">
-                    <div class="drop-zone" id="teacher-csv-drop-zone" onclick="document.getElementById('teacher-csv-file-input').click()">
+                    <div class="drop-zone" id="teacher-csv-drop-zone">
+                        <input type="file" id="teacher-csv-file-input" accept=".csv" multiple required title="แตะหรือคลิกเพื่อเลือกไฟล์ CSV">
                         <div class="drop-zone-icon"><i class="ri-file-excel-2-line"></i></div>
                         <div class="drop-zone-title">ลากไฟล์ CSV มาวางที่นี่ (เลือกหลายไฟล์ได้)</div>
-                        <div class="drop-zone-sub">หรือ <span>คลิกเพื่อเลือกไฟล์</span> (สามารถเลือกได้หลายไฟล์พร้อมกัน)</div>
+                        <div class="drop-zone-sub">หรือ <span style="text-decoration: underline; color: var(--indigo-600); font-weight: 600;">แตะ/คลิกเพื่อเลือกไฟล์</span> (สามารถเลือกได้หลายไฟล์พร้อมกัน)</div>
                         <div class="drop-zone-formats"><i class="ri-file-list-3-line"></i> รองรับไฟล์ .CSV ทั้งแบบไฟล์เดียวและหลายไฟล์พร้อมกัน</div>
-                        <input type="file" id="teacher-csv-file-input" accept=".csv" multiple required style="display: none;">
                     </div>
                     <div id="teacher-csv-selected-file" style="display:none; margin-top:12px; padding:10px 14px; background:var(--indigo-50); border:1px solid var(--indigo-100); border-radius:10px; font-size:0.88rem; color:var(--indigo-700); display:flex; align-items:center; gap:8px;">
                         <i class="ri-file-check-line"></i> <span id="teacher-csv-filename">ไม่มีไฟล์ที่เลือก</span>
@@ -2153,12 +2153,12 @@
     </div>
 
     <!-- Load Application Scripts -->
-    <script src="js/config.js?v=5.8"></script>
-    <script src="js/firebase-service.js?v=5.8"></script>
-    <script src="js/cloudinary-service.js?v=5.8"></script>
-    <script src="js/pdf-generator.js?v=5.8"></script>
-    <script src="js/csv-importer.js?v=5.8"></script>
-    <script src="js/auth.js?v=5.8"></script>
-    <script src="js/app.js?v=5.8"></script>
+    <script src="js/config.js?v=5.9"></script>
+    <script src="js/firebase-service.js?v=5.9"></script>
+    <script src="js/cloudinary-service.js?v=5.9"></script>
+    <script src="js/pdf-generator.js?v=5.9"></script>
+    <script src="js/csv-importer.js?v=5.9"></script>
+    <script src="js/auth.js?v=5.9"></script>
+    <script src="js/app.js?v=5.9"></script>
 </body>
 </html>

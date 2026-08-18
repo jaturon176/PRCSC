@@ -1286,6 +1286,27 @@ a { text-decoration: none; color: inherit; }
     background: linear-gradient(135deg, #fafafe 0%, #f5f4f9 100%);
     position: relative;
     overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.drop-zone input[type="file"],
+.user-avatar-upload-wrapper input[type="file"] {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    opacity: 0 !important;
+    cursor: pointer !important;
+    z-index: 10 !important;
+    display: block !important;
+    font-size: 0 !important;
+}
+
+.drop-zone .drop-zone-icon,
+.drop-zone .drop-zone-title,
+.drop-zone .drop-zone-sub,
+.drop-zone .drop-zone-formats {
+    pointer-events: none;
 }
 
 .drop-zone::before {
@@ -1384,6 +1405,8 @@ a { text-decoration: none; color: inherit; }
     cursor: pointer;
     transition: all 0.22s ease;
     background: var(--bg-subtle);
+    position: relative;
+    overflow: hidden;
 }
 .image-drop-zone:hover {
     border-color: var(--indigo-400);

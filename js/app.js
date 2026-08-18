@@ -792,24 +792,10 @@ class Application {
             this.openModal('modal-merit');
         });
 
-        // Offense Form & Image Drop Setup
+        // Offense Form & Modal Setup
         document.getElementById('btn-open-offense')?.addEventListener('click', () => {
-            document.getElementById('form-offense').reset();
-            document.getElementById('offense-image-preview').style.display = 'none';
-            this.selectedOffenseProofFile = null;
-            this.openModal('modal-offense');
+            this.openOffenseModal();
         });
-
-        const dropZone = document.getElementById('offense-drop-zone');
-        const fileInput = document.getElementById('offense-file-input');
-        if (dropZone && fileInput) {
-            dropZone.addEventListener('click', () => fileInput.click());
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) {
-                    this.handleOffenseImageSelect(e.target.files[0]);
-                }
-            });
-        }
 
         document.getElementById('form-offense')?.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1971,8 +1957,13 @@ class Application {
     openOffenseModal() {
         const form = document.getElementById('form-offense');
         if (form) form.reset();
+        const fileInput = document.getElementById('offense-file-input');
+        if (fileInput) fileInput.value = '';
         const preview = document.getElementById('offense-image-preview');
-        if (preview) preview.style.display = 'none';
+        if (preview) {
+            preview.style.display = 'none';
+            preview.src = '';
+        }
         this.selectedOffenseProofFile = null;
         this.openModal('modal-offense');
     }
